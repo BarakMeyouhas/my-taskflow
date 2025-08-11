@@ -1,6 +1,4 @@
 import React from 'react';
-import Header from './Header';
-import Sidebar from './Sidebar';
 import SearchBar from './SearchBar';
 import TaskBoard from './TaskBoard';
 
@@ -90,20 +88,14 @@ const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1">
-          <SearchBar />
-          <div className="p-6">
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold text-gray-900">Task Board</h1>
-              <p className="text-gray-600">Manage your team's tasks and track progress</p>
-            </div>
-            <TaskBoard tasks={sampleTasks} />
-          </div>
-        </main>
+    <div className="min-w-0">
+      <SearchBar />
+      <div className="p-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Task Board</h1>
+          <p className="text-gray-600">Manage your team&apos;s tasks and track progress</p>
+        </div>
+        <TaskBoard tasks={sampleTasks} />
       </div>
     </div>
   );
