@@ -5,4 +5,4 @@ export default function CalendarPage() {
       <p className="text-gray-600">View events and deadlines.</p>
     </div>
   );
-}
+

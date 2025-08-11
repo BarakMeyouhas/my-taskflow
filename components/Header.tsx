@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -10,7 +10,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const pathname = usePathname();
-  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+
 
   const navItems = [
     { href: '/', label: 'Dashboard' },
@@ -32,6 +32,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
             </div>
             <h1 className="text-xl font-bold text-gray-900">TaskFlow</h1>
           </div>
+
 
           {/* Mobile buttons */}
           <div className="flex items-center gap-1 lg:hidden">
@@ -57,6 +58,17 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               </svg>
             </button>
           </div>
+
+          {/* Mobile menu button */}
+          <button
+            className="lg:hidden p-2 text-gray-400 hover:text-gray-600 transition-colors"
+            aria-label="Toggle menu"
+            onClick={onMenuClick}
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
 
           {/* Navigation */}
           <nav className="hidden lg:flex space-x-2 flex-shrink-0">

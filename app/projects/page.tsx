@@ -5,4 +5,4 @@ export default function ProjectsPage() {
       <p className="text-gray-600">Browse and manage all projects here.</p>
     </div>
   );
-}
+
