@@ -17,7 +17,7 @@ const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 h-screen overflow-y-auto">
+    <aside className="w-64 shrink-0 bg-white border-r border-gray-200 h-[calc(100vh-4rem)] overflow-y-auto">
       {/* User Profile Section */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
