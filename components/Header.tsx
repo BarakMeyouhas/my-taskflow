@@ -1,6 +1,23 @@
-import React from 'react';
+"use client";
 
-const Header: React.FC = () => {
+import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+interface HeaderProps {
+  onMenuClick?: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
+  const pathname = usePathname();
+
+  const navItems = [
+    { href: '/', label: 'Dashboard' },
+    { href: '/projects', label: 'Projects' },
+    { href: '/calendar', label: 'Calendar' },
+    { href: '/reports', label: 'Reports' },
+  ];
+
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
       <div className="w-full px-4 sm:px-6 lg:px-8">
@@ -16,37 +33,45 @@ const Header: React.FC = () => {
           </div>
 
           {/* Mobile menu button */}
-          <button className="lg:hidden p-2 text-gray-400 hover:text-gray-600 transition-colors">
+          <button
+            className="lg:hidden p-2 text-gray-400 hover:text-gray-600 transition-colors"
+            aria-label="Toggle menu"
+            onClick={onMenuClick}
+          >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
 
-          {/* Navigation - Hidden on smaller screens to prevent crushing */}
-          <nav className="hidden lg:flex space-x-6 flex-shrink-0">
-            <a href="#" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap">
-              Dashboard
-            </a>
-            <a href="#" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap">
-              Projects
-            </a>
-            <a href="#" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap">
-              Calendar
-            </a>
-            <a href="#" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap">
-              Reports
-            </a>
+          {/* Navigation */}
+          <nav className="hidden lg:flex space-x-2 flex-shrink-0">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
+                    isActive
+                      ? 'text-blue-700 bg-blue-50'
+                      : 'text-gray-700 hover:text-blue-600'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* User Menu */}
           <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
             {/* Notifications */}
-            <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors relative">
+            <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors relative" aria-label="Notifications">
               <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
             </button>
 
             {/* User Avatar */}
