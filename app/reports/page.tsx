@@ -5,4 +5,4 @@ export default function ReportsPage() {
       <p className="text-gray-600">Generate and explore reports.</p>
     </div>
   );
-}
+
