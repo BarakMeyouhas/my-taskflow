@@ -3,6 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -10,6 +11,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const pathname = usePathname();
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
 
   const navItems = [
@@ -23,8 +25,18 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
     <header className="relative bg-white shadow-sm border-b border-gray-200">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 min-w-0">
-          {/* Logo and Brand */}
+          {/* Logo and Brand with Sidebar Toggle */}
           <div className="flex items-center space-x-3 flex-shrink-0">
+            {/* Sidebar toggle - mobile only */}
+            <button
+              className="lg:hidden p-2 text-gray-400 hover:text-gray-600 transition-colors"
+              aria-label="Toggle sidebar"
+              onClick={onMenuClick}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -33,20 +45,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
             <h1 className="text-xl font-bold text-gray-900">TaskFlow</h1>
           </div>
 
-
-          {/* Mobile buttons */}
+          {/* Mobile Navigation Toggle */}
           <div className="flex items-center gap-1 lg:hidden">
-            {/* Sidebar toggle */}
-            <button
-              className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-              aria-label="Toggle sidebar"
-              onClick={onMenuClick}
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-            {/* Navbar collapse toggle */}
             <button
               className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
               aria-label="Toggle navigation"
@@ -58,17 +58,6 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               </svg>
             </button>
           </div>
-
-          {/* Mobile menu button */}
-          <button
-            className="lg:hidden p-2 text-gray-400 hover:text-gray-600 transition-colors"
-            aria-label="Toggle menu"
-            onClick={onMenuClick}
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
 
           {/* Navigation */}
           <nav className="hidden lg:flex space-x-2 flex-shrink-0">

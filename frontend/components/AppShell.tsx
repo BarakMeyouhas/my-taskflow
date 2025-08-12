@@ -45,4 +45,6 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
   );
 };
 
+export default AppShell;
+
 
