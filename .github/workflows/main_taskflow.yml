@@ -21,7 +21,7 @@ jobs:
       - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
-          node-version: '22.x'
+          node-version: '20.x'
 
       - name: npm install, build, and test
         working-directory: ./frontend
@@ -45,7 +45,7 @@ jobs:
         working-directory: ./frontend
         shell: cmd
         run: |
-          # Remove development dependencies and source files
+          # Remove only development dependencies and logs
           rmdir /s /q node_modules
           rmdir /s /q .git
           del /q *.log
@@ -53,13 +53,6 @@ jobs:
           del /q .env.development.local
           del /q .env.test.local
           del /q .env.production.local
-          # Remove source files (keep only build output and configs)
-          rmdir /s /q app
-          rmdir /s /q components
-          rmdir /s /q contexts
-          del /q eslint.config.mjs
-          del /q next-env.d.ts
-          del /q postcss.config.mjs
       
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
