@@ -59,6 +59,17 @@ jobs:
         with:
           name: node-app
       
+      - name: Debug deployment package
+        run: |
+          echo "=== Deployment Package Contents ==="
+          ls -la
+          echo "=== Package.json contents ==="
+          cat package.json
+          echo "=== Next.js build files ==="
+          ls -la .next
+          echo "=== Public files ==="
+          ls -la public
+      
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
