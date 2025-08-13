@@ -33,22 +33,22 @@ jobs:
       - name: Prepare deployment package
         working-directory: ./frontend
         run: |
-          # Create a clean deployment directory
-          mkdir ..\deploy
+          # Create a clean deployment directory at workspace root
+          mkdir ..\deploy-package
           # Copy only the files needed for production
-          xcopy .next ..\deploy\.next /E /I /Y
-          xcopy public ..\deploy\public /E /I /Y
-          copy package.json ..\deploy\
-          copy package-lock.json ..\deploy\
-          copy next.config.ts ..\deploy\
-          copy tailwind.config.js ..\deploy\
-          copy tsconfig.json ..\deploy\
+          xcopy .next ..\deploy-package\.next /E /I /Y
+          xcopy public ..\deploy-package\public /E /I /Y
+          copy package.json ..\deploy-package\
+          copy package-lock.json ..\deploy-package\
+          copy next.config.ts ..\deploy-package\
+          copy tailwind.config.js ..\deploy-package\
+          copy tsconfig.json ..\deploy-package\
       
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: ..\deploy
+          path: deploy-package
 
   deploy:
     runs-on: ubuntu-latest
