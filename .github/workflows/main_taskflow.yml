@@ -52,5 +52,5 @@ jobs:
         with:
           app-name: 'TaskFlow'
           slot-name: 'Production'
-          package: ./frontend
+          package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3096CF908AD24070BB116DE0496C5F86 }}
