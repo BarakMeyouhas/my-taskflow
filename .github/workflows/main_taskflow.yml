@@ -24,16 +24,17 @@ jobs:
           node-version: '22.x'
 
       - name: npm install, build, and test
+        working-directory: ./frontend
         run: |
           npm install
-          npm run build --if-present
+          npm run build
           npm run test --if-present
       
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: .
+          path: ./frontend
 
   deploy:
     runs-on: ubuntu-latest
@@ -51,5 +52,5 @@ jobs:
         with:
           app-name: 'TaskFlow'
           slot-name: 'Production'
-          package: .
+          package: ./frontend
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3096CF908AD24070BB116DE0496C5F86 }}
