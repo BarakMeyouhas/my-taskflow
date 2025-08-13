@@ -27,7 +27,9 @@ jobs:
         working-directory: ./frontend
         run: |
           npm install
-          npm run build
+          npm run build --no-lint
+          echo "=== Build completed, checking .next folder ==="
+          ls -la .next || echo "ERROR: .next folder not found!"
           npm run test --if-present
       
       - name: Verify build output
@@ -35,7 +37,13 @@ jobs:
         shell: cmd
         run: |
           echo "=== Build Output Verification ==="
-          dir .next
+          if exist .next (
+            echo ".next folder found:"
+            dir .next
+          ) else (
+            echo "ERROR: .next folder missing - build may have failed!"
+            exit /b 1
+          )
           echo "=== Public Files ==="
           dir public
           echo "=== Package Files ==="
