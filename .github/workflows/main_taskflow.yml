@@ -27,28 +27,25 @@ jobs:
         working-directory: ./frontend
         shell: cmd
         run: |
+          echo "=== Installing dependencies ==="
           npm install
-          npm run build --no-lint || echo "Build failed, but continuing to check for .next folder"
-          echo "=== Build completed, checking .next folder ==="
-          dir .next || echo "ERROR: .next folder not found!"
-          npm run test --if-present
-      
-      - name: Verify build output
-        working-directory: ./frontend
-        shell: cmd
-        run: |
-          echo "=== Build Output Verification ==="
+          echo "=== Starting build process ==="
+          npm run build --no-lint
+          echo "=== Build process completed ==="
+          echo "=== Checking for .next folder ==="
           if exist .next (
             echo ".next folder found:"
             dir .next
           ) else (
-            echo "ERROR: .next folder missing - build may have failed!"
+            echo "ERROR: .next folder missing - build failed!"
+            echo "=== Checking what files exist ==="
+            dir
             exit /b 1
           )
-          echo "=== Public Files ==="
-          dir public
-          echo "=== Package Files ==="
-          dir package.json
+          echo "=== Running tests ==="
+          npm run test --if-present
+      
+
       
       - name: Clean up for deployment
         working-directory: ./frontend
