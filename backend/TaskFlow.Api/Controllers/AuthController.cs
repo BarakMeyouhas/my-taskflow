@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using TaskFlow.Api.Data;
 using TaskFlow.Api.Models;
 
 namespace TaskFlow.Api.Controllers
@@ -12,15 +13,39 @@ namespace TaskFlow.Api.Controllers
     public class AuthController : ControllerBase
     {
         [HttpPost("login")]
-        public IActionResult Login([FromBody] UserLoginRequest request)
+        public IActionResult Login(
+            [FromBody] UserLoginRequest request,
+            [FromServices] AppDbContext db
+        )
         {
-            // here for example we check against hardcoded values, in the future we will check against the database
-            if (request.Username == "admin" && request.Password == "1234")
+            // Find user in database
+            var user = db.Users.FirstOrDefault(u => u.Username == request.Username);
+
+            if (user == null)
             {
-                var token = GenerateJwtToken(request.Username);
-                return Ok(new { token });
+                return Unauthorized("Invalid username or password");
             }
-            return Unauthorized();
+
+            // Verify password hash
+            if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+            {
+                return Unauthorized("Invalid username or password");
+            }
+
+            // Generate token and return user info
+            var token = GenerateJwtToken(user.Username);
+            return Ok(
+                new
+                {
+                    token,
+                    user = new
+                    {
+                        id = user.Id,
+                        username = user.Username,
+                        email = user.Email,
+                    },
+                }
+            );
         }
 
         private string GenerateJwtToken(string username)
@@ -42,11 +67,49 @@ namespace TaskFlow.Api.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        [HttpPost("register")]
+        public IActionResult Register(
+            [FromBody] UserRegisterRequest request,
+            [FromServices] AppDbContext db
+        )
+        {
+            if (db.Users.Any(u => u.Username == request.Username))
+                return BadRequest("Username already exists");
+
+            var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+
+            var user = new User
+            {
+                Username = request.Username,
+                Email = request.Email,
+                PasswordHash = passwordHash,
+            };
+
+            db.Users.Add(user);
+            db.SaveChanges();
+
+            return Ok("User registered successfully");
+        }
+
+        public class UserRegisterRequest
+        {
+            public string Username { get; set; }
+            public string Email { get; set; }
+            public string Password { get; set; }
+        }
     }
 
     public class UserLoginRequest
     {
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+    }
+
+    public class UserRegisterRequest
+    {
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
     }
 }

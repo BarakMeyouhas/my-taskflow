@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
+import { useAuth } from "../contexts/AuthContext";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -10,6 +11,12 @@ interface AppShellProps {
 
 const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { isAuthenticated, isLoading } = useAuth();
+
+  // Don't render the shell for auth pages, landing page, or while loading
+  if (isLoading || !isAuthenticated) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -23,7 +30,7 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
         className={
           "fixed top-16 left-0 z-40 h-[calc(100vh-4rem)] w-64 transform border-r border-gray-200 bg-white transition-transform duration-200 ease-in-out " +
           (isSidebarOpen ? "translate-x-0" : "-translate-x-full") +
-          " lg:translate-x-0"
+          " lg:ml-64"
         }
       >
         <Sidebar />
