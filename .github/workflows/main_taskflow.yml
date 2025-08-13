@@ -30,6 +30,17 @@ jobs:
           npm run build
           npm run test --if-present
       
+      - name: Verify build output
+        working-directory: ./frontend
+        shell: cmd
+        run: |
+          echo "=== Build Output Verification ==="
+          dir .next
+          echo "=== Public Files ==="
+          dir public
+          echo "=== Package Files ==="
+          dir package.json
+      
       - name: Clean up for deployment
         working-directory: ./frontend
         shell: cmd
@@ -42,6 +53,13 @@ jobs:
           del /q .env.development.local
           del /q .env.test.local
           del /q .env.production.local
+          # Remove source files (keep only build output and configs)
+          rmdir /s /q app
+          rmdir /s /q components
+          rmdir /s /q contexts
+          del /q eslint.config.mjs
+          del /q next-env.d.ts
+          del /q postcss.config.mjs
       
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
