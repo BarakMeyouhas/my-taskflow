@@ -32,6 +32,7 @@ jobs:
       
       - name: Clean up for deployment
         working-directory: ./frontend
+        shell: cmd
         run: |
           # Remove development dependencies and source files
           rmdir /s /q node_modules
