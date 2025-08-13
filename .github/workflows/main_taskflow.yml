@@ -29,8 +29,10 @@ jobs:
         run: |
           echo "=== Installing dependencies ==="
           npm install
+          echo "=== Checking TypeScript compilation ==="
+          npx tsc --noEmit
           echo "=== Starting build process ==="
-          npm run build --no-lint
+          npm run build --no-lint 2>&1
           echo "=== Build process completed ==="
           echo "=== Checking for .next folder ==="
           if exist .next (
@@ -40,6 +42,8 @@ jobs:
             echo "ERROR: .next folder missing - build failed!"
             echo "=== Checking what files exist ==="
             dir
+            echo "=== Checking for build errors ==="
+            echo "=== Last few lines of build output ==="
             exit /b 1
           )
           echo "=== Running tests ==="
