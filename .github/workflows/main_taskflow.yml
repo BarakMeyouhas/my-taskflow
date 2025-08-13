@@ -32,24 +32,25 @@ jobs:
           echo "=== Checking TypeScript compilation ==="
           npx tsc --noEmit
           echo "=== Starting build process ==="
-          npm run build --no-lint 2>&1
-          echo "=== Build process completed ==="
+          npm run build
+          if %ERRORLEVEL% neq 0 (
+            echo "ERROR: Build failed with exit code %ERRORLEVEL%"
+            exit /b %ERRORLEVEL%
+          )
+          echo "=== Build process completed successfully ==="
           echo "=== Checking for .next folder ==="
           if exist .next (
             echo ".next folder found:"
             dir .next
           ) else (
-            echo "ERROR: .next folder missing - build failed!"
+            echo "ERROR: .next folder missing despite successful build!"
             echo "=== Checking what files exist ==="
             dir
             echo "=== Checking for build errors ==="
-            echo "=== Last few lines of build output ==="
             exit /b 1
           )
           echo "=== Running tests ==="
           npm run test --if-present
-      
-
       
       - name: Clean up for deployment
         working-directory: ./frontend
