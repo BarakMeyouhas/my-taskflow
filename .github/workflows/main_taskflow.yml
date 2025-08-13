@@ -38,6 +38,7 @@ jobs:
             ./frontend/.next
             ./frontend/public
             ./frontend/package.json
+            ./frontend/package-lock.json
             ./frontend/next.config.ts
             ./frontend/tailwind.config.js
             ./frontend/tsconfig.json
@@ -59,7 +60,7 @@ jobs:
       
       - name: Install production dependencies
         run: |
-          npm ci --only=production
+          npm ci --omit=dev
       
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
