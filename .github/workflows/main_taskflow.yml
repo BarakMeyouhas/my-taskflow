@@ -152,8 +152,9 @@ jobs:
           )
       
       - name: Upload artifact for deployment job
-        uses: actions/checkout@v4
+        uses: actions/upload-artifact@v4
         with:
+          name: node-app
           path: ./frontend
 
   deploy:
@@ -166,16 +167,16 @@ jobs:
         with:
           name: node-app
       
-      - name: Debug deployment package
-        run: |
-          echo "=== Deployment Package Contents ==="
-          ls -la
-          echo "=== Package.json contents ==="
-          cat package.json
-          echo "=== Next.js build files ==="
-          ls -la .next
-          echo "=== Public files ==="
-          ls -la public
+      # - name: Debug deployment package
+      #   run: |
+      #     echo "=== Deployment Package Contents ==="
+      #     ls -la
+      #     echo "=== Package.json contents ==="
+      #     cat package.json
+      #     echo "=== Next.js build files ==="
+      #     ls -la .next
+      #     echo "=== Public files ==="
+      #     ls -la public
       
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
