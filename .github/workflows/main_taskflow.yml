@@ -45,6 +45,8 @@ jobs:
           if exist .next (
             echo "SUCCESS: .next folder exists after build"
             dir .next
+            echo "=== Complete .next folder structure ==="
+            dir /s /b .next
           ) else (
             echo "ERROR: .next folder missing after build command"
             echo "=== This means the build actually failed ==="
@@ -150,9 +152,8 @@ jobs:
           )
       
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
+        uses: actions/checkout@v4
         with:
-          name: node-app
           path: ./frontend
 
   deploy:
