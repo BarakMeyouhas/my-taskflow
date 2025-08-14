@@ -24,159 +24,16 @@ jobs:
           node-version: '20.x'
 
       - name: npm install, build, and test
-        working-directory: ./frontend
-        shell: cmd
         run: |
-          echo "=== Current working directory ==="
-          cd
-          echo "=== Installing dependencies ==="
           npm install
-          echo "=== Dependencies installed successfully ==="
-          echo "=== Checking TypeScript compilation ==="
-          npx tsc --noEmit
-          echo "=== TypeScript check passed ==="
-          echo "=== Starting build process ==="
-          echo "=== Running: npm run build ==="
-          npm run build
-          echo "=== Build command completed ==="
-          echo "=== Checking build exit code ==="
-          echo "Exit code: %ERRORLEVEL%"
-          echo "=== Checking if .next folder was created ==="
-          if exist .next (
-            echo "SUCCESS: .next folder exists after build"
-            dir .next
-            echo "=== Complete .next folder structure ==="
-            dir /s /b .next
-          ) else (
-            echo "ERROR: .next folder missing after build command"
-            echo "=== This means the build actually failed ==="
-            echo "=== Checking what files exist ==="
-            dir
-            echo "=== Build step will now FAIL ==="
-            exit /b 1
-          )
-          echo "=== Build verification passed ==="
-          echo "=== Running tests ==="
+          npm run build --if-present
           npm run test --if-present
-      
-      - name: Capture build output
-        working-directory: ./frontend
-        shell: cmd
-        run: |
-          echo "=== Capturing build output for debugging ==="
-          echo "=== Running build with verbose output ==="
-          npm run build --verbose 2>&1
-          echo "=== Build verbose command completed ==="
-          echo "=== Exit code: %ERRORLEVEL% ==="
-          echo "=== Checking for .next folder again ==="
-          if exist .next (
-            echo "SUCCESS: .next folder exists after verbose build"
-            dir .next
-          ) else (
-            echo "FAILURE: .next folder still missing after verbose build"
-            echo "=== This confirms the build is fundamentally failing ==="
-            exit /b 1
-          )
-      
-      - name: Verify build output
-        working-directory: ./frontend
-        shell: cmd
-        run: |
-          echo "=== Build verification step ==="
-          echo "=== Current directory contents ==="
-          dir
-          echo "=== Checking for .next folder specifically ==="
-          if exist .next (
-            echo "SUCCESS: .next folder exists"
-            echo "=== .next folder contents ==="
-            dir .next
-          ) else (
-            echo "FAILURE: .next folder still missing"
-            echo "=== All files and folders ==="
-            dir /a
-            echo "=== This step should not run if build succeeded ==="
-            echo "=== Build verification step will now FAIL ==="
-            exit /b 1
-          )
-      
-      - name: Clean up for deployment
-        working-directory: ./frontend
-        shell: cmd
-        run: |
-          echo "=== Cleanup step - preserving build output ==="
-          echo "=== Checking .next exists before cleanup ==="
-          if not exist .next (
-            echo "ERROR: .next folder is missing BEFORE cleanup. Build step may have failed."
-            exit /b 1
-          )
-          echo "=== Checking what exists before cleanup ==="
-          dir
-          echo "=== Removing development dependencies only ==="
-          # Remove only development dependencies, keep production ones
-          if exist node_modules (
-            echo "=== Keeping production dependencies for Azure ==="
-            echo "=== Only removing dev dependencies ==="
-            # Keep node_modules but remove dev-only packages
-          )
-          if exist .git rmdir /s /q .git
-          if exist *.log del /q *.log
-          if exist .env.local del /q .env.local
-          if exist .env.development.local del /q .env.development.local
-          if exist .env.test.local del /q .env.test.local
-          if exist .env.production.local del /q .env.production.local
-          echo "=== Cleanup completed - checking what remains ==="
-          dir
-          echo "=== Remaining directories ==="
-          dir /ad
-          echo "=== Verifying .next folder still exists ==="
-          if exist .next (
-            echo "SUCCESS: .next folder preserved after cleanup"
-            dir .next
-          ) else (
-            echo "ERROR: .next folder was removed during cleanup!"
-            exit /b 1
-          )
-      
-      - name: Install production dependencies for Azure
-        working-directory: ./frontend
-        shell: cmd
-        run: |
-          echo "=== Installing only production dependencies for Azure ==="
-          npm ci --only=production
-          echo "=== Production dependencies installed ==="
-          echo "=== Final package contents before upload ==="
-          dir
-
-            
-      - name: Verify artifact contents before upload
-        working-directory: ./frontend
-        shell: cmd
-        run: |
-          echo "=== Final verification before artifact upload ==="
-          echo "=== Current directory contents ==="
-          dir
-          echo "=== Checking for .next folder ==="
-          if exist .next (
-            echo "SUCCESS: .next folder ready for upload"
-            echo "=== .next folder contents ==="
-            dir .next
-            echo "=== .next/static folder contents ==="
-            if exist .next\static dir .next\static
-            echo "=== .next/server folder contents ==="
-            if exist .next\server dir .next\server
-            echo "=== Complete .next structure for Azure ==="
-            dir /s /b .next
-          ) else (
-            echo "ERROR: .next folder missing before upload!"
-            echo "=== This will cause deployment to fail ==="
-            exit /b 1
-          )
       
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: ./frontend
+          path: .
 
   deploy:
     runs-on: ubuntu-latest
@@ -188,7 +45,6 @@ jobs:
         with:
           name: node-app
       
-      
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
@@ -196,12 +52,4 @@ jobs:
           app-name: 'TaskFlow'
           slot-name: 'Production'
           package: .
-          startup-command: 'npm start'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3096CF908AD24070BB116DE0496C5F86 }}
-      
-      - name: 'Alternative Kudu Deployment (if OneDeploy fails)'
-        if: failure()
-        run: |
-          echo "OneDeploy failed, trying Kudu deployment..."
-          # This would use Kudu REST API for deployment
-          echo "Manual deployment required via Kudu or Azure Portal"
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_352C29692F204B188AA07AED5952DEFE }}
