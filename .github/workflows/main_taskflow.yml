@@ -27,7 +27,7 @@ jobs:
         working-directory: ./frontend
         shell: cmd
         run: |
-          echo "=== Current working directory ==="
+          echo "=== Current working directory ===="
           cd
           echo "=== Installing dependencies ==="
           npm install
