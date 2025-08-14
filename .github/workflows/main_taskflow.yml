@@ -196,12 +196,12 @@ jobs:
           app-name: 'TaskFlow'
           slot-name: 'Production'
           package: .
-          startup-command: 'npm start'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3096CF908AD24070BB116DE0496C5F86 }}
       
-      - name: 'Alternative Kudu Deployment (if OneDeploy fails)'
+      - name: 'Kudu Deployment (Alternative)'
         if: failure()
         run: |
           echo "OneDeploy failed, trying Kudu deployment..."
-          # This would use Kudu REST API for deployment
           echo "Manual deployment required via Kudu or Azure Portal"
+          echo "Go to: https://taskflow-c8fyfpdcbwgefwg9.scm.canadacentral-01.azurewebsites.net/"
+          echo "Use Debug Console to upload files manually"
