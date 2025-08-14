@@ -27,14 +27,23 @@ jobs:
         working-directory: ./frontend
         shell: cmd
         run: |
+          echo "=== Current working directory ==="
+          cd
           echo "=== Installing dependencies ==="
           npm install
+          echo "=== Dependencies installed successfully ==="
           echo "=== Checking TypeScript compilation ==="
           npx tsc --noEmit
+          echo "=== TypeScript check passed ==="
           echo "=== Starting build process ==="
           npm run build
+          echo "=== Build command completed ==="
+          echo "=== Checking build exit code ==="
+          echo "Exit code: %ERRORLEVEL%"
           if %ERRORLEVEL% neq 0 (
             echo "ERROR: Build failed with exit code %ERRORLEVEL%"
+            echo "=== Checking what files exist after failed build ==="
+            dir
             exit /b %ERRORLEVEL%
           )
           echo "=== Build process completed successfully ==="
@@ -51,6 +60,27 @@ jobs:
           )
           echo "=== Running tests ==="
           npm run test --if-present
+      
+      - name: Verify build output
+        working-directory: ./frontend
+        shell: cmd
+        run: |
+          echo "=== Build verification step ==="
+          echo "=== Current directory contents ==="
+          dir
+          echo "=== Checking for .next folder specifically ==="
+          if exist .next (
+            echo "SUCCESS: .next folder exists"
+            echo "=== .next folder contents ==="
+            dir .next
+          ) else (
+            echo "FAILURE: .next folder still missing"
+            echo "=== All files and folders ==="
+            dir /a
+            echo "=== Checking if build actually ran ==="
+            echo "=== This should not happen if build succeeded ==="
+            exit /b 1
+          )
       
       - name: Clean up for deployment
         working-directory: ./frontend
