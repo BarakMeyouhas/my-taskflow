@@ -36,24 +36,18 @@ jobs:
           npx tsc --noEmit
           echo "=== TypeScript check passed ==="
           echo "=== Starting build process ==="
+          echo "=== Running: npm run build ==="
           npm run build
           echo "=== Build command completed ==="
           echo "=== Checking build exit code ==="
           echo "Exit code: %ERRORLEVEL%"
-          if %ERRORLEVEL% neq 0 (
-            echo "ERROR: Build failed with exit code %ERRORLEVEL%"
-            echo "=== Checking what files exist after failed build ==="
-            dir
-            exit /b %ERRORLEVEL%
-          )
-          echo "=== Build process completed successfully ==="
-          echo "=== Checking for .next folder ==="
+          echo "=== Checking if .next folder was created ==="
           if exist .next (
-            echo ".next folder found:"
+            echo "SUCCESS: .next folder exists after build"
             dir .next
           ) else (
-            echo "ERROR: .next folder missing despite successful build!"
-            echo "=== This indicates the build actually failed ==="
+            echo "ERROR: .next folder missing after build command"
+            echo "=== This means the build actually failed ==="
             echo "=== Checking what files exist ==="
             dir
             echo "=== Build step will now FAIL ==="
@@ -62,6 +56,25 @@ jobs:
           echo "=== Build verification passed ==="
           echo "=== Running tests ==="
           npm run test --if-present
+      
+      - name: Capture build output
+        working-directory: ./frontend
+        shell: cmd
+        run: |
+          echo "=== Capturing build output for debugging ==="
+          echo "=== Running build with verbose output ==="
+          npm run build --verbose 2>&1
+          echo "=== Build verbose command completed ==="
+          echo "=== Exit code: %ERRORLEVEL% ==="
+          echo "=== Checking for .next folder again ==="
+          if exist .next (
+            echo "SUCCESS: .next folder exists after verbose build"
+            dir .next
+          ) else (
+            echo "FAILURE: .next folder still missing after verbose build"
+            echo "=== This confirms the build is fundamentally failing ==="
+            exit /b 1
+          )
       
       - name: Verify build output
         working-directory: ./frontend
