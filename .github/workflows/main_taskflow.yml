@@ -53,11 +53,13 @@ jobs:
             dir .next
           ) else (
             echo "ERROR: .next folder missing despite successful build!"
+            echo "=== This indicates the build actually failed ==="
             echo "=== Checking what files exist ==="
             dir
-            echo "=== Checking for build errors ==="
+            echo "=== Build step will now FAIL ==="
             exit /b 1
           )
+          echo "=== Build verification passed ==="
           echo "=== Running tests ==="
           npm run test --if-present
       
@@ -77,8 +79,8 @@ jobs:
             echo "FAILURE: .next folder still missing"
             echo "=== All files and folders ==="
             dir /a
-            echo "=== Checking if build actually ran ==="
-            echo "=== This should not happen if build succeeded ==="
+            echo "=== This step should not run if build succeeded ==="
+            echo "=== Build verification step will now FAIL ==="
             exit /b 1
           )
       
