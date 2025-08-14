@@ -1,0 +1,5 @@
+[33m451a060[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Refactor GitHub Actions workflow for Next.js build process
+[33m5a4aded[m Refactor Next.js configuration to use ES6 module syntax
+[33m57b0d07[m Add Next.js configuration and enhance server.cjs logging
+[33m66b1857[m Refactor server.cjs to use CommonJS syntax for module imports
+[33m7d26623[m Update web.config to reference server.cjs instead of server.js for improved compatibility with ES6 module syntax
