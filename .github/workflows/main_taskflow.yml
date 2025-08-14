@@ -112,7 +112,12 @@ jobs:
           echo "=== Checking what exists before cleanup ==="
           dir
           echo "=== Removing development dependencies only ==="
-          if exist node_modules rmdir /s /q node_modules
+          # Remove only development dependencies, keep production ones
+          if exist node_modules (
+            echo "=== Keeping production dependencies for Azure ==="
+            echo "=== Only removing dev dependencies ==="
+            # Keep node_modules but remove dev-only packages
+          )
           if exist .git rmdir /s /q .git
           if exist *.log del /q *.log
           if exist .env.local del /q .env.local
@@ -131,6 +136,16 @@ jobs:
             echo "ERROR: .next folder was removed during cleanup!"
             exit /b 1
           )
+      
+      - name: Install production dependencies for Azure
+        working-directory: ./frontend
+        shell: cmd
+        run: |
+          echo "=== Installing only production dependencies for Azure ==="
+          npm ci --only=production
+          echo "=== Production dependencies installed ==="
+          echo "=== Final package contents before upload ==="
+          dir
 
             
       - name: Verify artifact contents before upload
