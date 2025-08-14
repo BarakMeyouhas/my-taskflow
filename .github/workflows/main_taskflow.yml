@@ -145,6 +145,12 @@ jobs:
             echo "SUCCESS: .next folder ready for upload"
             echo "=== .next folder contents ==="
             dir .next
+            echo "=== .next/static folder contents ==="
+            if exist .next\static dir .next\static
+            echo "=== .next/server folder contents ==="
+            if exist .next\server dir .next\server
+            echo "=== Complete .next structure for Azure ==="
+            dir /s /b .next
           ) else (
             echo "ERROR: .next folder missing before upload!"
             echo "=== This will cause deployment to fail ==="
@@ -167,16 +173,6 @@ jobs:
         with:
           name: node-app
       
-      # - name: Debug deployment package
-      #   run: |
-      #     echo "=== Deployment Package Contents ==="
-      #     ls -la
-      #     echo "=== Package.json contents ==="
-      #     cat package.json
-      #     echo "=== Next.js build files ==="
-      #     ls -la .next
-      #     echo "=== Public files ==="
-      #     ls -la public
       
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
