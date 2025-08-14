@@ -102,19 +102,25 @@ jobs:
         shell: cmd
         run: |
           echo "=== Cleanup step - preserving build output ==="
+          echo "=== Checking .next exists before cleanup ==="
+          if not exist .next (
+            echo "ERROR: .next folder is missing BEFORE cleanup. Build step may have failed."
+            exit /b 1
+          )
           echo "=== Checking what exists before cleanup ==="
           dir
           echo "=== Removing development dependencies only ==="
-          # Remove only development dependencies and logs
-          rmdir /s /q node_modules
-          rmdir /s /q .git
-          del /q *.log
-          del /q .env.local
-          del /q .env.development.local
-          del /q .env.test.local
-          del /q .env.production.local
+          if exist node_modules rmdir /s /q node_modules
+          if exist .git rmdir /s /q .git
+          if exist *.log del /q *.log
+          if exist .env.local del /q .env.local
+          if exist .env.development.local del /q .env.development.local
+          if exist .env.test.local del /q .env.test.local
+          if exist .env.production.local del /q .env.production.local
           echo "=== Cleanup completed - checking what remains ==="
           dir
+          echo "=== Remaining directories ==="
+          dir /ad
           echo "=== Verifying .next folder still exists ==="
           if exist .next (
             echo "SUCCESS: .next folder preserved after cleanup"
@@ -123,7 +129,8 @@ jobs:
             echo "ERROR: .next folder was removed during cleanup!"
             exit /b 1
           )
-      
+
+            
       - name: Verify artifact contents before upload
         working-directory: ./frontend
         shell: cmd
