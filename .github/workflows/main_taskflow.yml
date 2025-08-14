@@ -101,6 +101,10 @@ jobs:
         working-directory: ./frontend
         shell: cmd
         run: |
+          echo "=== Cleanup step - preserving build output ==="
+          echo "=== Checking what exists before cleanup ==="
+          dir
+          echo "=== Removing development dependencies only ==="
           # Remove only development dependencies and logs
           rmdir /s /q node_modules
           rmdir /s /q .git
@@ -109,6 +113,34 @@ jobs:
           del /q .env.development.local
           del /q .env.test.local
           del /q .env.production.local
+          echo "=== Cleanup completed - checking what remains ==="
+          dir
+          echo "=== Verifying .next folder still exists ==="
+          if exist .next (
+            echo "SUCCESS: .next folder preserved after cleanup"
+            dir .next
+          ) else (
+            echo "ERROR: .next folder was removed during cleanup!"
+            exit /b 1
+          )
+      
+      - name: Verify artifact contents before upload
+        working-directory: ./frontend
+        shell: cmd
+        run: |
+          echo "=== Final verification before artifact upload ==="
+          echo "=== Current directory contents ==="
+          dir
+          echo "=== Checking for .next folder ==="
+          if exist .next (
+            echo "SUCCESS: .next folder ready for upload"
+            echo "=== .next folder contents ==="
+            dir .next
+          ) else (
+            echo "ERROR: .next folder missing before upload!"
+            echo "=== This will cause deployment to fail ==="
+            exit /b 1
+          )
       
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
