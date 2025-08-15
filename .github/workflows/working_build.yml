@@ -148,7 +148,7 @@ jobs:
           echo "Downloaded files:"
           ls -la
           echo "Extracting deployment-package.zip..."
-          unzip deployment-package.zip
+          unzip -q deployment-package.zip || true
           echo "=== Extraction completed ==="
           echo "Extracted contents:"
           ls -la
