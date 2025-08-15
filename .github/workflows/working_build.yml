@@ -1,7 +1,9 @@
 name: Working Build Workflow
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
@@ -73,10 +75,6 @@ jobs:
             exit /b 1
           )
           
-          echo "=== Installing production dependencies ==="
-          npm ci --only=production
-          echo "=== Production dependencies installed ==="
-          
           echo "=== FINAL verification - Deployment package ready: ==="
           dir
           echo "=== Essential files check: ==="
@@ -86,7 +84,6 @@ jobs:
           if exist web.config echo "✓ web.config"
           if exist .deployment echo "✓ .deployment"
           if exist .next echo "✓ .next directory"
-          if exist node_modules echo "✓ node_modules (production)"
           
       - name: Create Deployment Package
         working-directory: ./frontend
@@ -95,8 +92,8 @@ jobs:
           echo "=== Creating deployment package ==="
           echo "Current directory: %CD%"
           echo "Creating optimized zip archive..."
-          echo "Including essential files: .next, package.json, package-lock.json, startup.js, server.cjs, web.config, .deployment"
-          echo "Excluding: node_modules (will reinstall on Azure)"
+          echo "Including essential files: .next, package.json, package-lock.json, startup.js, server.cjs, web.config, .deployment, app, components, config, contexts, public"
+          echo "Excluding: node_modules (will be installed on Azure via startup script)"
           
           powershell -Command "Compress-Archive -Path .next,package.json,package-lock.json,startup.js,server.cjs,web.config,.deployment,app,components,config,contexts,public -DestinationPath ../deployment-package.zip -Force"
           
@@ -178,33 +175,27 @@ jobs:
           fi
           echo "=== ARTIFACT DOWNLOAD VERIFICATION COMPLETE ==="
           
-      - name: Install Production Dependencies
+      - name: Verify Deployment Package
         run: |
-          echo "=== Installing production dependencies ==="
+          echo "=== Verifying deployment package ==="
           echo "Current directory: $(pwd)"
           echo "Current directory contents:"
           ls -la
           echo "=== Package.json contents: ==="
           cat package.json
-          echo "=== Installing production dependencies... ==="
-          npm ci --only=production --verbose
-          echo "=== Production dependencies installed ==="
-          echo "=== Verifying node_modules ==="
-          if [ -d "node_modules" ]; then
-            echo "✓ node_modules directory created"
-            ls -la node_modules
-            echo "=== Checking for next package ==="
-            if [ -d "node_modules/next" ]; then
-              echo "✓ next package found in node_modules"
-              ls -la node_modules/next
-            else
-              echo "✗ next package NOT found in node_modules!"
-              echo "Available packages:"
-              ls -la node_modules | head -20
-            fi
+          echo "=== Package-lock.json verification ==="
+          if [ -f "package-lock.json" ]; then
+            echo "✓ package-lock.json found (required for npm ci)"
+            ls -la package-lock.json
           else
-            echo "✗ node_modules directory NOT created!"
+            echo "✗ package-lock.json missing!"
           fi
+          echo "=== Essential files check ==="
+          if [ -d ".next" ]; then echo "✓ .next directory"; fi
+          if [ -f "startup.js" ]; then echo "✓ startup.js"; fi
+          if [ -f "server.cjs" ]; then echo "✓ server.cjs"; fi
+          if [ -f "web.config" ]; then echo "✓ web.config"; fi
+          if [ -f ".deployment" ]; then echo "✓ .deployment"; fi
           echo "Final directory contents:"
           ls -la
           
