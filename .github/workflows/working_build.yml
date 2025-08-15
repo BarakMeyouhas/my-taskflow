@@ -191,5 +191,5 @@ jobs:
         with:
           app-name: 'TaskFlow'
           slot-name: 'Production'
-          package: .
+          package: deployment-package.zip
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_352C29692F204B188AA07AED5952DEFE }}
