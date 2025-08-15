@@ -1,2 +1,2 @@
 [config]
-command = node startup.js
+command = npm start

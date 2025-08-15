@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
-const { spawn } = require('child_process');
-const path = require('path');
+import { spawn } from 'child_process';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 
 console.log('Starting TaskFlow application...');
 console.log('Current directory:', process.cwd());
@@ -9,7 +11,6 @@ console.log('Node version:', process.version);
 console.log('NODE_ENV:', process.env.NODE_ENV);
 
 // Check if .next directory exists
-const fs = require('fs');
 const nextDir = path.join(process.cwd(), '.next');
 
 if (!fs.existsSync(nextDir)) {

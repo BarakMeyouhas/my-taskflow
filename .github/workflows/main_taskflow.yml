@@ -28,35 +28,72 @@ jobs:
         shell: cmd
         run: |
           echo "=== Installing dependencies ==="
+          echo "Current directory: %CD%"
+          echo "Node version: %NODE_VERSION%"
+          echo "npm version:"
+          npm --version
+          echo "=== Starting npm ci ==="
           npm ci
           echo "=== Dependencies installed successfully ==="
+          echo "=== Verifying node_modules ==="
+          if exist node_modules (
+            echo "✓ node_modules directory exists"
+            dir node_modules | findstr "next react"
+          ) else (
+            echo "✗ node_modules directory missing!"
+            exit /b 1
+          )
 
       - name: Build Next.js application
         working-directory: ./frontend
         shell: cmd
         run: |
           echo "=== Starting Next.js build ==="
+          echo "Current directory: %CD%"
+          echo "Available scripts in package.json:"
+          npm run
+          echo "=== Running npm run build ==="
           npm run build
           echo "=== Build completed, exit code: %ERRORLEVEL% ==="
           
           if %ERRORLEVEL% neq 0 (
             echo "ERROR: Build failed with exit code %ERRORLEVEL%"
+            echo "=== Checking for build errors ==="
+            if exist .next (
+              echo "WARNING: .next directory exists despite build failure"
+              dir .next
+            )
             exit /b 1
           )
           
           echo "=== Verifying build output ==="
           if not exist .next (
             echo "ERROR: .next directory not found after build"
+            echo "=== Current directory contents: ==="
             dir
+            echo "=== package.json contents: ==="
+            type package.json
             exit /b 1
           )
           
           echo "=== Build successful! .next directory contents: ==="
           dir .next
           echo "=== .next/static contents: ==="
-          if exist .next\static dir .next\static
+          if exist .next\static (
+            dir .next\static
+            echo "=== Static files count: ==="
+            dir .next\static /b | find /c /v ""
+          ) else (
+            echo "WARNING: .next/static directory missing!"
+          )
           echo "=== .next/server contents: ==="
-          if exist .next\server dir .next\server
+          if exist .next\server (
+            dir .next\server
+            echo "=== Server files count: ==="
+            dir .next\server /b | find /c /v ""
+          ) else (
+            echo "WARNING: .next/server directory missing!"
+          )
 
       - name: Clean up for deployment
         working-directory: ./frontend
@@ -65,46 +102,104 @@ jobs:
           echo "=== Cleaning up for deployment ==="
           echo "=== Preserving essential files: .next, package.json, server.cjs, web.config, .deployment ==="
           
-          # Remove development files but keep build output and Azure config
-          if exist .git rmdir /s /q .git
-          if exist *.log del /q *.log
-          if exist .env.local del /q .env.local
-          if exist .env.development.local del /q .env.development.local
-          if exist .env.test.local del /q .env.test.local
-          if exist .env.production.local del /q .env.production.local
-          if exist tsconfig.tsbuildinfo del /q tsconfig.tsbuildinfo
-          if exist node_modules rmdir /s /q node_modules
+          echo "=== BEFORE CLEANUP - Current directory contents: ==="
+          dir
+          echo "=== BEFORE CLEANUP - .next directory size: ==="
+          if exist .next (
+            dir .next /s | findstr "File(s)"
+          )
           
-          echo "=== Final package contents: ==="
+          # Remove development files but keep build output and Azure config
+          echo "=== Removing development files ==="
+          if exist .git (
+            echo "Removing .git directory..."
+            rmdir /s /q .git
+          )
+          if exist *.log (
+            echo "Removing log files..."
+            del /q *.log
+          )
+          if exist .env.local (
+            echo "Removing .env.local..."
+            del /q .env.local
+          )
+          if exist .env.development.local (
+            echo "Removing .env.development.local..."
+            del /q .env.development.local
+          )
+          if exist .env.test.local (
+            echo "Removing .env.test.local..."
+            del /q .env.test.local
+          )
+          if exist .env.production.local (
+            echo "Removing .env.production.local..."
+            del /q .env.production.local
+          )
+          if exist tsconfig.tsbuildinfo (
+            echo "Removing tsconfig.tsbuildinfo..."
+            del /q tsconfig.tsbuildinfo
+          )
+          if exist node_modules (
+            echo "Removing node_modules..."
+            rmdir /s /q node_modules
+          )
+          
+          echo "=== AFTER CLEANUP - Final package contents: ==="
           dir
           echo "=== Verifying .next still exists: ==="
           if exist .next (
             echo "SUCCESS: .next directory preserved"
+            echo "=== .next directory contents after cleanup: ==="
             dir .next
+            echo "=== .next directory size after cleanup: ==="
+            dir .next /s | findstr "File(s)"
           ) else (
             echo "ERROR: .next directory was removed during cleanup!"
+            echo "=== Current directory contents after cleanup: ==="
+            dir
             exit /b 1
           )
           echo "=== Verifying Azure config files: ==="
           if exist .deployment (
             echo "SUCCESS: .deployment file preserved"
+            echo "=== .deployment contents: ==="
+            type .deployment
           ) else (
             echo "ERROR: .deployment file was removed!"
             exit /b 1
           )
           
           echo "=== Installing production dependencies ==="
+          echo "=== Running npm ci --only=production ==="
           npm ci --only=production
-          echo "=== Installing PM2 globally ==="
-          npm install -g pm2
           echo "=== Production dependencies installed ==="
           
           echo "=== Setting up startup script ==="
-          echo "=== Making startup.js executable ==="
           echo "=== Verifying startup.js exists: ==="
           if exist startup.js (
             echo "SUCCESS: startup.js found"
-            type startup.js
+            echo "=== startup.js first 10 lines: ==="
+            type startup.js | findstr /n "^" | findstr "^1:" | findstr /c:"^1:" /c:"^2:" /c:"^3:" /c:"^4:" /c:"^5:" /c:"^6:" /c:"^7:" /c:"^8:" /c:"^9:" /c:"^10:"
+            echo "=== Testing startup.js syntax ==="
+            node -c startup.js
+            if %ERRORLEVEL% neq 0 (
+              echo "ERROR: startup.js has syntax errors!"
+              exit /b 1
+            )
+            echo "✓ startup.js syntax is valid"
+          
+          echo "=== Testing server.cjs syntax ==="
+          if exist server.cjs (
+            node -c server.cjs
+            if %ERRORLEVEL% neq 0 (
+              echo "ERROR: server.cjs has syntax errors!"
+              exit /b 1
+            )
+            echo "✓ server.cjs syntax is valid"
+          ) else (
+            echo "ERROR: server.cjs not found!"
+            exit /b 1
+          )
           ) else (
             echo "ERROR: startup.js not found!"
             exit /b 1
@@ -119,7 +214,6 @@ jobs:
           if exist server.cjs echo "✓ server.cjs"
           if exist web.config echo "✓ web.config"
           if exist .deployment echo "✓ .deployment"
-          if exist azure-webapp.config.js echo "✓ azure-webapp.config.js"
           if exist .next echo "✓ .next directory"
           echo "=== .next directory contents: ==="
           dir .next
@@ -131,6 +225,24 @@ jobs:
         with:
           name: node-app
           path: ./frontend
+          
+      - name: Verify artifact upload
+        run: |
+          echo "=== Verifying artifact upload ==="
+          echo "=== Artifact name: node-app ==="
+          echo "=== Upload path: ./frontend ==="
+          echo "=== Current working directory: ${{ github.workspace }} ==="
+          echo "=== Frontend directory contents before upload: ==="
+          ls -la frontend/
+          echo "=== Frontend/.next contents before upload: ==="
+          if [ -d "frontend/.next" ]; then
+            ls -la frontend/.next/
+            echo "=== .next directory size: ==="
+            du -sh frontend/.next/
+          else
+            echo "ERROR: .next directory not found before upload!"
+            exit 1
+          fi
 
   deploy:
     runs-on: ubuntu-latest
@@ -154,6 +266,7 @@ jobs:
       - name: 'Verify deployment structure'
         run: |
           echo "=== Verifying deployed files ==="
+          echo "=== Current working directory: $(pwd) ==="
           echo "=== Root directory contents: ==="
           ls -la
           echo "=== Essential files check: ==="
@@ -162,21 +275,57 @@ jobs:
           [ -f "server.cjs" ] && echo "✓ server.cjs" || echo "✗ server.cjs missing"
           [ -f "web.config" ] && echo "✓ web.config" || echo "✗ web.config missing"
           [ -f ".deployment" ] && echo "✓ .deployment" || echo "✗ .deployment missing"
-          [ -f "azure-webapp.config.js" ] && echo "✓ azure-webapp.config.js" || echo "✗ azure-webapp.config.js missing"
           [ -d ".next" ] && echo "✓ .next directory" || echo "✗ .next directory missing"
+          
+          echo "=== File sizes and details: ==="
+          if [ -f "package.json" ]; then
+            echo "package.json: $(wc -l < package.json) lines, $(du -h package.json | cut -f1)"
+          fi
+          if [ -f "startup.js" ]; then
+            echo "startup.js: $(wc -l < startup.js) lines, $(du -h startup.js | cut -f1)"
+          fi
+          if [ -f "server.cjs" ]; then
+            echo "server.cjs: $(wc -l < server.cjs) lines, $(du -h server.cjs | cut -f1)"
+          fi
+          if [ -f ".deployment" ]; then
+            echo ".deployment: $(cat .deployment)"
+          fi
+          
           echo "=== .next directory contents: ==="
           if [ -d ".next" ]; then
             ls -la .next
+            echo "=== .next directory size: ==="
+            du -sh .next/
             echo "=== .next/static contents: ==="
-            ls -la .next/static || echo "No static directory"
+            if [ -d ".next/static" ]; then
+              ls -la .next/static
+              echo "=== Static files count: ==="
+              find .next/static -type f | wc -l
+            else
+              echo "No static directory"
+            fi
             echo "=== .next/server contents: ==="
-            ls -la .next/server || echo "No server directory"
+            if [ -d ".next/server" ]; then
+              ls -la .next/server
+              echo "=== Server files count: ==="
+              find .next/server -type f | wc -l
+            else
+              echo "No server directory"
+            fi
           else
             echo "ERROR: .next directory not found in deployment!"
+            echo "=== Current directory contents: ==="
+            ls -la
             exit 1
           fi
-          echo "=== Package.json: ==="
+          
+          echo "=== Package.json contents: ==="
           cat package.json
+          
+          echo "=== Final verification summary: ==="
+          echo "✓ All essential files present"
+          echo "✓ .next directory exists with $(find .next -type f | wc -l) files"
+          echo "✓ Ready for Azure deployment"
       
       - name: 'Kudu Deployment (Alternative)'
         if: failure()

@@ -17,22 +17,29 @@ Your Azure Web App was successfully deploying but failing to run because it coul
 - Added comprehensive file verification before deployment
 
 ### 3. **Azure Web App Configuration**
-- Created `azure-webapp.config.js` for additional Azure configuration
+- Created `.deployment` file for Azure startup command
 - Updated `web.config` references
-- Added PM2 process manager support
+- Simplified startup process without external dependencies
 
 ## Files Created/Modified
 
 ### New Files:
 - `.deployment` - Azure deployment configuration
 - `startup.js` - Custom startup script with error handling
-- `azure-webapp.config.js` - Azure Web App configuration
 - `AZURE_DEPLOYMENT_FIX.md` - This guide
 
 ### Modified Files:
 - `.github/workflows/main_taskflow.yml` - Enhanced build and deployment workflow
-- `frontend/package.json` - Updated start script and added PM2 dependency
-- `frontend/ecosystem.config.js` - Updated PM2 configuration
+- `frontend/package.json` - Updated start script
+
+## Current Architecture
+
+The deployment now uses a simplified approach:
+1. **GitHub Actions** builds the Next.js app and preserves the `.next` directory
+2. **Azure Web App** uses the `.deployment` file to run `npm start`
+3. **npm start** runs `node startup.js`
+4. **startup.js** verifies the `.next` directory exists and starts the server
+5. **server.cjs** runs the actual Next.js application
 
 ## Next Steps
 
@@ -56,7 +63,7 @@ git push origin main
 ### 4. **If Issues Persist**
 - Check Azure Web App Configuration in Azure Portal
 - Ensure Node.js 20.x is selected as runtime
-- Verify startup command is set to `node startup.js`
+- Verify startup command is set to `npm start`
 
 ## Expected Behavior
 
@@ -90,7 +97,7 @@ After these fixes, your Azure Web App should:
 2. **Build Verification**: Workflow verifies build output before deployment
 3. **File Preservation**: Ensures all necessary files reach Azure
 4. **Azure Integration**: Proper Azure Web App configuration files
-5. **Process Management**: PM2 support for better runtime management
+5. **Process Management**: Custom startup script for better error handling
 
 ## Support
 
