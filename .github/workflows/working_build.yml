@@ -52,6 +52,9 @@ jobs:
           echo "Removing development files..."
           if exist node_modules rmdir /s /q node_modules
           if exist .git rmdir /s /q .git
+          echo "=== Installing production dependencies ==="
+          npm ci --only=production
+          echo "=== Production dependencies installed ==="
           echo "=== Deployment package ready ==="
           dir
           
