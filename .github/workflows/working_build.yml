@@ -147,7 +147,9 @@ jobs:
           echo "Current directory: $(pwd)"
           echo "Downloaded files:"
           ls -la
-          echo "Extracting deployment-package.zip..."
+          echo "=== Verifying zip contents ==="
+          unzip -l deployment-package.zip | head -30
+          echo "=== Extracting deployment-package.zip... ==="
           unzip -q deployment-package.zip || true
           echo "=== Extraction completed ==="
           echo "Extracted contents:"
@@ -180,9 +182,29 @@ jobs:
         run: |
           echo "=== Installing production dependencies ==="
           echo "Current directory: $(pwd)"
-          echo "Installing production dependencies..."
-          npm ci --only=production
+          echo "Current directory contents:"
+          ls -la
+          echo "=== Package.json contents: ==="
+          cat package.json
+          echo "=== Installing production dependencies... ==="
+          npm ci --only=production --verbose
           echo "=== Production dependencies installed ==="
+          echo "=== Verifying node_modules ==="
+          if [ -d "node_modules" ]; then
+            echo "✓ node_modules directory created"
+            ls -la node_modules
+            echo "=== Checking for next package ==="
+            if [ -d "node_modules/next" ]; then
+              echo "✓ next package found in node_modules"
+              ls -la node_modules/next
+            else
+              echo "✗ next package NOT found in node_modules!"
+              echo "Available packages:"
+              ls -la node_modules | head -20
+            fi
+          else
+            echo "✗ node_modules directory NOT created!"
+          fi
           echo "Final directory contents:"
           ls -la
           
