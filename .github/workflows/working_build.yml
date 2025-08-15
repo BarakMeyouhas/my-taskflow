@@ -32,6 +32,7 @@ jobs:
           
       - name: Verify Build Output
         working-directory: ./frontend
+        shell: cmd
         run: |
           echo "=== Verifying build output ==="
           if exist .next (
@@ -45,6 +46,7 @@ jobs:
           
       - name: Prepare for Deployment
         working-directory: ./frontend
+        shell: cmd
         run: |
           echo "=== Preparing for deployment ==="
           echo "Removing development files..."
