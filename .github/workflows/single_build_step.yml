@@ -1,0 +1,47 @@
+name: Single Build Step - Force Execution
+
+on:
+  workflow_dispatch:
+
+jobs:
+  force-build:
+    runs-on: windows-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+          
+      - name: Install and Build in Single Step
+        working-directory: ./frontend
+        shell: cmd
+        run: |
+          echo "=== SINGLE STEP: Install + Build ==="
+          echo "Current directory: %CD%"
+          echo "Node version:"
+          node --version
+          echo "npm version:"
+          npm --version
+          echo "=== Installing dependencies ==="
+          npm ci
+          echo "=== Dependencies installed ==="
+          echo "=== Package.json contents ==="
+          type package.json
+          echo "=== Next.js config contents ==="
+          type next.config.js
+          echo "=== Starting Next.js build ==="
+          npm run build
+          echo "=== Build command completed ==="
+          echo "=== Checking for .next directory ==="
+          if exist .next (
+            echo "✓ .next directory created successfully!"
+            dir .next
+          ) else (
+            echo "✗ .next directory missing after build"
+            echo "=== Current directory contents: ==="
+            dir
+          )
+          echo "=== SINGLE STEP COMPLETED ==="

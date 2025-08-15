@@ -1,0 +1,13 @@
+{
+  "/api/auth/login/route": "/api/auth/login",
+  "/api/auth/register/route": "/api/auth/register",
+  "/api/auth/verify/route": "/api/auth/verify",
+  "/favicon.ico/route": "/favicon.ico",
+  "/_not-found/page": "/_not-found",
+  "/login/page": "/login",
+  "/page": "/",
+  "/projects/page": "/projects",
+  "/register/page": "/register",
+  "/reports/page": "/reports",
+  "/calendar/page": "/calendar"
+}
