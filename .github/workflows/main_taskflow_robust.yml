@@ -1,4 +1,4 @@
-name: Build and deploy Node.js app to Azure Web App - TaskFlow
+name: Build and deploy Node.js app to Azure Web App - TaskFlow (Robust)
 
 on:
   push:
@@ -41,6 +41,24 @@ jobs:
             exit /b 1
           )
 
+      - name: Debug - Check current state before build
+        working-directory: ./frontend
+        shell: cmd
+        run: |
+          echo "=== DEBUG: Current state before build ==="
+          echo "Current directory: %CD%"
+          echo "Current directory contents:"
+          dir
+          echo "=== Checking for existing .next directory ==="
+          if exist .next (
+            echo "WARNING: .next directory already exists before build!"
+            dir .next
+          ) else (
+            echo "✓ No .next directory exists (expected before build)"
+          )
+          echo "=== Checking package.json scripts ==="
+          type package.json | findstr "scripts" -A 10
+
       - name: Build Next.js application
         working-directory: ./frontend
         shell: cmd
@@ -73,6 +91,19 @@ jobs:
             dir
             echo "=== package.json contents: ==="
             type package.json
+            echo "=== Checking for alternative build outputs ==="
+            if exist out (
+              echo "WARNING: 'out' directory found instead of .next"
+              dir out
+            )
+            if exist dist (
+              echo "WARNING: 'dist' directory found instead of .next"
+              dir dist
+            )
+            if exist build (
+              echo "WARNING: 'build' directory found instead of .next"
+              dir build
+            )
             exit /b 1
           )
           
@@ -95,21 +126,62 @@ jobs:
             echo "WARNING: .next/server directory missing!"
           )
 
-      - name: Clean up for deployment
+      - name: Debug - Verify build output exists
         working-directory: ./frontend
         shell: cmd
         run: |
-          echo "=== Cleaning up for deployment ==="
-          echo "=== Preserving essential files: .next, package.json, server.cjs, web.config, .deployment ==="
+          echo "=== DEBUG: Verifying build output exists ==="
+          echo "Current directory: %CD%"
+          echo "Current directory contents:"
+          dir
+          echo "=== .next directory details: ==="
+          if exist .next (
+            echo "✓ .next directory found"
+            dir .next
+            echo "=== .next directory size: ==="
+            dir .next /s | findstr "File(s)"
+          ) else (
+            echo "✗ .next directory NOT found after build!"
+            echo "This means the build step failed or didn't run properly."
+            exit /b 1
+          )
+
+      - name: Smart cleanup for deployment
+        working-directory: ./frontend
+        shell: cmd
+        run: |
+          echo "=== SMART CLEANUP: Starting intelligent cleanup ==="
+          echo "Current directory: %CD%"
           
           echo "=== BEFORE CLEANUP - Current directory contents: ==="
           dir
-          echo "=== BEFORE CLEANUP - .next directory size: ==="
+          echo "=== BEFORE CLEANUP - .next directory verification: ==="
           if exist .next (
+            echo "✓ .next directory found before cleanup"
+            dir .next
+            echo "=== .next directory size: ==="
             dir .next /s | findstr "File(s)"
+          ) else (
+            echo "✗ .next directory missing before cleanup!"
+            echo "=== Searching for build output in other locations ==="
+            if exist out (
+              echo "Found 'out' directory - this might be the build output"
+              dir out
+            )
+            if exist dist (
+              echo "Found 'dist' directory - this might be the build output"
+              dir dist
+            )
+            if exist build (
+              echo "Found 'build' directory - this might be the build output"
+              dir build
+            )
+            echo "=== ERROR: No build output found! ==="
+            echo "The build step either failed or didn't run."
+            exit /b 1
           )
           
-          echo "=== Removing development files ==="
+          echo "=== Removing development files (preserving build output) ==="
           if exist .git (
             echo "Removing .git directory..."
             rmdir /s /q .git
@@ -145,9 +217,9 @@ jobs:
           
           echo "=== AFTER CLEANUP - Final package contents: ==="
           dir
-          echo "=== Verifying .next still exists: ==="
+          echo "=== Verifying .next still exists after cleanup: ==="
           if exist .next (
-            echo "SUCCESS: .next directory preserved"
+            echo "SUCCESS: .next directory preserved during cleanup"
             echo "=== .next directory contents after cleanup: ==="
             dir .next
             echo "=== .next directory size after cleanup: ==="
@@ -156,6 +228,7 @@ jobs:
             echo "ERROR: .next directory was removed during cleanup!"
             echo "=== Current directory contents after cleanup: ==="
             dir
+            echo "=== This should not happen - cleanup script is too aggressive ==="
             exit /b 1
           )
           
