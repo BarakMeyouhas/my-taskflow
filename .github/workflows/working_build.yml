@@ -88,11 +88,22 @@ jobs:
           if exist .next echo "✓ .next directory"
           if exist node_modules echo "✓ node_modules (production)"
           
-      - name: Upload Build Artifact
+      - name: Create Deployment Package
+        working-directory: ./frontend
+        shell: cmd
+        run: |
+          echo "=== Creating deployment package ==="
+          echo "Current directory: %CD%"
+          echo "Creating zip archive with .next directory..."
+          powershell -Command "Compress-Archive -Path . -DestinationPath ../deployment-package.zip -Force"
+          echo "=== Deployment package created ==="
+          dir ..\deployment-package.zip
+          
+      - name: Upload Deployment Package
         uses: actions/upload-artifact@v4
         with:
           name: nextjs-build
-          path: ./frontend
+          path: ./deployment-package.zip
           
       - name: Verify Artifact Before Upload
         working-directory: ./frontend
@@ -123,6 +134,18 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: nextjs-build
+          
+      - name: Extract Deployment Package
+        run: |
+          echo "=== Extracting deployment package ==="
+          echo "Current directory: $(pwd)"
+          echo "Downloaded files:"
+          ls -la
+          echo "Extracting deployment-package.zip..."
+          unzip deployment-package.zip
+          echo "=== Extraction completed ==="
+          echo "Extracted contents:"
+          ls -la
           
       - name: Verify Artifact After Download
         run: |
