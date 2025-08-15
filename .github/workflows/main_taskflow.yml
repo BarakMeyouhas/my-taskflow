@@ -48,6 +48,7 @@ jobs:
         working-directory: ./frontend
         shell: cmd
         run: |
+          echo "=== BUILD STEP STARTED ==="
           echo "=== Starting Next.js build ==="
           echo "Current directory: %CD%"
           echo "Available scripts in package.json:"
@@ -63,6 +64,8 @@ jobs:
               echo "WARNING: .next directory exists despite build failure"
               dir .next
             )
+            echo "=== Current directory contents after build failure: ==="
+            dir
             exit /b 1
           )
           
@@ -73,6 +76,8 @@ jobs:
             dir
             echo "=== package.json contents: ==="
             type package.json
+            echo "=== npm run build output: ==="
+            npm run build 2>&1
             exit /b 1
           )
           
@@ -187,19 +192,19 @@ jobs:
               exit /b 1
             )
             echo "✓ startup.js syntax is valid"
-          
-          echo "=== Testing server.cjs syntax ==="
-          if exist server.cjs (
-            node -c server.cjs
-            if %ERRORLEVEL% neq 0 (
-              echo "ERROR: server.cjs has syntax errors!"
+            
+            echo "=== Testing server.cjs syntax ==="
+            if exist server.cjs (
+              node -c server.cjs
+              if %ERRORLEVEL% neq 0 (
+                echo "ERROR: server.cjs has syntax errors!"
+                exit /b 1
+              )
+              echo "✓ server.cjs syntax is valid"
+            ) else (
+              echo "ERROR: server.cjs not found!"
               exit /b 1
             )
-            echo "✓ server.cjs syntax is valid"
-          ) else (
-            echo "ERROR: server.cjs not found!"
-            exit /b 1
-          )
           ) else (
             echo "ERROR: startup.js not found!"
             exit /b 1
