@@ -1,6 +1,6 @@
 export const authConfig = {
   // Backend API URL - update this to match your backend
-  backendUrl: process.env.BACKEND_URL || 'http://localhost:5225',
+  backendUrl: process.env.BACKEND_URL || 'https://taskflowBackend.canadacentral-01.azurewebsites.net',
   
   // App name
   appName: process.env.NEXT_PUBLIC_APP_NAME || 'TaskFlow',

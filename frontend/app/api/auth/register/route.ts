@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { authConfig } from '@/config/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,9 +14,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: Replace with actual backend API call
-    // For now, we'll simulate a successful registration
-    const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5225'}/api/auth/register`, {
+    // Call the backend API
+    const response = await fetch(`${authConfig.backendUrl}/api/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

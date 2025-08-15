@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { authConfig } from '@/config/auth';
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,9 +14,8 @@ export async function GET(request: NextRequest) {
 
     const token = authHeader.substring(7); // Remove 'Bearer ' prefix
 
-    // TODO: Replace with actual backend token verification
-    // For now, we'll simulate a successful verification
-    const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5225'}/api/auth/verify`, {
+    // Call the backend API for token verification
+    const response = await fetch(`${authConfig.backendUrl}/api/auth/verify`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
