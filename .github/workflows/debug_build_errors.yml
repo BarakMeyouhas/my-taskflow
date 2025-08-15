@@ -1,0 +1,83 @@
+name: Debug Build Errors
+
+on:
+  workflow_dispatch:
+
+jobs:
+  debug-build-errors:
+    runs-on: windows-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+          
+      - name: Install Dependencies
+        working-directory: ./frontend
+        shell: cmd
+        run: |
+          echo "=== Installing dependencies ==="
+          npm ci
+          echo "=== Dependencies installed ==="
+          
+      - name: Debug Build with Error Capture
+        working-directory: ./frontend
+        shell: cmd
+        run: |
+          echo "=== Starting build with error capture ==="
+          echo "Current directory: %CD%"
+          echo "Node version:"
+          node --version
+          echo "npm version:"
+          npm --version
+          echo "=== Package.json contents: ==="
+          type package.json
+          echo "=== Next.js config contents: ==="
+          type next.config.js
+          echo "=== Running build with full output capture ==="
+          npm run build 2>&1
+          echo "=== Build command completed, exit code: %ERRORLEVEL% ==="
+          
+          if %ERRORLEVEL% neq 0 (
+            echo "ERROR: Build failed with exit code %ERRORLEVEL%"
+            echo "=== Checking for partial build output ==="
+            if exist .next (
+              echo "WARNING: .next directory exists despite failure"
+              dir .next
+            ) else (
+              echo "No .next directory found after build failure"
+            )
+          ) else (
+            echo "SUCCESS: Build completed with exit code 0"
+            if exist .next (
+              echo "✓ .next directory created successfully"
+              dir .next
+            ) else (
+              echo "WARNING: Build succeeded but no .next directory"
+            )
+          )
+          
+      - name: Final Directory Check
+        working-directory: ./frontend
+        shell: cmd
+        run: |
+          echo "=== Final directory contents ==="
+          dir
+          echo "=== Checking for any build artifacts ==="
+          if exist .next (
+            echo "✓ .next directory found"
+            dir .next
+          ) else (
+            echo "✗ .next directory missing"
+          )
+          if exist out (
+            echo "Found 'out' directory:"
+            dir out
+          )
+          if exist dist (
+            echo "Found 'dist' directory:"
+            dir dist
+          )
