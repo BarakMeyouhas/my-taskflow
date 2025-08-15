@@ -164,9 +164,10 @@ jobs:
             echo "✓ .next directory exists after download"
             ls -la .next
             echo "=== .next directory size: ==="
-            du -sh .next/
+            du -sh .next/ 2>/dev/null || echo "Size calculation had permission issues (non-critical)"
             echo "=== .next directory file count: ==="
-            find .next -type f | wc -l
+            find .next -type f 2>/dev/null | wc -l || echo "File count had permission issues (non-critical)"
+            echo "✓ .next directory verification successful"
           else
             echo "✗ .next directory missing after download!"
             echo "Current directory contents:"
