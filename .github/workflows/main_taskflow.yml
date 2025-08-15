@@ -63,9 +63,9 @@ jobs:
         shell: cmd
         run: |
           echo "=== Cleaning up for deployment ==="
-          echo "=== Preserving essential files: .next, package.json, server.cjs, web.config ==="
+          echo "=== Preserving essential files: .next, package.json, server.cjs, web.config, .deployment ==="
           
-          # Remove development files but keep build output
+          # Remove development files but keep build output and Azure config
           if exist .git rmdir /s /q .git
           if exist *.log del /q *.log
           if exist .env.local del /q .env.local
@@ -73,6 +73,7 @@ jobs:
           if exist .env.test.local del /q .env.test.local
           if exist .env.production.local del /q .env.production.local
           if exist tsconfig.tsbuildinfo del /q tsconfig.tsbuildinfo
+          if exist node_modules rmdir /s /q node_modules
           
           echo "=== Final package contents: ==="
           dir
@@ -84,6 +85,46 @@ jobs:
             echo "ERROR: .next directory was removed during cleanup!"
             exit /b 1
           )
+          echo "=== Verifying Azure config files: ==="
+          if exist .deployment (
+            echo "SUCCESS: .deployment file preserved"
+          ) else (
+            echo "ERROR: .deployment file was removed!"
+            exit /b 1
+          )
+          
+          echo "=== Installing production dependencies ==="
+          npm ci --only=production
+          echo "=== Installing PM2 globally ==="
+          npm install -g pm2
+          echo "=== Production dependencies installed ==="
+          
+          echo "=== Setting up startup script ==="
+          echo "=== Making startup.js executable ==="
+          echo "=== Verifying startup.js exists: ==="
+          if exist startup.js (
+            echo "SUCCESS: startup.js found"
+            type startup.js
+          ) else (
+            echo "ERROR: startup.js not found!"
+            exit /b 1
+          )
+          
+          echo "=== Final deployment package structure: ==="
+          echo "=== Root directory: ==="
+          dir
+          echo "=== Essential files check: ==="
+          if exist package.json echo "✓ package.json"
+          if exist startup.js echo "✓ startup.js"
+          if exist server.cjs echo "✓ server.cjs"
+          if exist web.config echo "✓ web.config"
+          if exist .deployment echo "✓ .deployment"
+          if exist azure-webapp.config.js echo "✓ azure-webapp.config.js"
+          if exist .next echo "✓ .next directory"
+          echo "=== .next directory contents: ==="
+          dir .next
+          echo "=== Package.json contents: ==="
+          type package.json
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -109,6 +150,33 @@ jobs:
           slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_352C29692F204B188AA07AED5952DEFE }}
+          
+      - name: 'Verify deployment structure'
+        run: |
+          echo "=== Verifying deployed files ==="
+          echo "=== Root directory contents: ==="
+          ls -la
+          echo "=== Essential files check: ==="
+          [ -f "package.json" ] && echo "✓ package.json" || echo "✗ package.json missing"
+          [ -f "startup.js" ] && echo "✓ startup.js" || echo "✗ startup.js missing"
+          [ -f "server.cjs" ] && echo "✓ server.cjs" || echo "✗ server.cjs missing"
+          [ -f "web.config" ] && echo "✓ web.config" || echo "✗ web.config missing"
+          [ -f ".deployment" ] && echo "✓ .deployment" || echo "✗ .deployment missing"
+          [ -f "azure-webapp.config.js" ] && echo "✓ azure-webapp.config.js" || echo "✗ azure-webapp.config.js missing"
+          [ -d ".next" ] && echo "✓ .next directory" || echo "✗ .next directory missing"
+          echo "=== .next directory contents: ==="
+          if [ -d ".next" ]; then
+            ls -la .next
+            echo "=== .next/static contents: ==="
+            ls -la .next/static || echo "No static directory"
+            echo "=== .next/server contents: ==="
+            ls -la .next/server || echo "No server directory"
+          else
+            echo "ERROR: .next directory not found in deployment!"
+            exit 1
+          fi
+          echo "=== Package.json: ==="
+          cat package.json
       
       - name: 'Kudu Deployment (Alternative)'
         if: failure()

@@ -2,17 +2,18 @@ module.exports = {
   apps: [
     {
       name: 'taskflow',
-      script: 'npm',
-      args: 'start',
-      cwd: './',
+      script: 'server.cjs',
       instances: 1,
       autorestart: true,
       watch: false,
       max_memory_restart: '1G',
       env: {
         NODE_ENV: 'production',
-        PORT: process.env.PORT || 8080,
-        HOSTNAME: '0.0.0.0'
+        PORT: 8080
+      },
+      env_production: {
+        NODE_ENV: 'production',
+        PORT: 8080
       }
     }
   ]
