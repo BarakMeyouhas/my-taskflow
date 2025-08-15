@@ -35,33 +35,20 @@ const nodeModulesDir = path.join(process.cwd(), 'node_modules');
 const nextPackageDir = path.join(nodeModulesDir, 'next');
 
 if (!fs.existsSync(nextPackageDir)) {
-  console.log('⚠️  Next.js dependencies not found, installing production dependencies...');
-  
+  console.error('❌ Next.js dependencies not found!');
+  console.error('This means the deployment package is missing required dependencies.');
+  console.error('Available files in current directory:');
   try {
-    // Install production dependencies
-    const npmInstall = spawn('npm', ['ci', '--omit=dev', '--no-audit', '--no-fund'], {
-      stdio: 'inherit',
-      cwd: process.cwd()
-    });
-    
-    npmInstall.on('exit', (code) => {
-      if (code === 0) {
-        console.log('✓ Production dependencies installed successfully');
-        startServer();
-      } else {
-        console.error(`✗ Failed to install dependencies (exit code: ${code})`);
-        process.exit(1);
-      }
-    });
-    
-    npmInstall.on('error', (err) => {
-      console.error('Failed to run npm install:', err);
-      process.exit(1);
-    });
+    const files = fs.readdirSync(process.cwd());
+    console.error(files);
   } catch (err) {
-    console.error('Failed to start dependency installation:', err);
-    process.exit(1);
+    console.error('Could not read directory:', err.message);
   }
+  
+  console.error('❌ The application cannot run without the Next.js package.');
+  console.error('❌ Please ensure the deployment package includes all production dependencies.');
+  console.error('❌ Check that node_modules is included in the deployment or build process.');
+  process.exit(1);
 } else {
   console.log('✓ Dependencies already installed');
   startServer();

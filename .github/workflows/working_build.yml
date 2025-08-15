@@ -46,6 +46,16 @@ jobs:
             dir
           )
           
+      - name: Install Production Dependencies
+        working-directory: ./frontend
+        shell: cmd
+        run: |
+          echo "=== Installing production dependencies ==="
+          echo "Current directory: %CD%"
+          echo "Installing only production dependencies..."
+          npm ci --omit=dev --no-audit --no-fund
+          echo "✓ Production dependencies installed"
+          
       - name: Prepare for Deployment
         working-directory: ./frontend
         shell: cmd
@@ -62,16 +72,32 @@ jobs:
             exit /b 1
           )
           
-          echo "=== Removing development files (preserving .next) ==="
-          if exist node_modules rmdir /s /q node_modules
+          echo "=== BEFORE cleanup - node_modules verification: ==="
+          if exist node_modules (
+            echo "✓ node_modules directory found before cleanup"
+            dir node_modules
+          ) else (
+            echo "✗ node_modules directory missing before cleanup!"
+            exit /b 1
+          )
+          
+          echo "=== Removing development files (preserving .next and node_modules) ==="
           if exist .git rmdir /s /q .git
           
-          echo "=== AFTER cleanup - Verifying .next still exists: ==="
+          echo "=== AFTER cleanup - Verifying essential directories still exist: ==="
           if exist .next (
             echo "✓ .next directory preserved during cleanup"
             dir .next
           ) else (
             echo "ERROR: .next directory was removed during cleanup!"
+            exit /b 1
+          )
+          
+          if exist node_modules (
+            echo "✓ node_modules directory preserved during cleanup"
+            dir node_modules
+          ) else (
+            echo "ERROR: node_modules directory was removed during cleanup!"
             exit /b 1
           )
           
@@ -84,6 +110,7 @@ jobs:
           if exist web.config echo "✓ web.config"
           if exist .deployment echo "✓ .deployment"
           if exist .next echo "✓ .next directory"
+          if exist node_modules echo "✓ node_modules directory"
           
       - name: Create Deployment Package
         working-directory: ./frontend
@@ -92,10 +119,10 @@ jobs:
           echo "=== Creating deployment package ==="
           echo "Current directory: %CD%"
           echo "Creating optimized zip archive..."
-          echo "Including essential files: .next, package.json, package-lock.json, startup.cjs, server.cjs, web.config, .deployment, app, components, config, contexts, public"
-          echo "Excluding: node_modules (will be installed on Azure via startup script)"
+          echo "Including essential files: .next, package.json, package-lock.json, startup.cjs, server.cjs, web.config, .deployment, app, components, config, contexts, public, node_modules"
+          echo "Note: node_modules included for Azure runtime (production dependencies only)"
           
-          powershell -Command "Compress-Archive -Path .next,package.json,package-lock.json,startup.cjs,server.cjs,web.config,.deployment,app,components,config,contexts,public -DestinationPath ../deployment-package.zip -Force"
+          powershell -Command "Compress-Archive -Path .next,package.json,package-lock.json,startup.cjs,server.cjs,web.config,.deployment,app,components,config,contexts,public,node_modules -DestinationPath ../deployment-package.zip -Force"
           
           echo "=== Deployment package created ==="
           dir ..\deployment-package.zip
@@ -196,6 +223,7 @@ jobs:
           if [ -f "server.cjs" ]; then echo "✓ server.cjs"; fi
           if [ -f "web.config" ]; then echo "✓ web.config"; fi
           if [ -f ".deployment" ]; then echo "✓ .deployment"; fi
+          if [ -d "node_modules" ]; then echo "✓ node_modules directory"; fi
           echo "Final directory contents:"
           ls -la
           
