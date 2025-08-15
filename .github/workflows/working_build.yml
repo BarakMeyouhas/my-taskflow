@@ -49,14 +49,44 @@ jobs:
         shell: cmd
         run: |
           echo "=== Preparing for deployment ==="
-          echo "Removing development files..."
+          echo "=== BEFORE cleanup - Current directory contents: ==="
+          dir
+          echo "=== BEFORE cleanup - .next directory verification: ==="
+          if exist .next (
+            echo "✓ .next directory found before cleanup"
+            dir .next
+          ) else (
+            echo "✗ .next directory missing before cleanup!"
+            exit /b 1
+          )
+          
+          echo "=== Removing development files (preserving .next) ==="
           if exist node_modules rmdir /s /q node_modules
           if exist .git rmdir /s /q .git
+          
+          echo "=== AFTER cleanup - Verifying .next still exists: ==="
+          if exist .next (
+            echo "✓ .next directory preserved during cleanup"
+            dir .next
+          ) else (
+            echo "ERROR: .next directory was removed during cleanup!"
+            exit /b 1
+          )
+          
           echo "=== Installing production dependencies ==="
           npm ci --only=production
           echo "=== Production dependencies installed ==="
-          echo "=== Deployment package ready ==="
+          
+          echo "=== FINAL verification - Deployment package ready: ==="
           dir
+          echo "=== Essential files check: ==="
+          if exist package.json echo "✓ package.json"
+          if exist startup.js echo "✓ startup.js"
+          if exist server.cjs echo "✓ server.cjs"
+          if exist web.config echo "✓ web.config"
+          if exist .deployment echo "✓ .deployment"
+          if exist .next echo "✓ .next directory"
+          if exist node_modules echo "✓ node_modules (production)"
           
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
