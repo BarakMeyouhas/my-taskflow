@@ -94,6 +94,26 @@ jobs:
           name: nextjs-build
           path: ./frontend
           
+      - name: Verify Artifact Before Upload
+        working-directory: ./frontend
+        shell: cmd
+        run: |
+          echo "=== VERIFYING ARTIFACT BEFORE UPLOAD ==="
+          echo "Current directory: %CD%"
+          echo "Directory contents:"
+          dir
+          echo "=== .next directory verification: ==="
+          if exist .next (
+            echo "✓ .next directory exists before upload"
+            dir .next
+            echo "=== .next directory size: ==="
+            dir .next /s | findstr "File(s)"
+          ) else (
+            echo "✗ .next directory missing before upload!"
+            exit /b 1
+          )
+          echo "=== ARTIFACT VERIFICATION COMPLETE ==="
+          
   deploy:
     runs-on: ubuntu-latest
     needs: build
