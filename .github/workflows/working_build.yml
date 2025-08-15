@@ -94,10 +94,16 @@ jobs:
         run: |
           echo "=== Creating deployment package ==="
           echo "Current directory: %CD%"
-          echo "Creating zip archive with .next directory..."
-          powershell -Command "Compress-Archive -Path . -DestinationPath ../deployment-package.zip -Force"
+          echo "Creating optimized zip archive..."
+          echo "Including essential files: .next, package.json, startup.js, server.cjs, web.config, .deployment"
+          echo "Excluding: node_modules (will reinstall on Azure)"
+          
+          powershell -Command "Compress-Archive -Path .next,package.json,startup.js,server.cjs,web.config,.deployment,app,components,config,contexts,public -DestinationPath ../deployment-package.zip -Force"
+          
           echo "=== Deployment package created ==="
           dir ..\deployment-package.zip
+          echo "=== Package size: ==="
+          powershell -Command "Get-ChildItem ../deployment-package.zip | Select-Object Name, @{Name='Size(MB)';Expression={[math]::Round($_.Length/1MB,2)}}"
           
       - name: Upload Deployment Package
         uses: actions/upload-artifact@v4
@@ -168,6 +174,16 @@ jobs:
             exit 1
           fi
           echo "=== ARTIFACT DOWNLOAD VERIFICATION COMPLETE ==="
+          
+      - name: Install Production Dependencies
+        run: |
+          echo "=== Installing production dependencies ==="
+          echo "Current directory: $(pwd)"
+          echo "Installing production dependencies..."
+          npm ci --only=production
+          echo "=== Production dependencies installed ==="
+          echo "Final directory contents:"
+          ls -la
           
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
