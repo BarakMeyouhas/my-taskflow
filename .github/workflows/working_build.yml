@@ -95,10 +95,10 @@ jobs:
           echo "=== Creating deployment package ==="
           echo "Current directory: %CD%"
           echo "Creating optimized zip archive..."
-          echo "Including essential files: .next, package.json, startup.js, server.cjs, web.config, .deployment"
+          echo "Including essential files: .next, package.json, package-lock.json, startup.js, server.cjs, web.config, .deployment"
           echo "Excluding: node_modules (will reinstall on Azure)"
           
-          powershell -Command "Compress-Archive -Path .next,package.json,startup.js,server.cjs,web.config,.deployment,app,components,config,contexts,public -DestinationPath ../deployment-package.zip -Force"
+          powershell -Command "Compress-Archive -Path .next,package.json,package-lock.json,startup.js,server.cjs,web.config,.deployment,app,components,config,contexts,public -DestinationPath ../deployment-package.zip -Force"
           
           echo "=== Deployment package created ==="
           dir ..\deployment-package.zip
