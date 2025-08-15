@@ -227,10 +227,14 @@ jobs:
           echo "Final directory contents:"
           ls -la
           
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'TaskFlow'
           slot-name: 'Production'
           package: deployment-package.zip
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_352C29692F204B188AA07AED5952DEFE }}
