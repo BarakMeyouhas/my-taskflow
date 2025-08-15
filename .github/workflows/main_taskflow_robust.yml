@@ -57,7 +57,10 @@ jobs:
             echo "✓ No .next directory exists (expected before build)"
           )
           echo "=== Checking package.json scripts ==="
-          type package.json | findstr "scripts" -A 10
+          echo "=== package.json scripts section: ==="
+          findstr /C:"scripts" package.json
+          echo "=== Full package.json contents: ==="
+          type package.json
 
       - name: Build Next.js application
         working-directory: ./frontend
