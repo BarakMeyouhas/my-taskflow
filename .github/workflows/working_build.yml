@@ -124,6 +124,28 @@ jobs:
         with:
           name: nextjs-build
           
+      - name: Verify Artifact After Download
+        run: |
+          echo "=== VERIFYING ARTIFACT AFTER DOWNLOAD ==="
+          echo "Current directory: $(pwd)"
+          echo "Root directory contents:"
+          ls -la
+          echo "=== .next directory verification: ==="
+          if [ -d ".next" ]; then
+            echo "✓ .next directory exists after download"
+            ls -la .next
+            echo "=== .next directory size: ==="
+            du -sh .next/
+            echo "=== .next directory file count: ==="
+            find .next -type f | wc -l
+          else
+            echo "✗ .next directory missing after download!"
+            echo "Current directory contents:"
+            ls -la
+            exit 1
+          fi
+          echo "=== ARTIFACT DOWNLOAD VERIFICATION COMPLETE ==="
+          
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
