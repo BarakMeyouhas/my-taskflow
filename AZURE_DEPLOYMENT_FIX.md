@@ -8,7 +8,7 @@ Your Azure Web App was successfully deploying but failing to run because it coul
 ### 1. **Startup Configuration**
 - Created `.deployment` file to tell Azure how to start your app
 - Updated `package.json` start script to use a custom startup script
-- Created `startup.js` with proper error handling and verification
+- Created `startup.cjs` with proper error handling and verification
 
 ### 2. **Build Process Improvements**
 - Enhanced GitHub Actions workflow to preserve all necessary files
@@ -25,7 +25,7 @@ Your Azure Web App was successfully deploying but failing to run because it coul
 
 ### New Files:
 - `.deployment` - Azure deployment configuration
-- `startup.js` - Custom startup script with error handling
+- `startup.cjs` - Custom startup script with error handling
 - `AZURE_DEPLOYMENT_FIX.md` - This guide
 
 ### Modified Files:
@@ -37,8 +37,8 @@ Your Azure Web App was successfully deploying but failing to run because it coul
 The deployment now uses a simplified approach:
 1. **GitHub Actions** builds the Next.js app and preserves the `.next` directory
 2. **Azure Web App** uses the `.deployment` file to run `npm start`
-3. **npm start** runs `node startup.js`
-4. **startup.js** verifies the `.next` directory exists and starts the server
+3. **npm start** runs `node startup.cjs`
+4. **startup.cjs** verifies the `.next` directory exists and starts the server
 5. **server.cjs** runs the actual Next.js application
 
 ## Next Steps

@@ -8,6 +8,9 @@ console.log('Starting TaskFlow application...');
 console.log('Current directory:', process.cwd());
 console.log('Node version:', process.version);
 console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('PORT:', process.env.PORT);
+console.log('WEBSITE_SITE_NAME:', process.env.WEBSITE_SITE_NAME);
+console.log('WEBSITE_INSTANCE_ID:', process.env.WEBSITE_INSTANCE_ID);
 
 // Check if .next directory exists
 const nextDir = path.join(process.cwd(), '.next');
@@ -67,14 +70,15 @@ if (!fs.existsSync(nextPackageDir)) {
 function startServer() {
   console.log('✓ Starting Next.js server...');
   
-  // Start the server
-  const server = spawn('node', ['server.cjs'], {
-    stdio: 'inherit',
-    env: Object.assign({}, process.env, {
-      NODE_ENV: 'production',
-      PORT: process.env.PORT || 8080
-    })
-  });
+  try {
+    // Start the server
+    const server = spawn('node', ['server.cjs'], {
+      stdio: 'inherit',
+      env: Object.assign({}, process.env, {
+        NODE_ENV: 'production',
+        PORT: process.env.PORT || 8080
+      })
+    });
 
   server.on('error', (err) => {
     console.error('Failed to start server:', err);
@@ -96,4 +100,9 @@ function startServer() {
     console.log('Received SIGINT, shutting down gracefully...');
     server.kill('SIGINT');
   });
+  
+  } catch (err) {
+    console.error('Failed to start server process:', err);
+    process.exit(1);
+  }
 }

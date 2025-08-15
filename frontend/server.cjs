@@ -22,6 +22,14 @@ app.prepare()
     
     createServer(async (req, res) => {
       try {
+        // Add health check endpoint
+        if (req.url === '/health') {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'text/plain');
+          res.end('OK - TaskFlow is running');
+          return;
+        }
+        
         const parsedUrl = parse(req.url, true);
         await handle(req, res, parsedUrl);
       } catch (err) {

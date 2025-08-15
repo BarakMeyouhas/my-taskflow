@@ -94,14 +94,14 @@ X File(s) Y bytes
 ### 1.5 Script Validation
 **Look for:**
 ```
-=== Testing startup.js syntax ===
-✓ startup.js syntax is valid
+=== Testing startup.cjs syntax ===
+✓ startup.cjs syntax is valid
 === Testing server.cjs syntax ===
 ✓ server.cjs syntax is valid
 ```
 
 **Red flags:**
-- ❌ `ERROR: startup.js has syntax errors!` - ES module syntax issues
+- ❌ `ERROR: startup.cjs has syntax errors!` - CommonJS syntax issues
 - ❌ `ERROR: server.cjs has syntax errors!` - CommonJS syntax issues
 
 **Fix:** Check for import/require syntax mismatches or syntax errors
@@ -175,14 +175,14 @@ Deployment successful
 === Current working directory: /home/runner/work/my-taskflow/my-taskflow ===
 === Essential files check: ===
 ✓ package.json
-✓ startup.js
+✓ startup.cjs
 ✓ server.cjs
 ✓ web.config
 ✓ .deployment
 ✓ .next directory
 === File sizes and details: ===
 package.json: X lines, X.XK
-startup.js: X lines, X.XK
+startup.cjs: X lines, X.XK
 server.cjs: X lines, X.XK
 .deployment: [config] command = npm start
 === .next directory size: ===
@@ -259,7 +259,7 @@ cd frontend
 npm run build
 
 # Test startup script
-node startup.js
+node startup.cjs
 
 # Test server
 node server.cjs
