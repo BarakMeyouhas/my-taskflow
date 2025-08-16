@@ -62,12 +62,7 @@ jobs:
         with:
           name: backend-build
           
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-          
-      - name: Deploy Backend to Azure Web App
+      - name: Deploy to Azure Web App (Simple)
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'TaskFlowBackend'
