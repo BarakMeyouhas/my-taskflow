@@ -27,6 +27,9 @@ builder.Services.AddControllers();
 // Add services to the container.
 builder.Services.AddOpenApi();
 
+// Add Queue Service
+builder.Services.AddScoped<IQueueService, QueueService>();
+
 builder
     .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

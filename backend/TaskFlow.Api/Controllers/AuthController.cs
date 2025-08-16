@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using TaskFlow.Api.Data;
 using TaskFlow.Api.Models;
+using TaskFlow.Api.Services;
 
 namespace TaskFlow.Api.Controllers
 {
@@ -12,6 +13,13 @@ namespace TaskFlow.Api.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
+        private readonly ILogger<AuthController> _logger;
+
+        public AuthController(ILogger<AuthController> logger)
+        {
+            _logger = logger;
+        }
+
         [HttpPost("login")]
         public IActionResult Login(
             [FromBody] UserLoginRequest request,
@@ -154,27 +162,60 @@ namespace TaskFlow.Api.Controllers
         }
 
         [HttpPost("register")]
-        public IActionResult Register(
+        public async Task<IActionResult> Register(
             [FromBody] UserRegisterRequest request,
-            [FromServices] AppDbContext db
+            [FromServices] AppDbContext db,
+            [FromServices] IQueueService queueService
         )
         {
-            if (db.Users.Any(u => u.Username == request.Username))
-                return BadRequest("Username already exists");
-
-            var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
-
-            var user = new User
+            try
             {
-                Username = request.Username,
-                Email = request.Email,
-                PasswordHash = passwordHash,
-            };
+                // Validate request
+                if (string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
+                {
+                    return BadRequest("Username, email, and password are required");
+                }
 
-            db.Users.Add(user);
-            db.SaveChanges();
+                // Check if user already exists
+                if (db.Users.Any(u => u.Username == request.Username || u.Email == request.Email))
+                {
+                    return BadRequest("Username or email already exists");
+                }
 
-            return Ok("User registered successfully");
+                // Create queue message
+                var queueMessage = new
+                {
+                    Username = request.Username,
+                    Email = request.Email,
+                    Password = request.Password,
+                    RequestedAt = DateTime.UtcNow,
+                    RequestId = Guid.NewGuid().ToString()
+                };
+
+                // Send to queue for processing
+                var success = await queueService.SendMessageAsync("user-registration-queue", queueMessage);
+                
+                if (success)
+                {
+                    _logger.LogInformation("User registration queued for username: {Username}", request.Username);
+                    
+                    return Ok(new { 
+                        message = "User registration request received and queued for processing",
+                        requestId = queueMessage.RequestId,
+                        status = "queued"
+                    });
+                }
+                else
+                {
+                    _logger.LogError("Failed to queue user registration for username: {Username}", request.Username);
+                    return StatusCode(500, new { error = "Failed to queue registration request" });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error queuing user registration for username: {Username}", request.Username);
+                return StatusCode(500, new { error = "Internal server error", details = ex.Message });
+            }
         }
 
         public class UserRegisterRequest
