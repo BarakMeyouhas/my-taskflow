@@ -1,4 +1,4 @@
-name: Working Build Workflow
+name: Frontend Deployment Workflow
 
 on:
   push:
