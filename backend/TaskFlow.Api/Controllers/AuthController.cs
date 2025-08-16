@@ -18,34 +18,64 @@ namespace TaskFlow.Api.Controllers
             [FromServices] AppDbContext db
         )
         {
-            // Find user in database
-            var user = db.Users.FirstOrDefault(u => u.Username == request.Username);
-
-            if (user == null)
+            try
             {
-                return Unauthorized("Invalid username or password");
-            }
-
-            // Verify password hash
-            if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-            {
-                return Unauthorized("Invalid username or password");
-            }
-
-            // Generate token and return user info
-            var token = GenerateJwtToken(user.Username);
-            return Ok(
-                new
+                // Validate request
+                if (
+                    request == null
+                    || string.IsNullOrEmpty(request.Username)
+                    || string.IsNullOrEmpty(request.Password)
+                )
                 {
-                    token,
-                    user = new
-                    {
-                        id = user.Id,
-                        username = user.Username,
-                        email = user.Email,
-                    },
+                    return BadRequest("Username and password are required");
                 }
-            );
+
+                // Find user in database
+                var user = db.Users.FirstOrDefault(u => u.Username == request.Username);
+
+                if (user == null)
+                {
+                    return Unauthorized("Invalid username or password");
+                }
+
+                // Verify password hash
+                if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+                {
+                    return Unauthorized("Invalid username or password");
+                }
+
+                // Generate token and return user info
+                var token = GenerateJwtToken(user.Username);
+                return Ok(
+                    new
+                    {
+                        token,
+                        user = new
+                        {
+                            id = user.Id,
+                            username = user.Username,
+                            email = user.Email,
+                        },
+                    }
+                );
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (in production, use proper logging)
+                Console.WriteLine($"Login error: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+
+                return StatusCode(
+                    500,
+                    new { error = "Internal server error", details = ex.Message }
+                );
+            }
+        }
+
+        [HttpGet("test")]
+        public IActionResult Test()
+        {
+            return Ok(new { message = "Auth controller is working!", timestamp = DateTime.UtcNow });
         }
 
         private string GenerateJwtToken(string username)

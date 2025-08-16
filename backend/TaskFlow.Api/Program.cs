@@ -9,17 +9,24 @@ var builder = WebApplication.CreateBuilder(args);
 // Add CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
+    options.AddPolicy(
+        "AllowAll",
+        policy =>
+        {
+            policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+        }
+    );
 });
 
+// Use in-memory database for testing (temporary)
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseInMemoryDatabase("TaskFlowTestDb")
 );
+
+// Uncomment this when you have a real database connection
+// builder.Services.AddDbContext<AppDbContext>(options =>
+//     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+// );
 
 builder.Services.AddControllers();
 
@@ -57,12 +64,19 @@ app.UseAuthorization();
 app.MapControllers();
 
 // בריאות בסיסית ל־root "/"
-app.MapGet("/", () => Results.Ok(new { 
-    status = "OK", 
-    message = "TaskFlow API is running 🚀",
-    timestamp = DateTime.UtcNow,
-    environment = app.Environment.EnvironmentName
-}));
+app.MapGet(
+    "/",
+    () =>
+        Results.Ok(
+            new
+            {
+                status = "OK",
+                message = "TaskFlow API is running 🚀",
+                timestamp = DateTime.UtcNow,
+                environment = app.Environment.EnvironmentName,
+            }
+        )
+);
 
 // Test endpoint to verify routing
 app.MapGet("/test", () => Results.Ok(new { message = "Test endpoint working!" }));
@@ -75,8 +89,16 @@ if (app.Environment.IsDevelopment())
 
 var summaries = new[]
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild",
-    "Warm", "Balmy", "Hot", "Sweltering", "Scorching",
+    "Freezing",
+    "Bracing",
+    "Chilly",
+    "Cool",
+    "Mild",
+    "Warm",
+    "Balmy",
+    "Hot",
+    "Sweltering",
+    "Scorching",
 };
 
 app.MapGet(
