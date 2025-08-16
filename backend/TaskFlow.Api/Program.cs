@@ -6,15 +6,24 @@ using TaskFlow.Api.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
-
 builder.Services.AddControllers();
 
 // Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 builder
@@ -37,10 +46,26 @@ builder
 
 var app = builder.Build();
 
+app.UseHttpsRedirection();
+
+// Enable CORS
+app.UseCors("AllowAll");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// בריאות בסיסית ל־root "/"
+app.MapGet("/", () => Results.Ok(new { 
+    status = "OK", 
+    message = "TaskFlow API is running 🚀",
+    timestamp = DateTime.UtcNow,
+    environment = app.Environment.EnvironmentName
+}));
+
+// Test endpoint to verify routing
+app.MapGet("/test", () => Results.Ok(new { message = "Test endpoint working!" }));
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -48,20 +73,10 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
-
 var summaries = new[]
 {
-    "Freezing",
-    "Bracing",
-    "Chilly",
-    "Cool",
-    "Mild",
-    "Warm",
-    "Balmy",
-    "Hot",
-    "Sweltering",
-    "Scorching",
+    "Freezing", "Bracing", "Chilly", "Cool", "Mild",
+    "Warm", "Balmy", "Hot", "Sweltering", "Scorching",
 };
 
 app.MapGet(
