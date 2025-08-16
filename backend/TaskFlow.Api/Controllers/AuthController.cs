@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using TaskFlow.Api.Data;
 using TaskFlow.Api.Models;
-using TaskFlow.Api.Services;
 
 namespace TaskFlow.Api.Controllers
 {
@@ -162,10 +161,9 @@ namespace TaskFlow.Api.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(
+        public IActionResult Register(
             [FromBody] UserRegisterRequest request,
-            [FromServices] AppDbContext db,
-            [FromServices] IQueueService queueService
+            [FromServices] AppDbContext db
         )
         {
             try
@@ -182,38 +180,31 @@ namespace TaskFlow.Api.Controllers
                     return BadRequest("Username or email already exists");
                 }
 
-                // Create queue message
-                var queueMessage = new
+                // Hash the password
+                var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+
+                // Create new user
+                var newUser = new User
                 {
                     Username = request.Username,
                     Email = request.Email,
-                    Password = request.Password,
-                    RequestedAt = DateTime.UtcNow,
-                    RequestId = Guid.NewGuid().ToString()
+                    PasswordHash = passwordHash,
                 };
 
-                // Send to queue for processing
-                var success = await queueService.SendMessageAsync("user-registration-queue", queueMessage);
-                
-                if (success)
-                {
-                    _logger.LogInformation("User registration queued for username: {Username}", request.Username);
-                    
-                    return Ok(new { 
-                        message = "User registration request received and queued for processing",
-                        requestId = queueMessage.RequestId,
-                        status = "queued"
-                    });
-                }
-                else
-                {
-                    _logger.LogError("Failed to queue user registration for username: {Username}", request.Username);
-                    return StatusCode(500, new { error = "Failed to queue registration request" });
-                }
+                // Add to database
+                db.Users.Add(newUser);
+                db.SaveChanges();
+
+                _logger.LogInformation("User registered successfully for username: {Username}", request.Username);
+
+                return Ok(new { 
+                    message = "User registered successfully",
+                    userId = newUser.Id
+                });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error queuing user registration for username: {Username}", request.Username);
+                _logger.LogError(ex, "Error registering user for username: {Username}", request.Username);
                 return StatusCode(500, new { error = "Internal server error", details = ex.Message });
             }
         }
