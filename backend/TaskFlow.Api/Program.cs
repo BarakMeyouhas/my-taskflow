@@ -18,15 +18,9 @@ builder.Services.AddCors(options =>
     );
 });
 
-// Use in-memory database for testing (temporary)
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseInMemoryDatabase("TaskFlowTestDb")
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
-
-// Uncomment this when you have a real database connection
-// builder.Services.AddDbContext<AppDbContext>(options =>
-//     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-// );
 
 builder.Services.AddControllers();
 
