@@ -169,7 +169,11 @@ namespace TaskFlow.Api.Controllers
             try
             {
                 // Validate request
-                if (string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
+                if (
+                    string.IsNullOrEmpty(request.Username)
+                    || string.IsNullOrEmpty(request.Email)
+                    || string.IsNullOrEmpty(request.Password)
+                )
                 {
                     return BadRequest("Username, email, and password are required");
                 }
@@ -195,17 +199,24 @@ namespace TaskFlow.Api.Controllers
                 db.Users.Add(newUser);
                 db.SaveChanges();
 
-                _logger.LogInformation("User registered successfully for username: {Username}", request.Username);
+                _logger.LogInformation(
+                    "User registered successfully for username: {Username}",
+                    request.Username
+                );
 
-                return Ok(new { 
-                    message = "User registered successfully",
-                    userId = newUser.Id
-                });
+                return Ok(new { message = "User registered successfully", userId = newUser.Id });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error registering user for username: {Username}", request.Username);
-                return StatusCode(500, new { error = "Internal server error", details = ex.Message });
+                _logger.LogError(
+                    ex,
+                    "Error registering user for username: {Username}",
+                    request.Username
+                );
+                return StatusCode(
+                    500,
+                    new { error = "Internal server error", details = ex.Message }
+                );
             }
         }
 
