@@ -20,6 +20,9 @@ namespace TaskFlow.Api.Controllers
         {
             try
             {
+                // Log the incoming request
+                Console.WriteLine($"Login attempt for username: {request?.Username}");
+
                 // Validate request
                 if (
                     request == null
@@ -27,25 +30,39 @@ namespace TaskFlow.Api.Controllers
                     || string.IsNullOrEmpty(request.Password)
                 )
                 {
+                    Console.WriteLine("Login failed: Invalid request data");
                     return BadRequest("Username and password are required");
                 }
+
+                Console.WriteLine("Attempting to query database...");
 
                 // Find user in database
                 var user = db.Users.FirstOrDefault(u => u.Username == request.Username);
 
+                Console.WriteLine($"User found: {user != null}");
+
                 if (user == null)
                 {
+                    Console.WriteLine("Login failed: User not found");
                     return Unauthorized("Invalid username or password");
                 }
+
+                Console.WriteLine("Verifying password...");
 
                 // Verify password hash
                 if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
                 {
+                    Console.WriteLine("Login failed: Invalid password");
                     return Unauthorized("Invalid username or password");
                 }
 
+                Console.WriteLine("Generating JWT token...");
+
                 // Generate token and return user info
                 var token = GenerateJwtToken(user.Username);
+
+                Console.WriteLine("Login successful");
+
                 return Ok(
                     new
                     {
@@ -61,9 +78,18 @@ namespace TaskFlow.Api.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception (in production, use proper logging)
-                Console.WriteLine($"Login error: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                // Log the exception with full details
+                Console.WriteLine($"=== LOGIN ERROR ===");
+                Console.WriteLine($"Error Type: {ex.GetType().Name}");
+                Console.WriteLine($"Error Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+                }
+
+                Console.WriteLine($"=== END LOGIN ERROR ===");
 
                 return StatusCode(
                     500,
@@ -76,6 +102,35 @@ namespace TaskFlow.Api.Controllers
         public IActionResult Test()
         {
             return Ok(new { message = "Auth controller is working!", timestamp = DateTime.UtcNow });
+        }
+
+        [HttpGet("db-test")]
+        public IActionResult TestDatabase([FromServices] AppDbContext db)
+        {
+            try
+            {
+                var userCount = db.Users.Count();
+                return Ok(
+                    new
+                    {
+                        message = "Database connection working!",
+                        userCount = userCount,
+                        timestamp = DateTime.UtcNow,
+                    }
+                );
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        error = "Database error",
+                        details = ex.Message,
+                        stackTrace = ex.StackTrace,
+                    }
+                );
+            }
         }
 
         private string GenerateJwtToken(string username)
