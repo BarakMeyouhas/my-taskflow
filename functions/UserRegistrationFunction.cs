@@ -1,3 +1,5 @@
+using System.Text.Json;
+using Azure.Storage.Queues.Models;
 using BCrypt.Net;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
@@ -24,40 +26,57 @@ namespace TaskFlow.Functions
         [Function("UserRegistration")]
         public async Task Run(
             [QueueTrigger("user-registration-queue", Connection = "AzureWebJobsStorage")]
-                UserRegistrationMessage message
+                QueueMessage message
         )
         {
             try
             {
                 _logger.LogInformation(
-                    "Processing user registration for username: {Username}",
-                    message.Username
+                    "Processing user registration message: {messageText}",
+                    message.MessageText
                 );
-                _logger.LogInformation("Request ID: {RequestId}", message.RequestId);
+
+                // Deserialize the message from JSON
+                var registrationMessage = JsonSerializer.Deserialize<UserRegistrationMessage>(
+                    message.MessageText
+                );
+
+                if (registrationMessage == null)
+                {
+                    _logger.LogError("Failed to deserialize user registration message");
+                    return;
+                }
+
+                _logger.LogInformation(
+                    "Processing user registration for username: {Username}",
+                    registrationMessage.Username
+                );
+                _logger.LogInformation("Request ID: {RequestId}", registrationMessage.RequestId);
 
                 // Check if user already exists
                 var existingUser = await _dbContext.Users.FirstOrDefaultAsync(u =>
-                    u.Username == message.Username || u.Email == message.Email
+                    u.Username == registrationMessage.Username
+                    || u.Email == registrationMessage.Email
                 );
 
                 if (existingUser != null)
                 {
                     _logger.LogWarning(
                         "User registration failed: Username or email already exists. Username: {Username}, Email: {Email}",
-                        message.Username,
-                        message.Email
+                        registrationMessage.Username,
+                        registrationMessage.Email
                     );
                     return;
                 }
 
                 // Hash the password
-                var passwordHash = BCrypt.Net.BCrypt.HashPassword(message.Password);
+                var passwordHash = BCrypt.Net.BCrypt.HashPassword(registrationMessage.Password);
 
                 // Create new user
                 var newUser = new User
                 {
-                    Username = message.Username,
-                    Email = message.Email,
+                    Username = registrationMessage.Username,
+                    Email = registrationMessage.Email,
                     PasswordHash = passwordHash,
                     CreatedAt = DateTime.UtcNow,
                 };
@@ -68,7 +87,7 @@ namespace TaskFlow.Functions
 
                 _logger.LogInformation(
                     "User registration successful for username: {Username}, User ID: {UserId}",
-                    message.Username,
+                    registrationMessage.Username,
                     newUser.Id
                 );
             }
@@ -76,9 +95,8 @@ namespace TaskFlow.Functions
             {
                 _logger.LogError(
                     ex,
-                    "Error processing user registration for username: {Username}, Request ID: {RequestId}",
-                    message.Username,
-                    message.RequestId
+                    "Error processing user registration message: {MessageText}",
+                    message.MessageText
                 );
                 throw; // Re-throw to trigger retry mechanism
             }

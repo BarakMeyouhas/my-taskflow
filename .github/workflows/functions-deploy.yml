@@ -1,4 +1,4 @@
-name: Azure Functions Deploy Workflow
+name: Azure Functions Deployment Workflow
 
 on:
   push:

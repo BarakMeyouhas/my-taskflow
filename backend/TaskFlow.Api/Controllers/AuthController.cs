@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using TaskFlow.Api.Data;
 using TaskFlow.Api.Models;
+using TaskFlow.Api.Services;
 
 namespace TaskFlow.Api.Controllers
 {
@@ -13,10 +14,12 @@ namespace TaskFlow.Api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;
+        private readonly IQueueService _queueService;
 
-        public AuthController(ILogger<AuthController> logger)
+        public AuthController(ILogger<AuthController> logger, IQueueService queueService)
         {
             _logger = logger;
+            _queueService = queueService;
         }
 
         [HttpPost("login")]
@@ -161,7 +164,7 @@ namespace TaskFlow.Api.Controllers
         }
 
         [HttpPost("register")]
-        public IActionResult Register(
+        public async Task<IActionResult> Register(
             [FromBody] UserRegisterRequest request,
             [FromServices] AppDbContext db
         )
@@ -184,33 +187,39 @@ namespace TaskFlow.Api.Controllers
                     return BadRequest("Username or email already exists");
                 }
 
-                // Hash the password
-                var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
-
-                // Create new user
+                // Create user object (without password hash - will be done by the function)
                 var newUser = new User
                 {
                     Username = request.Username,
                     Email = request.Email,
-                    PasswordHash = passwordHash,
+                    PasswordHash = string.Empty, // Will be set by the function
                 };
 
-                // Add to database
-                db.Users.Add(newUser);
-                db.SaveChanges();
+                // Send registration message to queue
+                var messageSent = await _queueService.SendUserRegistrationMessageAsync(newUser, request.Password);
+                
+                if (!messageSent)
+                {
+                    _logger.LogError("Failed to send user registration message to queue for username: {Username}", request.Username);
+                    return StatusCode(500, new { error = "Failed to process registration request" });
+                }
 
                 _logger.LogInformation(
-                    "User registered successfully for username: {Username}",
+                    "User registration request queued successfully for username: {Username}",
                     request.Username
                 );
 
-                return Ok(new { message = "User registered successfully", userId = newUser.Id });
+                return Ok(new { 
+                    message = "User registration request received and queued for processing", 
+                    requestId = Guid.NewGuid().ToString(),
+                    status = "queued"
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(
                     ex,
-                    "Error registering user for username: {Username}",
+                    "Error processing user registration request for username: {Username}",
                     request.Username
                 );
                 return StatusCode(
