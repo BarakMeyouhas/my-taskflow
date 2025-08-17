@@ -1,6 +1,6 @@
+using System.Text.Json;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
-using System.Text.Json;
 using TaskFlow.Api.Models;
 
 namespace TaskFlow.Api.Services
@@ -19,12 +19,15 @@ namespace TaskFlow.Api.Services
 
         public QueueService(IConfiguration configuration, ILogger<QueueService> logger)
         {
-            var connectionString = configuration.GetConnectionString("AzureStorage") 
+            var connectionString =
+                configuration.GetConnectionString("AzureStorage")
                 ?? configuration["AzureWebJobsStorage"];
-            
+
             if (string.IsNullOrEmpty(connectionString))
             {
-                throw new InvalidOperationException("Azure Storage connection string is not configured");
+                throw new InvalidOperationException(
+                    "Azure Storage connection string is not configured"
+                );
             }
 
             _queueServiceClient = new QueueServiceClient(connectionString);
@@ -41,14 +44,18 @@ namespace TaskFlow.Api.Services
                     Email = user.Email,
                     Password = password,
                     RequestedAt = DateTime.UtcNow,
-                    RequestId = Guid.NewGuid().ToString()
+                    RequestId = Guid.NewGuid().ToString(),
                 };
 
                 return await SendMessageAsync(UserRegistrationQueueName, message);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error sending user registration message to queue for user: {Username}", user.Username);
+                _logger.LogError(
+                    ex,
+                    "Error sending user registration message to queue for user: {Username}",
+                    user.Username
+                );
                 return false;
             }
         }
@@ -58,7 +65,7 @@ namespace TaskFlow.Api.Services
             try
             {
                 var queueClient = _queueServiceClient.GetQueueClient(queueName);
-                
+
                 // Ensure queue exists
                 await queueClient.CreateIfNotExistsAsync();
 
@@ -69,7 +76,10 @@ namespace TaskFlow.Api.Services
                 // Send message to queue
                 await queueClient.SendMessageAsync(Convert.ToBase64String(messageBytes));
 
-                _logger.LogInformation("Message sent successfully to queue: {QueueName}", queueName);
+                _logger.LogInformation(
+                    "Message sent successfully to queue: {QueueName}",
+                    queueName
+                );
                 return true;
             }
             catch (Exception ex)

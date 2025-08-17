@@ -196,12 +196,21 @@ namespace TaskFlow.Api.Controllers
                 };
 
                 // Send registration message to queue
-                var messageSent = await _queueService.SendUserRegistrationMessageAsync(newUser, request.Password);
-                
+                var messageSent = await _queueService.SendUserRegistrationMessageAsync(
+                    newUser,
+                    request.Password
+                );
+
                 if (!messageSent)
                 {
-                    _logger.LogError("Failed to send user registration message to queue for username: {Username}", request.Username);
-                    return StatusCode(500, new { error = "Failed to process registration request" });
+                    _logger.LogError(
+                        "Failed to send user registration message to queue for username: {Username}",
+                        request.Username
+                    );
+                    return StatusCode(
+                        500,
+                        new { error = "Failed to process registration request" }
+                    );
                 }
 
                 _logger.LogInformation(
@@ -209,11 +218,14 @@ namespace TaskFlow.Api.Controllers
                     request.Username
                 );
 
-                return Ok(new { 
-                    message = "User registration request received and queued for processing", 
-                    requestId = Guid.NewGuid().ToString(),
-                    status = "queued"
-                });
+                return Ok(
+                    new
+                    {
+                        message = "User registration request received and queued for processing",
+                        requestId = Guid.NewGuid().ToString(),
+                        status = "queued",
+                    }
+                );
             }
             catch (Exception ex)
             {
