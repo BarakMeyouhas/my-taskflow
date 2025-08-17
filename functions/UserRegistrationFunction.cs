@@ -78,7 +78,7 @@ namespace TaskFlow.Functions
                     Username = registrationMessage.Username,
                     Email = registrationMessage.Email,
                     PasswordHash = passwordHash,
-                    CreatedAt = DateTime.UtcNow,
+                    // Removed CreatedAt as it doesn't exist in the actual database schema
                 };
 
                 // Add to database
