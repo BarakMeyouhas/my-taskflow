@@ -50,7 +50,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: functions-build
-          path: ../functions-deployment.zip
+          path: ${{ github.workspace }}/functions-deployment.zip
 
   deploy:
     runs-on: ubuntu-latest
