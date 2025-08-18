@@ -83,6 +83,13 @@ jobs:
             echo "❌ output.zip not found!"
             exit 1
           fi
+          - name: Deploy to Azure Functions
+          uses: Azure/functions-action@v1
+          id: fa
+          with:
+            app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+            package: './output.zip'
+            publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
 
       - name: Debug Azure Credentials
         run: |
@@ -106,18 +113,6 @@ jobs:
           fi
           
           echo "✅ All required secrets are set"
-
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Login to Azure (Fallback Method)
-        if: failure()
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-        continue-on-error: true
 
       - name: Verify Azure Access
         run: |
@@ -189,10 +184,18 @@ jobs:
             exit 1
           fi
 
-      - name: Deploy to Azure Functions
-        uses: Azure/functions-action@v1
-        id: fa
+      - name: Login to Azure
+        uses: azure/login@v1
         with:
-          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-          package: './output.zip'
-          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to Azure (Fallback Method)
+        if: failure()
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+        continue-on-error: true
+
+      
+
+      
