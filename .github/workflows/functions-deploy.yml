@@ -87,7 +87,33 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Verify Azure Access
+        run: |
+          echo "=== Verifying Azure access ==="
+          echo "Checking available subscriptions..."
+          
+          # List available subscriptions
+          subscriptions=$(az account list --query "[].{name:name, id:id, isDefault:isDefault}" --output table)
+          if [ $? -eq 0 ]; then
+            echo "✅ Successfully retrieved subscriptions:"
+            echo "$subscriptions"
+          else
+            echo "❌ Failed to retrieve subscriptions"
+            exit 1
+          fi
+          
+          # Set the specific subscription
+          echo "Setting subscription to: ${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+          az account set --subscription "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+          
+          # Verify current subscription
+          current_sub=$(az account show --query "{name:name, id:id}" --output table)
+          echo "Current subscription:"
+          echo "$current_sub"
 
       - name: Check Function App Exists
         run: |
