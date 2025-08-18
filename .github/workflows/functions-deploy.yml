@@ -61,7 +61,6 @@ jobs:
     needs: build
     env:
       AZURE_FUNCTIONAPP_NAME: 'UserRegistrationFunction'
-      AZURE_FUNCTIONAPP_PACKAGE_PATH: './functions'
 
     steps:
       - name: Download Functions Build Artifact
@@ -69,10 +68,25 @@ jobs:
         with:
           name: functions-build
 
+      - name: Verify Deployment Package
+        run: |
+          echo "=== Verifying deployment package ==="
+          echo "Current directory: $(pwd)"
+          echo "Contents of current directory:"
+          ls -la
+          echo "Checking if output.zip exists:"
+          if [ -f "./output.zip" ]; then
+            echo "✅ output.zip found successfully"
+            ls -la output.zip
+          else
+            echo "❌ output.zip not found!"
+            exit 1
+          fi
+
       - name: Deploy to Azure Functions
         uses: Azure/functions-action@v1
         id: fa
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-          package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
+          package: './output.zip'
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
