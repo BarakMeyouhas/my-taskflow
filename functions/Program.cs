@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TaskFlow.Functions.Data;
 
-//test
+
 
 var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
