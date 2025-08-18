@@ -33,6 +33,5 @@ namespace TaskFlow.Functions.Data
         public string Username { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
-        // Removed CreatedAt as it doesn't exist in the actual database
     }
 }
