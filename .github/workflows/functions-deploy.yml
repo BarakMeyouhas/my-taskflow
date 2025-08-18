@@ -80,7 +80,7 @@ jobs:
             echo "✅ output.zip found successfully"
             ls -la output.zip
           else
-            echo "❌ output.zip not found!"
+            echo "❌ output.zip not found!!"
             exit 1
           fi
       - name: Deploy to Azure Functions
@@ -91,110 +91,110 @@ jobs:
           package: './output.zip'
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
 
-      - name: Debug Azure Credentials
-        run: |
-          echo "=== Debugging Azure Credentials ==="
-          echo "Client ID: ${{ secrets.AZURE_CLIENT_ID }}"
-          echo "Tenant ID: ${{ secrets.AZURE_TENANT_ID }}"
-          echo "Subscription ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+      # - name: Debug Azure Credentials
+      #   run: |
+      #     echo "=== Debugging Azure Credentials ==="
+      #     echo "Client ID: ${{ secrets.AZURE_CLIENT_ID }}"
+      #     echo "Tenant ID: ${{ secrets.AZURE_TENANT_ID }}"
+      #     echo "Subscription ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}"
           
-          # Check if secrets are set
-          if [ -z "${{ secrets.AZURE_CLIENT_ID }}" ]; then
-            echo "❌ AZURE_CLIENT_ID is not set"
-            exit 1
-          fi
-          if [ -z "${{ secrets.AZURE_TENANT_ID }}" ]; then
-            echo "❌ AZURE_TENANT_ID is not set"
-            exit 1
-          fi
-          if [ -z "${{ secrets.AZURE_SUBSCRIPTION_ID }}" ]; then
-            echo "❌ AZURE_SUBSCRIPTION_ID is not set"
-            exit 1
-          fi
+      #     # Check if secrets are set
+      #     if [ -z "${{ secrets.AZURE_CLIENT_ID }}" ]; then
+      #       echo "❌ AZURE_CLIENT_ID is not set"
+      #       exit 1
+      #     fi
+      #     if [ -z "${{ secrets.AZURE_TENANT_ID }}" ]; then
+      #       echo "❌ AZURE_TENANT_ID is not set"
+      #       exit 1
+      #     fi
+      #     if [ -z "${{ secrets.AZURE_SUBSCRIPTION_ID }}" ]; then
+      #       echo "❌ AZURE_SUBSCRIPTION_ID is not set"
+      #       exit 1
+      #     fi
           
-          echo "✅ All required secrets are set"
+      #     echo "✅ All required secrets are set"
 
-      - name: Verify Azure Access
-        run: |
-          echo "=== Verifying Azure access ==="
-          echo "Checking available subscriptions..."
+      # - name: Verify Azure Access
+      #   run: |
+      #     echo "=== Verifying Azure access ==="
+      #     echo "Checking available subscriptions..."
           
-          # List available subscriptions
-          subscriptions=$(az account list --query "[].{name:name, id:id, isDefault:isDefault}" --output table)
-          if [ $? -eq 0 ]; then
-            echo "✅ Successfully retrieved subscriptions:"
-            echo "$subscriptions"
-          else
-            echo "❌ Failed to retrieve subscriptions"
-            exit 1
-          fi
+      #     # List available subscriptions
+      #     subscriptions=$(az account list --query "[].{name:name, id:id, isDefault:isDefault}" --output table)
+      #     if [ $? -eq 0 ]; then
+      #       echo "✅ Successfully retrieved subscriptions:"
+      #       echo "$subscriptions"
+      #     else
+      #       echo "❌ Failed to retrieve subscriptions"
+      #       exit 1
+      #     fi
           
-          # Set the specific subscription
-          echo "Setting subscription to: ${{ secrets.AZURE_SUBSCRIPTION_ID }}"
-          az account set --subscription "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+      #     # Set the specific subscription
+      #     echo "Setting subscription to: ${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+      #     az account set --subscription "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
           
-          # Verify current subscription
-          current_sub=$(az account show --query "{name:name, id:id}" --output table)
-          echo "Current subscription:"
-          echo "$current_sub"
+      #     # Verify current subscription
+      #     current_sub=$(az account show --query "{name:name, id:id}" --output table)
+      #     echo "Current subscription:"
+      #     echo "$current_sub"
 
-      - name: List Available Function Apps
-        run: |
-          echo "=== Listing Available Function Apps ==="
-          echo "Checking all Function Apps in your subscription..."
+      # - name: List Available Function Apps
+      #   run: |
+      #     echo "=== Listing Available Function Apps ==="
+      #     echo "Checking all Function Apps in your subscription..."
           
-          # List all Function Apps
-          functionapps=$(az functionapp list --query "[].{name:name, resourceGroup:resourceGroup, location:location, state:state}" --output table)
-          if [ $? -eq 0 ]; then
-            echo "✅ Available Function Apps:"
-            echo "$functionapps"
-          else
-            echo "❌ Failed to list Function Apps"
-            exit 1
-          fi
+      #     # List all Function Apps
+      #     functionapps=$(az functionapp list --query "[].{name:name, resourceGroup:resourceGroup, location:location, state:state}" --output table)
+      #     if [ $? -eq 0 ]; then
+      #       echo "✅ Available Function Apps:"
+      #       echo "$functionapps"
+      #     else
+      #       echo "❌ Failed to list Function Apps"
+      #       exit 1
+      #     fi
           
-          echo ""
-          echo "=== Checking Resource Groups ==="
-          # List resource groups
-          resourcegroups=$(az group list --query "[].{name:name, location:location}" --output table)
-          if [ $? -eq 0 ]; then
-            echo "✅ Available Resource Groups:"
-            echo "$resourcegroups"
-          else
-            echo "❌ Failed to list Resource Groups"
-            exit 1
-          fi
+      #     echo ""
+      #     echo "=== Checking Resource Groups ==="
+      #     # List resource groups
+      #     resourcegroups=$(az group list --query "[].{name:name, location:location}" --output table)
+      #     if [ $? -eq 0 ]; then
+      #       echo "✅ Available Resource Groups:"
+      #       echo "$resourcegroups"
+      #     else
+      #       echo "❌ Failed to list Resource Groups"
+      #       exit 1
+      #     fi
 
-      - name: Check Function App Exists
-        run: |
-          echo "=== Checking if Function App exists ==="
-          echo "Function App Name: ${{ env.AZURE_FUNCTIONAPP_NAME }}"
-          echo "Resource Group: ${{ env.AZURE_FUNCTIONAPP_RESOURCE_GROUP }}"
+      # - name: Check Function App Exists
+      #   run: |
+      #     echo "=== Checking if Function App exists ==="
+      #     echo "Function App Name: ${{ env.AZURE_FUNCTIONAPP_NAME }}"
+      #     echo "Resource Group: ${{ env.AZURE_FUNCTIONAPP_RESOURCE_GROUP }}"
           
-          # Check if Function App exists
-          if az functionapp show --name "${{ env.AZURE_FUNCTIONAPP_NAME }}" --resource-group "${{ env.AZURE_FUNCTIONAPP_RESOURCE_GROUP }}" >/dev/null 2>&1; then
-            echo "✅ Function App '${{ env.AZURE_FUNCTIONAPP_NAME }}' exists"
-            az functionapp show --name "${{ env.AZURE_FUNCTIONAPP_NAME }}" --resource-group "${{ env.AZURE_FUNCTIONAPP_RESOURCE_GROUP }}" --query "{name:name, resourceGroup:resourceGroup, state:state, kind:kind}" --output table
-          else
-            echo "❌ Function App '${{ env.AZURE_FUNCTIONAPP_NAME }}' does not exist!!"
-            echo "Please create the Function App first using one of these methods:"
-            echo "1. Azure Portal: Create a new Function App"
-            echo "2. Azure CLI: az functionapp create --name '${{ env.AZURE_FUNCTIONAPP_NAME }}' --resource-group '${{ env.AZURE_FUNCTIONAPP_RESOURCE_GROUP }}' --consumption-plan-location 'eastus' --runtime dotnet-isolated --functions-version 4"
-            echo "3. Or update the AZURE_FUNCTIONAPP_NAME and AZURE_FUNCTIONAPP_RESOURCE_GROUP in this workflow"
-            exit 1
-          fi
+      #     # Check if Function App exists
+      #     if az functionapp show --name "${{ env.AZURE_FUNCTIONAPP_NAME }}" --resource-group "${{ env.AZURE_FUNCTIONAPP_RESOURCE_GROUP }}" >/dev/null 2>&1; then
+      #       echo "✅ Function App '${{ env.AZURE_FUNCTIONAPP_NAME }}' exists"
+      #       az functionapp show --name "${{ env.AZURE_FUNCTIONAPP_NAME }}" --resource-group "${{ env.AZURE_FUNCTIONAPP_RESOURCE_GROUP }}" --query "{name:name, resourceGroup:resourceGroup, state:state, kind:kind}" --output table
+      #     else
+      #       echo "❌ Function App '${{ env.AZURE_FUNCTIONAPP_NAME }}' does not exist!!"
+      #       echo "Please create the Function App first using one of these methods:"
+      #       echo "1. Azure Portal: Create a new Function App"
+      #       echo "2. Azure CLI: az functionapp create --name '${{ env.AZURE_FUNCTIONAPP_NAME }}' --resource-group '${{ env.AZURE_FUNCTIONAPP_RESOURCE_GROUP }}' --consumption-plan-location 'eastus' --runtime dotnet-isolated --functions-version 4"
+      #       echo "3. Or update the AZURE_FUNCTIONAPP_NAME and AZURE_FUNCTIONAPP_RESOURCE_GROUP in this workflow"
+      #       exit 1
+      #     fi
 
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      # - name: Login to Azure
+      #   uses: azure/login@v1
+      #   with:
+      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Login to Azure (Fallback Method)
-        if: failure()
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-        continue-on-error: true
+      # - name: Login to Azure (Fallback Method)
+      #   if: failure()
+      #   uses: azure/login@v1
+      #   with:
+      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
+      #   continue-on-error: true
 
       
 
