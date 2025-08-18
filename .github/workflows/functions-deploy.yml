@@ -80,7 +80,7 @@ jobs:
             echo "✅ output.zip found successfully"
             ls -la output.zip
           else
-            echo "❌ output.zip not found!"
+            echo "❌ output.zip not found!!"
             exit 1
           fi
       - name: Deploy to Azure Functions
