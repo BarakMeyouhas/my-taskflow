@@ -1,9 +1,13 @@
 using System.Text;
+using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using TaskFlow.Api.Data;
 using TaskFlow.Api.Services;
+
+// Load environment variables from .env file
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +29,26 @@ var connectionString =
     Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING")
     ?? builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+// Log connection string info (without sensitive data)
+var connectionInfo =
+    connectionString?.Contains("barak.database.windows.net") == true
+        ? "Using Azure SQL Database connection"
+        : "Using fallback connection string";
+Console.WriteLine($"Database Connection: {connectionInfo}");
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(
+        connectionString,
+        sqlServerOptionsAction: sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null
+            );
+        }
+    )
+);
 
 // Register QueueService
 builder.Services.AddScoped<IQueueService, QueueService>();
