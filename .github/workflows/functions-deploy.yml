@@ -71,7 +71,7 @@ jobs:
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          subscription-id: "e846a1a1-ec8b-4365-adff-1fd5ea2c2b30"
 
       - name: Deploy to Azure Functions
         uses: azure/functions-action@v1
