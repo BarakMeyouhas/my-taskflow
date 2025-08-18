@@ -19,14 +19,16 @@ namespace TaskFlow.Api.Services
 
         public QueueService(IConfiguration configuration, ILogger<QueueService> logger)
         {
+            // Try to get connection string from environment variable first, then fallback to configuration
             var connectionString =
-                configuration.GetConnectionString("AzureStorage")
+                Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING")
+                ?? configuration.GetConnectionString("AzureStorage")
                 ?? configuration["AzureWebJobsStorage"];
 
             if (string.IsNullOrEmpty(connectionString))
             {
                 throw new InvalidOperationException(
-                    "Azure Storage connection string is not configured"
+                    "Azure Storage connection string is not configured. Please set AZURE_STORAGE_CONNECTION_STRING environment variable."
                 );
             }
 
