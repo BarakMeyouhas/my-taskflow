@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using TaskFlow.Api.Data;
 using TaskFlow.Api.Models;
@@ -126,21 +127,17 @@ namespace TaskFlow.Api.Controllers
             try
             {
                 // Log connection attempt details
-                var connectionString = db.Database.GetConnectionString();
-                var maskedConnectionString = MaskConnectionString(connectionString);
-
                 Console.WriteLine($"=== DATABASE CONNECTION TEST ===");
                 Console.WriteLine($"Attempting to connect to database...");
-                Console.WriteLine($"Connection string: {maskedConnectionString}");
                 Console.WriteLine($"Database provider: {db.Database.ProviderName}");
                 Console.WriteLine($"Database name: {db.Database.GetDbConnection().Database}");
                 Console.WriteLine($"Server: {db.Database.GetDbConnection().DataSource}");
-
+                
                 var userCount = db.Users.Count();
-
+                
                 Console.WriteLine($"Connection successful! User count: {userCount}");
                 Console.WriteLine($"=== END DATABASE TEST ===");
-
+                
                 return Ok(
                     new
                     {
@@ -151,9 +148,8 @@ namespace TaskFlow.Api.Controllers
                         {
                             provider = db.Database.ProviderName,
                             database = db.Database.GetDbConnection().Database,
-                            server = db.Database.GetDbConnection().DataSource,
-                            connectionStringMasked = maskedConnectionString,
-                        },
+                            server = db.Database.GetDbConnection().DataSource
+                        }
                     }
                 );
             }
@@ -163,14 +159,14 @@ namespace TaskFlow.Api.Controllers
                 Console.WriteLine($"Error Type: {ex.GetType().Name}");
                 Console.WriteLine($"Error Message: {ex.Message}");
                 Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-
+                
                 if (ex.InnerException != null)
                 {
                     Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
                 }
-
+                
                 Console.WriteLine($"=== END DATABASE ERROR ===");
-
+                
                 // Enhanced error handling to show inner exception details
                 var errorDetails = new
                 {
@@ -194,59 +190,12 @@ namespace TaskFlow.Api.Controllers
             }
         }
 
-        private string MaskConnectionString(string connectionString)
-        {
-            if (string.IsNullOrEmpty(connectionString))
-                return "No connection string available";
-
-            // Mask password and sensitive parts
-            var masked = connectionString;
-
-            // Mask password
-            var passwordIndex = masked.IndexOf("Password=");
-            if (passwordIndex >= 0)
-            {
-                var endIndex = masked.IndexOf(';', passwordIndex);
-                if (endIndex >= 0)
-                {
-                    masked =
-                        masked.Substring(0, passwordIndex)
-                        + "Password=***"
-                        + masked.Substring(endIndex);
-                }
-                else
-                {
-                    masked = masked.Substring(0, passwordIndex) + "Password=***";
-                }
-            }
-
-            // Mask user ID
-            var userIdIndex = masked.IndexOf("User ID=");
-            if (userIdIndex >= 0)
-            {
-                var endIndex = masked.IndexOf(';', userIdIndex);
-                if (endIndex >= 0)
-                {
-                    masked =
-                        masked.Substring(0, userIdIndex)
-                        + "User ID=***"
-                        + masked.Substring(endIndex);
-                }
-                else
-                {
-                    masked = masked.Substring(0, userIdIndex) + "User ID=***";
-                }
-            }
-
-            return masked;
-        }
-
         private List<object> GetAllInnerExceptions(Exception ex)
         {
             var innerExceptions = new List<object>();
             var current = ex.InnerException;
             var depth = 0;
-
+            
             while (current != null && depth < 5) // Limit to 5 levels to avoid infinite loops
             {
                 innerExceptions.Add(
@@ -258,11 +207,11 @@ namespace TaskFlow.Api.Controllers
                         stackTrace = current.StackTrace,
                     }
                 );
-
+                
                 current = current.InnerException;
                 depth++;
             }
-
+            
             return innerExceptions;
         }
 
@@ -287,7 +236,7 @@ namespace TaskFlow.Api.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(
+        public IActionResult Register(
             [FromBody] UserRegisterRequest request
         // Temporarily disabled database dependency for startup testing
         // [FromServices] AppDbContext db
