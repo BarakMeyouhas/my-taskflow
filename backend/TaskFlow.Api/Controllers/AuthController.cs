@@ -132,12 +132,12 @@ namespace TaskFlow.Api.Controllers
                 Console.WriteLine($"Database provider: {db.Database.ProviderName}");
                 Console.WriteLine($"Database name: {db.Database.GetDbConnection().Database}");
                 Console.WriteLine($"Server: {db.Database.GetDbConnection().DataSource}");
-                
+
                 var userCount = db.Users.Count();
-                
+
                 Console.WriteLine($"Connection successful! User count: {userCount}");
                 Console.WriteLine($"=== END DATABASE TEST ===");
-                
+
                 return Ok(
                     new
                     {
@@ -148,8 +148,8 @@ namespace TaskFlow.Api.Controllers
                         {
                             provider = db.Database.ProviderName,
                             database = db.Database.GetDbConnection().Database,
-                            server = db.Database.GetDbConnection().DataSource
-                        }
+                            server = db.Database.GetDbConnection().DataSource,
+                        },
                     }
                 );
             }
@@ -159,14 +159,14 @@ namespace TaskFlow.Api.Controllers
                 Console.WriteLine($"Error Type: {ex.GetType().Name}");
                 Console.WriteLine($"Error Message: {ex.Message}");
                 Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-                
+
                 if (ex.InnerException != null)
                 {
                     Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
                 }
-                
+
                 Console.WriteLine($"=== END DATABASE ERROR ===");
-                
+
                 // Enhanced error handling to show inner exception details
                 var errorDetails = new
                 {
@@ -195,7 +195,7 @@ namespace TaskFlow.Api.Controllers
             var innerExceptions = new List<object>();
             var current = ex.InnerException;
             var depth = 0;
-            
+
             while (current != null && depth < 5) // Limit to 5 levels to avoid infinite loops
             {
                 innerExceptions.Add(
@@ -207,11 +207,11 @@ namespace TaskFlow.Api.Controllers
                         stackTrace = current.StackTrace,
                     }
                 );
-                
+
                 current = current.InnerException;
                 depth++;
             }
-            
+
             return innerExceptions;
         }
 
