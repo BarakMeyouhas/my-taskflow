@@ -47,10 +47,18 @@ Console.WriteLine($"Database Connection: {connectionInfo}");
 
 // Debug logging for connection string processing
 Console.WriteLine($"=== DATABASE CONNECTION DEBUG ===");
-Console.WriteLine($"DATABASE_CONNECTION_STRING env var: {(Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING") != null ? "SET" : "NOT SET")}");
-Console.WriteLine($"DATABASE_PASSWORD env var: {(Environment.GetEnvironmentVariable("DATABASE_PASSWORD") != null ? "SET" : "NOT SET")}");
-Console.WriteLine($"Connection string contains placeholder: {connectionString?.Contains("${DATABASE_PASSWORD}")}");
-Console.WriteLine($"Final connection string (masked): {connectionString?.Replace(Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "MASKED", "***")}");
+Console.WriteLine(
+    $"DATABASE_CONNECTION_STRING env var: {(Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING") != null ? "SET" : "NOT SET")}"
+);
+Console.WriteLine(
+    $"DATABASE_PASSWORD env var: {(Environment.GetEnvironmentVariable("DATABASE_PASSWORD") != null ? "SET" : "NOT SET")}"
+);
+Console.WriteLine(
+    $"Connection string contains placeholder: {connectionString?.Contains("${DATABASE_PASSWORD}")}"
+);
+Console.WriteLine(
+    $"Final connection string (masked): {connectionString?.Replace(Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "MASKED", "***")}"
+);
 Console.WriteLine($"=== END DATABASE DEBUG ===");
 
 // Validate database connection string
