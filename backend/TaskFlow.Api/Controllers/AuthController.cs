@@ -137,16 +137,52 @@ namespace TaskFlow.Api.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(
-                    500,
+                // Enhanced error handling to show inner exception details
+                var errorDetails = new
+                {
+                    error = "Database error",
+                    details = ex.Message,
+                    exceptionType = ex.GetType().Name,
+                    stackTrace = ex.StackTrace,
+                    innerException = ex.InnerException != null
+                        ? new
+                        {
+                            message = ex.InnerException.Message,
+                            type = ex.InnerException.GetType().Name,
+                            stackTrace = ex.InnerException.StackTrace,
+                        }
+                        : null,
+                    // Show all inner exceptions in the chain
+                    allInnerExceptions = GetAllInnerExceptions(ex),
+                };
+
+                return StatusCode(500, errorDetails);
+            }
+        }
+
+        private List<object> GetAllInnerExceptions(Exception ex)
+        {
+            var innerExceptions = new List<object>();
+            var current = ex.InnerException;
+            var depth = 0;
+
+            while (current != null && depth < 5) // Limit to 5 levels to avoid infinite loops
+            {
+                innerExceptions.Add(
                     new
                     {
-                        error = "Database error",
-                        details = ex.Message,
-                        stackTrace = ex.StackTrace,
+                        depth = depth,
+                        type = current.GetType().Name,
+                        message = current.Message,
+                        stackTrace = current.StackTrace,
                     }
                 );
+
+                current = current.InnerException;
+                depth++;
             }
+
+            return innerExceptions;
         }
 
         private string GenerateJwtToken(string username)
