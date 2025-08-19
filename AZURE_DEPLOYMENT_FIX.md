@@ -1,108 +1,141 @@
-# Azure Web App Deployment Fix
+# Azure Deployment Fix Guide for TaskFlow API
 
 ## Problem Summary
-Your Azure Web App was successfully deploying but failing to run because it couldn't find the `.next` directory (Next.js build output) at runtime.
+Your TaskFlow API is getting a 500 Internal Server Error when deployed to Azure, specifically when trying to register users. The error suggests transient database connection failures and Azure Storage configuration issues.
 
-## What We Fixed
+## Root Causes Identified
 
-### 1. **Startup Configuration**
-- Created `.deployment` file to tell Azure how to start your app
-- Updated `package.json` start script to use a custom startup script
-- Created `startup.cjs` with proper error handling and verification
+1. **Missing Azure Storage Connection String**: The deployed app is trying to use `UseDevelopmentStorage=true` which only works locally
+2. **Database Connection Issues**: While retry logic exists, the connection string might not be properly configured
+3. **Queue Service Failures**: The queue service fails to initialize, causing the registration flow to break
 
-### 2. **Build Process Improvements**
-- Enhanced GitHub Actions workflow to preserve all necessary files
-- Added verification steps to ensure `.next` directory is built and preserved
-- Added production dependency installation
-- Added comprehensive file verification before deployment
+## Solutions Implemented
 
-### 3. **Azure Web App Configuration**
-- Created `.deployment` file for Azure startup command
-- Updated `web.config` references
-- Simplified startup process without external dependencies
+### 1. Enhanced Error Handling and Logging
+- Added comprehensive logging for database and Azure Storage connection status
+- Improved error handling in QueueService to gracefully handle connection failures
+- Added service availability checks before attempting operations
 
-## Files Created/Modified
+### 2. Resilient Queue Service
+- QueueService now handles connection failures gracefully
+- Added `IsAvailable()` method to check service status
+- Service continues to work even if Azure Storage is temporarily unavailable
 
-### New Files:
-- `.deployment` - Azure deployment configuration
-- `startup.cjs` - Custom startup script with error handling
-- `AZURE_DEPLOYMENT_FIX.md` - This guide
+### 3. Better Configuration Management
+- Created `appsettings.Production.json` for Azure-specific settings
+- Enhanced environment variable handling
+- Added validation for required connection strings
 
-### Modified Files:
-- `.github/workflows/main_taskflow.yml` - Enhanced build and deployment workflow
-- `frontend/package.json` - Updated start script
+## Required Azure Configuration
 
-## Current Architecture
+### 1. Environment Variables (Set in Azure App Service Configuration)
+```
+DATABASE_CONNECTION_STRING=Server=tcp:your-server.database.windows.net,1433;Initial Catalog=your-database;Persist Security Info=False;User ID=your-username;Password=your-password;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
 
-The deployment now uses a simplified approach:
-1. **GitHub Actions** builds the Next.js app and preserves the `.next` directory
-2. **Azure Web App** uses the `.deployment` file to run `npm start`
-3. **npm start** runs `node startup.cjs`
-4. **startup.cjs** verifies the `.next` directory exists and starts the server
-5. **server.cjs** runs the actual Next.js application
+AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=your-storage-account;AccountKey=your-storage-key;EndpointSuffix=core.windows.net
+
+JWT_KEY=your-secure-jwt-secret-key
+JWT_ISSUER=taskflow
+JWT_AUDIENCE=taskflow
+```
+
+### 2. Azure Resources Required
+- **Azure SQL Database**: For user data storage
+- **Azure Storage Account**: For queue message storage
+- **Azure Function App**: For processing user registration messages
+
+## Steps to Fix Your Azure Deployment
+
+### Step 1: Configure Azure App Service Environment Variables
+1. Go to your Azure App Service in the Azure Portal
+2. Navigate to **Configuration** → **Application settings**
+3. Add the following environment variables:
+   - `DATABASE_CONNECTION_STRING` (your actual Azure SQL connection string)
+   - `AZURE_STORAGE_CONNECTION_STRING` (your actual Azure Storage connection string)
+   - `JWT_KEY` (a secure random string)
+   - `JWT_ISSUER` and `JWT_AUDIENCE` (can be "taskflow")
+
+### Step 2: Verify Azure SQL Database
+1. Ensure your Azure SQL Database is running and accessible
+2. Check firewall rules allow connections from Azure App Service
+3. Verify the connection string format matches Azure SQL requirements
+
+### Step 3: Configure Azure Storage Account
+1. Create or verify your Azure Storage Account
+2. Ensure the storage account has queues enabled
+3. Get the connection string from **Access keys** section
+
+### Step 4: Deploy Updated Code
+1. The updated code now handles connection failures gracefully
+2. Deploy the updated `Program.cs`, `QueueService.cs`, and `AuthController.cs`
+3. The app will now provide better error messages and handle service unavailability
+
+## Testing the Fix
+
+### 1. Check Health Endpoint
+After deployment, visit your root endpoint:
+```
+GET https://your-app.azurewebsites.net/
+```
+
+This should now show:
+```json
+{
+  "status": "OK",
+  "message": "TaskFlow API is running 🚀",
+  "databaseConfigured": true,
+  "azureStorageConfigured": true
+}
+```
+
+### 2. Test Database Connection
+Use the database test endpoint:
+```
+GET https://your-app.azurewebsites.net/api/auth/db-test
+```
+
+### 3. Test Registration
+Try the registration endpoint again:
+```
+POST https://your-app.azurewebsites.net/api/auth/register
+```
+
+## Monitoring and Troubleshooting
+
+### 1. Check Azure App Service Logs
+- Go to **Log stream** in your App Service
+- Look for connection string validation messages
+- Monitor for any remaining errors
+
+### 2. Common Issues and Solutions
+
+**Issue**: "Queue service is not available"
+**Solution**: Check `AZURE_STORAGE_CONNECTION_STRING` environment variable
+
+**Issue**: "Database connection failed"
+**Solution**: Verify `DATABASE_CONNECTION_STRING` and Azure SQL firewall rules
+
+**Issue**: JWT token generation fails
+**Solution**: Ensure `JWT_KEY` environment variable is set
 
 ## Next Steps
 
-### 1. **Commit and Push Changes**
-```bash
-git add .
-git commit -m "Fix Azure Web App deployment - add startup scripts and build verification"
-git push origin main
-```
+1. **Deploy the updated code** to your Azure App Service
+2. **Configure the environment variables** as specified above
+3. **Test the endpoints** to verify the fix
+4. **Monitor the logs** for any remaining issues
 
-### 2. **Monitor GitHub Actions**
-- Watch the workflow run in GitHub Actions
-- Verify that all files are properly built and deployed
-- Check that `.next` directory is preserved
+## Additional Recommendations
 
-### 3. **Verify Azure Deployment**
-- Check Azure Web App logs after deployment
-- Look for the startup script output
-- Verify the app is running at your domain
-
-### 4. **If Issues Persist**
-- Check Azure Web App Configuration in Azure Portal
-- Ensure Node.js 20.x is selected as runtime
-- Verify startup command is set to `npm start`
-
-## Expected Behavior
-
-After these fixes, your Azure Web App should:
-1. ✅ Successfully build the Next.js application
-2. ✅ Preserve the `.next` directory during deployment
-3. ✅ Use the custom startup script to verify files exist
-4. ✅ Start the Next.js server properly
-5. ✅ Serve your application at the Azure domain
-
-## Troubleshooting
-
-### If `.next` directory is still missing:
-- Check GitHub Actions build logs for build errors
-- Verify the build step completes successfully
-- Check that cleanup doesn't remove essential files
-
-### If startup script fails:
-- Check Azure Web App logs for detailed error messages
-- Verify all files are present in the deployment
-- Check Node.js version compatibility
-
-### If app still won't start:
-- Check Azure Web App Configuration settings
-- Verify startup command is correct
-- Check for any Azure-specific environment variables
-
-## Key Benefits of These Changes
-
-1. **Better Error Handling**: Startup script provides clear error messages
-2. **Build Verification**: Workflow verifies build output before deployment
-3. **File Preservation**: Ensures all necessary files reach Azure
-4. **Azure Integration**: Proper Azure Web App configuration files
-5. **Process Management**: Custom startup script for better error handling
+1. **Use Azure Key Vault** for storing sensitive connection strings
+2. **Implement Application Insights** for better monitoring
+3. **Set up proper logging** to Azure Storage or Application Insights
+4. **Consider using Managed Identity** for Azure SQL and Storage access
 
 ## Support
 
-If you continue to have issues after implementing these fixes:
-1. Check the GitHub Actions workflow logs
-2. Review Azure Web App logs using `az webapp log tail`
-3. Verify all configuration files are present
-4. Check Azure Web App Configuration in the Azure Portal
+If you continue to experience issues after implementing these fixes:
+1. Check the Azure App Service logs for specific error messages
+2. Verify all environment variables are correctly set
+3. Test database connectivity from the App Service
+4. Ensure Azure resources are in the same region for better performance
