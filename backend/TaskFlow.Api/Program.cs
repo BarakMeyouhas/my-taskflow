@@ -63,20 +63,20 @@ Console.WriteLine(
 );
 
 // Temporarily disable database context for testing startup
-// builder.Services.AddDbContext<AppDbContext>(options =>
-//     options.UseSqlServer(
-//         connectionString
-//     // Temporarily disabled retry logic for testing
-//     // sqlServerOptionsAction: sqlOptions =>
-//     // {
-//     //     sqlOptions.EnableRetryOnFailure(
-//     //         maxRetryCount: 5,
-//     //         maxRetryDelay: TimeSpan.FromSeconds(30),
-//     //         errorNumbersToAdd: null
-//     //     );
-//     // }
-//     )
-// );
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(
+        connectionString
+    // Temporarily disabled retry logic for testing
+    // sqlServerOptionsAction: sqlOptions =>
+    // {
+    //     sqlOptions.EnableRetryOnFailure(
+    //         maxRetryCount: 5,
+    //         maxRetryDelay: TimeSpan.FromSeconds(30),
+    //         errorNumbersToAdd: null
+    //     );
+    // }
+    )
+);
 
 // Temporarily disable QueueService for testing startup
 // try
@@ -141,7 +141,7 @@ app.MapGet(
                 environment = app.Environment.EnvironmentName,
                 databaseConfigured = !string.IsNullOrEmpty(connectionString),
                 azureStorageConfigured = !string.IsNullOrEmpty(azureStorageConnectionString),
-                note = "Database and Queue services temporarily disabled for startup testing"
+                note = "Database and Queue services temporarily disabled for startup testing",
             }
         )
 );
