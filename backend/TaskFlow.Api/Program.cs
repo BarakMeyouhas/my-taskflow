@@ -28,6 +28,16 @@ var connectionString =
     Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING")
     ?? builder.Configuration.GetConnectionString("DefaultConnection");
 
+// Substitute environment variables in connection string if needed
+if (connectionString?.Contains("${DATABASE_PASSWORD}") == true)
+{
+    var dbPassword = Environment.GetEnvironmentVariable("DATABASE_PASSWORD");
+    if (!string.IsNullOrEmpty(dbPassword))
+    {
+        connectionString = connectionString.Replace("${DATABASE_PASSWORD}", dbPassword);
+    }
+}
+
 // Log connection string info (without sensitive data)
 var connectionInfo =
     connectionString?.Contains("barak.database.windows.net") == true
@@ -49,6 +59,19 @@ var azureStorageConnectionString =
     Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING")
     ?? builder.Configuration.GetConnectionString("AzureStorage")
     ?? builder.Configuration["AzureWebJobsStorage"];
+
+// Substitute environment variables in Azure Storage connection string if needed
+if (azureStorageConnectionString?.Contains("${AZURE_STORAGE_ACCOUNT_KEY}") == true)
+{
+    var storageKey = Environment.GetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_KEY");
+    if (!string.IsNullOrEmpty(storageKey))
+    {
+        azureStorageConnectionString = azureStorageConnectionString.Replace(
+            "${AZURE_STORAGE_ACCOUNT_KEY}",
+            storageKey
+        );
+    }
+}
 
 if (string.IsNullOrEmpty(azureStorageConnectionString))
 {
@@ -98,6 +121,22 @@ builder
     .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+        if (string.IsNullOrEmpty(jwtKey))
+        {
+            // Fallback to configuration if environment variable not set
+            jwtKey = builder.Configuration["JwtSettings:Key"];
+            // Substitute environment variable placeholder if present
+            if (jwtKey?.Contains("${JWT_KEY}") == true)
+            {
+                var envJwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+                if (!string.IsNullOrEmpty(envJwtKey))
+                {
+                    jwtKey = envJwtKey;
+                }
+            }
+        }
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -108,8 +147,7 @@ builder
             ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "taskflow",
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(
-                    Environment.GetEnvironmentVariable("JWT_KEY")
-                        ?? "SuperSecretKey12345SuperSecretKey12345SuperSecretKey12345"
+                    jwtKey ?? "SuperSecretKey12345SuperSecretKey12345SuperSecretKey12345"
                 )
             ),
         };
