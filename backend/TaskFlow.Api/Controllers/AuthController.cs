@@ -14,12 +14,18 @@ namespace TaskFlow.Api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;
-        private readonly IQueueService _queueService;
 
-        public AuthController(ILogger<AuthController> logger, IQueueService queueService)
+        // Temporarily disabled queue service for startup testing
+        // private readonly IQueueService _queueService;
+
+        public AuthController(
+            ILogger<AuthController> logger
+        // Temporarily disabled queue service for startup testing
+        // IQueueService queueService
+        )
         {
             _logger = logger;
-            _queueService = queueService;
+            // _queueService = queueService;
         }
 
         [HttpPost("login")]
@@ -166,8 +172,8 @@ namespace TaskFlow.Api.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(
             [FromBody] UserRegisterRequest request
-            // Temporarily disabled database dependency for startup testing
-            // [FromServices] AppDbContext db
+        // Temporarily disabled database dependency for startup testing
+        // [FromServices] AppDbContext db
         )
         {
             try
@@ -190,21 +196,21 @@ namespace TaskFlow.Api.Controllers
                 // }
 
                 // Check if queue service is available
-                if (!_queueService.IsAvailable())
-                {
-                    _logger.LogWarning(
-                        "Queue service is not available. Cannot process user registration."
-                    );
-                    return StatusCode(
-                        503,
-                        new
-                        {
-                            error = "Service temporarily unavailable",
-                            details = "User registration service is currently unavailable. Please try again later.",
-                            code = "QUEUE_SERVICE_UNAVAILABLE",
-                        }
-                    );
-                }
+                // if (!_queueService.IsAvailable())
+                // {
+                //     _logger.LogWarning(
+                //         "Queue service is not available. Cannot process user registration."
+                //     );
+                //     return StatusCode(
+                //         503,
+                //         new
+                //         {
+                //             error = "Service temporarily unavailable",
+                //             details = "User registration service is currently unavailable. Please try again later.",
+                //             code = "QUEUE_SERVICE_UNAVAILABLE",
+                //         }
+                //     );
+                // }
 
                 // Create user object (without password hash - will be done by the function)
                 var newUser = new User
@@ -215,45 +221,47 @@ namespace TaskFlow.Api.Controllers
                 };
 
                 // Send registration message to queue
-                var messageSent = await _queueService.SendUserRegistrationMessageAsync(
-                    newUser,
-                    request.Password
-                );
+                // var messageSent = await _queueService.SendUserRegistrationMessageAsync(
+                //     newUser,
+                //     request.Password
+                // );
 
-                if (!messageSent)
-                {
-                    _logger.LogError(
-                        "Failed to send user registration message to queue for username: {Username}",
-                        request.Username
-                    );
-                    return StatusCode(
-                        500,
-                        new { error = "Failed to process registration request" }
-                    );
-                }
+                // if (!messageSent)
+                // {
+                //     _logger.LogError(
+                //         "Failed to send user registration message to queue for username: {Username}",
+                //         request.Username
+                //     );
+                //     return StatusCode(
+                //         500,
+                //         new { error = "Failed to process registration request" }
+                //     );
+                // }
 
-                _logger.LogInformation(
-                    "User registration request queued successfully for username: {Username}",
-                    request.Username
-                );
+                // _logger.LogInformation(
+                //     "User registration request queued successfully for username: {Username}",
+                //     request.Username
+                // );
 
                 return Ok(
                     new
                     {
-                        message = "User registration request received and queued for processing",
+                        message = "User registration request received (TEST MODE - no actual processing)",
                         requestId = Guid.NewGuid().ToString(),
-                        status = "queued",
-                        note = "Database operations temporarily disabled for startup testing"
+                        status = "test_mode",
+                        note = "Database and Queue services temporarily disabled for startup testing. This is a simulation only.",
+                        username = request.Username,
+                        email = request.Email,
                     }
                 );
             }
             catch (Exception ex)
             {
-                _logger.LogError(
-                    ex,
-                    "Error processing user registration request for username: {Username}",
-                    request.Username
-                );
+                // _logger.LogError(
+                //     ex,
+                //     "Error processing user registration request for username: {Username}",
+                //     request.Username
+                // );
                 return StatusCode(
                     500,
                     new { error = "Internal server error", details = ex.Message }
