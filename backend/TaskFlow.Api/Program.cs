@@ -85,15 +85,15 @@ Console.WriteLine(
     $"Azure Storage Connection: {(string.IsNullOrEmpty(azureStorageConnectionString) ? "NOT CONFIGURED" : "Configured")}"
 );
 
-// Temporarily disable database context for testing startup
+// Add database context with retry logic
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         connectionString,
         sqlServerOptionsAction: sqlOptions =>
         {
             sqlOptions.EnableRetryOnFailure(
-                maxRetryCount: 3, // Reduced from 5 for faster testing
-                maxRetryDelay: TimeSpan.FromSeconds(10), // Reduced from 30 for faster testing
+                maxRetryCount: 3,
+                maxRetryDelay: TimeSpan.FromSeconds(10),
                 errorNumbersToAdd: null
             );
         }
@@ -178,7 +178,7 @@ app.MapGet(
                 environment = app.Environment.EnvironmentName,
                 databaseConfigured = !string.IsNullOrEmpty(connectionString),
                 azureStorageConfigured = !string.IsNullOrEmpty(azureStorageConnectionString),
-                note = "Database and Queue services temporarily disabled for startup testing",
+                note = "Database context enabled with retry logic",
             }
         )
 );
