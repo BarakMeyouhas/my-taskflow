@@ -125,18 +125,52 @@ namespace TaskFlow.Api.Controllers
         {
             try
             {
+                // Log connection attempt details
+                var connectionString = db.Database.GetConnectionString();
+                var maskedConnectionString = MaskConnectionString(connectionString);
+
+                Console.WriteLine($"=== DATABASE CONNECTION TEST ===");
+                Console.WriteLine($"Attempting to connect to database...");
+                Console.WriteLine($"Connection string: {maskedConnectionString}");
+                Console.WriteLine($"Database provider: {db.Database.ProviderName}");
+                Console.WriteLine($"Database name: {db.Database.GetDbConnection().Database}");
+                Console.WriteLine($"Server: {db.Database.GetDbConnection().DataSource}");
+
                 var userCount = db.Users.Count();
+
+                Console.WriteLine($"Connection successful! User count: {userCount}");
+                Console.WriteLine($"=== END DATABASE TEST ===");
+
                 return Ok(
                     new
                     {
                         message = "Database connection working!",
                         userCount = userCount,
                         timestamp = DateTime.UtcNow,
+                        connectionInfo = new
+                        {
+                            provider = db.Database.ProviderName,
+                            database = db.Database.GetDbConnection().Database,
+                            server = db.Database.GetDbConnection().DataSource,
+                            connectionStringMasked = maskedConnectionString,
+                        },
                     }
                 );
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"=== DATABASE CONNECTION ERROR ===");
+                Console.WriteLine($"Error Type: {ex.GetType().Name}");
+                Console.WriteLine($"Error Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+                }
+
+                Console.WriteLine($"=== END DATABASE ERROR ===");
+
                 // Enhanced error handling to show inner exception details
                 var errorDetails = new
                 {
@@ -158,6 +192,53 @@ namespace TaskFlow.Api.Controllers
 
                 return StatusCode(500, errorDetails);
             }
+        }
+
+        private string MaskConnectionString(string connectionString)
+        {
+            if (string.IsNullOrEmpty(connectionString))
+                return "No connection string available";
+
+            // Mask password and sensitive parts
+            var masked = connectionString;
+
+            // Mask password
+            var passwordIndex = masked.IndexOf("Password=");
+            if (passwordIndex >= 0)
+            {
+                var endIndex = masked.IndexOf(';', passwordIndex);
+                if (endIndex >= 0)
+                {
+                    masked =
+                        masked.Substring(0, passwordIndex)
+                        + "Password=***"
+                        + masked.Substring(endIndex);
+                }
+                else
+                {
+                    masked = masked.Substring(0, passwordIndex) + "Password=***";
+                }
+            }
+
+            // Mask user ID
+            var userIdIndex = masked.IndexOf("User ID=");
+            if (userIdIndex >= 0)
+            {
+                var endIndex = masked.IndexOf(';', userIdIndex);
+                if (endIndex >= 0)
+                {
+                    masked =
+                        masked.Substring(0, userIdIndex)
+                        + "User ID=***"
+                        + masked.Substring(endIndex);
+                }
+                else
+                {
+                    masked = masked.Substring(0, userIdIndex) + "User ID=***";
+                }
+            }
+
+            return masked;
         }
 
         private List<object> GetAllInnerExceptions(Exception ex)
