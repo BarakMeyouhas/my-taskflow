@@ -1,0 +1,85 @@
+* [33mc9c9d5a[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m Remove hardcoded secrets from appsettings.json - use environment variables only
+* [33m77acf5d[m refactor: update connection strings to use environment variables for enhanced security
+* [33ma394557[m chore: update appsettings.json with new connection strings and enhance logging in AuthController
+* [33ma9e02c4[m[33m ([m[1;31morigin/main[m[33m)[m refactor: streamline database connection logging and remove sensitive data masking
+* [33m6ca6c16[m feat: enhance database connection diagnostics and error handling in AuthController
+* [33m765ef9c[m feat: enhance error handling in AuthController for better diagnostics
+* [33m74cdcae[m chore: adjust SQL Server retry logic for testing in Program.cs
+* [33md86b590[m chore: re-enable database context in Program.cs for testing
+* [33m2742144[m chore: further disable dependencies in AuthController for testing
+* [33m28e62f1[m chore: temporarily disable database and QueueService for startup testing
+* [33m98ea339[m fix: resolve 500 Internal Server Error in TaskFlow API deployment
+* [33ma8b2225[m feat: add production configuration and enhance service availability checks
+* [33mea23d87[m feat: enhance database connection handling and load environment variables
+* [33mfb724c3[m feat: implement environment variables for sensitive configuration
+* [33m762926a[m chore: update comments for clarity and consistency
+* [33m6503ad3[m fix: correct output.zip not found error message for consistency
+* [33mf88e8e1[m fix: update output.zip not found error message for clarity
+* [33m19bfa06[m fix: correct output.zip not found error message in deployment workflow
+* [33m52ed611[m chore: format Azure Functions deployment step for consistency
+* [33m1b3ed04[m chore: streamline Azure Functions deployment workflow by consolidating login steps
+* [33me622b5f[m chore: enhance Azure Functions deployment workflow with function app and resource group listing
+* [33madcec53[m chore: enhance Azure Functions deployment workflow with credential debugging and fallback login
+* [33mceddada[m chore: enhance Azure Functions deployment workflow with Azure access verification
+* [33m58a2e27[m fix: correct error message for non-existent Azure Function App in deployment workflow
+* [33m8a2dddf[m chore: enhance Azure Functions deployment workflow with resource group check
+* [33m0c65bb0[m chore: enhance Azure Functions deployment workflow with package verification
+* [33ma251739[m chore: remove obsolete property from FunctionsDbContext
+* [33me9605bc[m chore: refine Azure Functions deployment workflow
+* [33m8166e48[m chore: add test comment in Program.cs for future reference
+* [33m10ac757[m chore: enhance Azure Functions deployment workflow
+* [33m86223fe[m fix: update subscription ID in functions deployment workflow
+* [33ma6a7ad7[m chore: remove commented-out code in Program.cs for cleaner codebase
+* [33mc260c50[m chore: add comment to Program.cs for clarity
+* [33mb50d340[m chore: update functions deployment workflow with permissions and Azure login action
+* [33m900c4fc[m chore: add Azure login step to functions deployment workflow
+* [33mb1c09d0[m fix: revert to correct Azure Functions deployment action
+* [33m4adb5f3[m chore: update Azure Functions deployment action to use webapps-deploy
+* [33m3f5b48b[m fix: update Azure Functions app name to match actual app
+* [33m6db32eb[m chore: update frontend deployment workflow and refactor AuthController for readability
+* [33m5dcf723[m fix: update artifact upload path in functions-deploy workflow
+* [33mc5d7bad[m fix: correct artifact upload path in functions workflow
+* [33m170b1e6[m fix: remove CreatedAt reference and update System.Text.Json for security
+* [33m9f4b9a0[m[33m ([m[1;31morigin/feature/azure-functions[m[33m, [m[1;32mfeature/azure-functions[m[33m)[m feat: implement queue-based user registration architecture
+* [33m518ad8d[m[33m ([m[1;31morigin/api-stable[m[33m, [m[1;32mapi-stable[m[33m)[m Refactor AuthController for improved readability and logging; update backend URL in auth configuration to point to the new Azure endpoint.
+* [33mab996ba[m Refactor AuthController to remove queue service dependency and streamline user registration process; update Program.cs to remove unused queue service registration.
+* [33mb122e77[m Remove Azure Storage connection string from appsettings.json for security reasons
+* [33md466701[m Add Azure Functions deployment workflow and configure VSCode settings for development
+* [33mfe81a19[m Update backend URL in auth configuration to new Azure endpoint
+* [33m851196c[m Add detailed logging to AuthController for login attempts and errors; introduce a new database test endpoint
+* [33meb5f43b[m Update Program.cs to switch from in-memory database to SQL Server connection for production readiness
+* [33m00ea319[m Refactor authentication logic in AuthController to improve error handling and validation; update Program.cs for in-memory database testing and code formatting.
+* [33mf856012[m Add CORS support and basic health check endpoints in Program.cs
+* [33m4db30e3[m Remove unnecessary comment in Program.cs to improve code clarity
+* [33m26a5764[m Refactor Azure deployment workflows for frontend and backend by removing explicit login steps and updating to use publish profiles for deployment.
+* [33m55d87ff[m Enhance backend deployment workflow by adding Azure login step and updating deployment action name
+* [33m9e76e22[m Remove test comment in Program.cs for code clarity
+* [33mc6d3e98[m Refactor Azure deployment workflow to simplify backend deployment step by removing explicit login and renaming the deployment action.
+* [33m32bd15a[m Add test comment in Program.cs for clarity
+* [33mcd506b2[m Update backend deployment workflow to include changes in the workflow file path
+* [33mf56e49d[m Add frontend deployment workflow for Azure integration
+* [33md7d69af[m Enhance Azure deployment workflows by adding login step for authentication
+* [33mef899dd[m Fix: Update frontend to use Azure backend, add backend deployment workflow
+* [33m46ebd5e[m Fix: Complete Azure deployment solution - include production dependencies, enhanced startup script
+* [33m1981c14[m Fix: Resolve 404 error - remove ES module conflict, enhance Azure startup
+* [33m8447262[m Fix: Convert startup.js to CommonJS (startup.cjs) for Azure compatibility
+* [33m40fcc15[m Fix: Update Azure configuration to run startup.js instead of bypassing it
+* [33m6390fcb[m Enhance startup script to auto-install production dependencies if missing
+* [33mf7835bb[m Add comprehensive debugging for dependency installation and deployment package verification
+* [33m635eb57[m Fix: Use pre-built zip package for Azure deployment to avoid permission issues
+* [33m3ae9265[m Fix: Include package-lock.json for npm ci to work properly
+* [33m3c5c0d8[m Fix: Handle permission issues gracefully in verification step
+* [33mb53e87e[m Fix: Ignore unzip warnings to continue with deployment
+* [33m259e26e[m Optimize: Create smaller deployment package and reinstall dependencies on Azure
+* [33m4b73ae8[m Fix: Use zip archive to preserve .next directory during artifact transfer
+* [33mfa7701a[m Add artifact download verification to identify where .next directory is lost
+* [33m4b5ba1b[m Add artifact verification step to catch when .next directory is lost
+* [33m138a7be[m Enhanced deployment verification to ensure .next directory is preserved
+* [33m10ade9a[m Fix: Install production dependencies before deployment to resolve missing 'next' module error
+* [33m6d061c8[m Add Azure deployment to working build workflow
+* [33m780ea3b[m Fix shell syntax by explicitly using cmd for verification steps
+* [33m70c0075[m Add working build workflow based on successful environment test
+* [33m1f97d3e[m Add environment test workflow to diagnose GitHub Actions issues
+* [33m9bf8405[m Add new Next.js build artifacts and update GitHub Actions workflow
+* [33m6ea6596[m Add build error debugging workflow
+* [33me2d0cfd[m Add debug build workflow for Next.js application
