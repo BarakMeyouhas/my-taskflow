@@ -23,20 +23,10 @@ builder.Services.AddCors(options =>
     );
 });
 
-// Get connection string from environment variable or fallback to configuration
-var connectionString =
-    Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING")
-    ?? builder.Configuration.GetConnectionString("DefaultConnection");
+// Get connection string from configuration (appsettings.json)
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// Substitute environment variables in connection string if needed
-if (connectionString?.Contains("${DATABASE_PASSWORD}") == true)
-{
-    var dbPassword = Environment.GetEnvironmentVariable("DATABASE_PASSWORD");
-    if (!string.IsNullOrEmpty(dbPassword))
-    {
-        connectionString = connectionString.Replace("${DATABASE_PASSWORD}", dbPassword);
-    }
-}
+// Connection string is now directly from appsettings.json
 
 // Log connection string info (without sensitive data)
 var connectionInfo =
@@ -47,17 +37,9 @@ Console.WriteLine($"Database Connection: {connectionInfo}");
 
 // Debug logging for connection string processing
 Console.WriteLine($"=== DATABASE CONNECTION DEBUG ===");
+Console.WriteLine($"Using connection string from appsettings.json");
 Console.WriteLine(
-    $"DATABASE_CONNECTION_STRING env var: {(Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING") != null ? "SET" : "NOT SET")}"
-);
-Console.WriteLine(
-    $"DATABASE_PASSWORD env var: {(Environment.GetEnvironmentVariable("DATABASE_PASSWORD") != null ? "SET" : "NOT SET")}"
-);
-Console.WriteLine(
-    $"Connection string contains placeholder: {connectionString?.Contains("${DATABASE_PASSWORD}")}"
-);
-Console.WriteLine(
-    $"Final connection string (masked): {connectionString?.Replace(Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "MASKED", "***")}"
+    $"Connection string (masked): {connectionString?.Replace("Kingzerz@1998", "***")}"
 );
 Console.WriteLine($"=== END DATABASE DEBUG ===");
 
@@ -65,36 +47,18 @@ Console.WriteLine($"=== END DATABASE DEBUG ===");
 if (string.IsNullOrEmpty(connectionString))
 {
     Console.WriteLine("ERROR: No database connection string found!");
-    Console.WriteLine(
-        "Please set DATABASE_CONNECTION_STRING environment variable or configure DefaultConnection in appsettings.json"
-    );
+    Console.WriteLine("Please configure DefaultConnection in appsettings.json");
 }
 
-// Validate Azure Storage connection string
-var azureStorageConnectionString =
-    Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING")
-    ?? builder.Configuration.GetConnectionString("AzureStorage")
-    ?? builder.Configuration["AzureWebJobsStorage"];
+// Get Azure Storage connection string from configuration (appsettings.json)
+var azureStorageConnectionString = builder.Configuration.GetConnectionString("AzureStorage");
 
-// Substitute environment variables in Azure Storage connection string if needed
-if (azureStorageConnectionString?.Contains("${AZURE_STORAGE_ACCOUNT_KEY}") == true)
-{
-    var storageKey = Environment.GetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_KEY");
-    if (!string.IsNullOrEmpty(storageKey))
-    {
-        azureStorageConnectionString = azureStorageConnectionString.Replace(
-            "${AZURE_STORAGE_ACCOUNT_KEY}",
-            storageKey
-        );
-    }
-}
+// Azure Storage connection string is now directly from appsettings.json
 
 if (string.IsNullOrEmpty(azureStorageConnectionString))
 {
     Console.WriteLine("ERROR: No Azure Storage connection string found!");
-    Console.WriteLine(
-        "Please set AZURE_STORAGE_CONNECTION_STRING environment variable or configure AzureStorage in appsettings.json"
-    );
+    Console.WriteLine("Please configure AzureStorage in appsettings.json");
 }
 
 Console.WriteLine(
