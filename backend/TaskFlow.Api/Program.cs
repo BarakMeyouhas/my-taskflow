@@ -65,16 +65,15 @@ Console.WriteLine(
 // Temporarily disable database context for testing startup
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
-        connectionString
-    // Temporarily disabled retry logic for testing
-    // sqlServerOptionsAction: sqlOptions =>
-    // {
-    //     sqlOptions.EnableRetryOnFailure(
-    //         maxRetryCount: 5,
-    //         maxRetryDelay: TimeSpan.FromSeconds(30),
-    //         errorNumbersToAdd: null
-    //     );
-    // }
+        connectionString,
+        sqlServerOptionsAction: sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 3, // Reduced from 5 for faster testing
+                maxRetryDelay: TimeSpan.FromSeconds(10), // Reduced from 30 for faster testing
+                errorNumbersToAdd: null
+            );
+        }
     )
 );
 
