@@ -165,8 +165,9 @@ namespace TaskFlow.Api.Controllers
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(
-            [FromBody] UserRegisterRequest request,
-            [FromServices] AppDbContext db
+            [FromBody] UserRegisterRequest request
+            // Temporarily disabled database dependency for startup testing
+            // [FromServices] AppDbContext db
         )
         {
             try
@@ -181,11 +182,12 @@ namespace TaskFlow.Api.Controllers
                     return BadRequest("Username, email, and password are required");
                 }
 
-                // Check if user already exists
-                if (db.Users.Any(u => u.Username == request.Username || u.Email == request.Email))
-                {
-                    return BadRequest("Username or email already exists");
-                }
+                // Temporarily disabled database operations for startup testing
+                // // Check if user already exists
+                // if (db.Users.Any(u => u.Username == request.Username || u.Email == request.Email))
+                // {
+                //     return BadRequest("Username or email already exists");
+                // }
 
                 // Check if queue service is available
                 if (!_queueService.IsAvailable())
@@ -241,6 +243,7 @@ namespace TaskFlow.Api.Controllers
                         message = "User registration request received and queued for processing",
                         requestId = Guid.NewGuid().ToString(),
                         status = "queued",
+                        note = "Database operations temporarily disabled for startup testing"
                     }
                 );
             }

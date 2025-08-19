@@ -11,7 +11,6 @@ Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
-//test
 // Add CORS
 builder.Services.AddCors(options =>
 {
@@ -63,31 +62,33 @@ Console.WriteLine(
     $"Azure Storage Connection: {(string.IsNullOrEmpty(azureStorageConnectionString) ? "NOT CONFIGURED" : "Configured")}"
 );
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
-        connectionString,
-        sqlServerOptionsAction: sqlOptions =>
-        {
-            sqlOptions.EnableRetryOnFailure(
-                maxRetryCount: 5,
-                maxRetryDelay: TimeSpan.FromSeconds(30),
-                errorNumbersToAdd: null
-            );
-        }
-    )
-);
+// Temporarily disable database context for testing startup
+// builder.Services.AddDbContext<AppDbContext>(options =>
+//     options.UseSqlServer(
+//         connectionString
+//     // Temporarily disabled retry logic for testing
+//     // sqlServerOptionsAction: sqlOptions =>
+//     // {
+//     //     sqlOptions.EnableRetryOnFailure(
+//     //         maxRetryCount: 5,
+//     //         maxRetryDelay: TimeSpan.FromSeconds(30),
+//     //         errorNumbersToAdd: null
+//     //     );
+//     // }
+//     )
+// );
 
-// Register QueueService with error handling
-try
-{
-    builder.Services.AddScoped<IQueueService, QueueService>();
-    Console.WriteLine("QueueService registered successfully");
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"ERROR: Failed to register QueueService: {ex.Message}");
-    // Continue without queue service for now
-}
+// Temporarily disable QueueService for testing startup
+// try
+// {
+//     builder.Services.AddScoped<IQueueService, QueueService>();
+//     Console.WriteLine("QueueService registered successfully");
+// }
+// catch (Exception ex)
+// {
+//     Console.WriteLine($"ERROR: Failed to register QueueService: {ex.Message}");
+//     // Continue without queue service for now
+// }
 
 builder.Services.AddControllers();
 
@@ -140,6 +141,7 @@ app.MapGet(
                 environment = app.Environment.EnvironmentName,
                 databaseConfigured = !string.IsNullOrEmpty(connectionString),
                 azureStorageConfigured = !string.IsNullOrEmpty(azureStorageConnectionString),
+                note = "Database and Queue services temporarily disabled for startup testing"
             }
         )
 );
