@@ -36,6 +36,33 @@ var connectionInfo =
         : "Using fallback connection string";
 Console.WriteLine($"Database Connection: {connectionInfo}");
 
+// Validate database connection string
+if (string.IsNullOrEmpty(connectionString))
+{
+    Console.WriteLine("ERROR: No database connection string found!");
+    Console.WriteLine(
+        "Please set DATABASE_CONNECTION_STRING environment variable or configure DefaultConnection in appsettings.json"
+    );
+}
+
+// Validate Azure Storage connection string
+var azureStorageConnectionString =
+    Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING")
+    ?? builder.Configuration.GetConnectionString("AzureStorage")
+    ?? builder.Configuration["AzureWebJobsStorage"];
+
+if (string.IsNullOrEmpty(azureStorageConnectionString))
+{
+    Console.WriteLine("ERROR: No Azure Storage connection string found!");
+    Console.WriteLine(
+        "Please set AZURE_STORAGE_CONNECTION_STRING environment variable or configure AzureStorage in appsettings.json"
+    );
+}
+
+Console.WriteLine(
+    $"Azure Storage Connection: {(string.IsNullOrEmpty(azureStorageConnectionString) ? "NOT CONFIGURED" : "Configured")}"
+);
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         connectionString,
@@ -50,8 +77,17 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     )
 );
 
-// Register QueueService
-builder.Services.AddScoped<IQueueService, QueueService>();
+// Register QueueService with error handling
+try
+{
+    builder.Services.AddScoped<IQueueService, QueueService>();
+    Console.WriteLine("QueueService registered successfully");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"ERROR: Failed to register QueueService: {ex.Message}");
+    // Continue without queue service for now
+}
 
 builder.Services.AddControllers();
 
@@ -102,6 +138,8 @@ app.MapGet(
                 message = "TaskFlow API is running 🚀",
                 timestamp = DateTime.UtcNow,
                 environment = app.Environment.EnvironmentName,
+                databaseConfigured = !string.IsNullOrEmpty(connectionString),
+                azureStorageConfigured = !string.IsNullOrEmpty(azureStorageConnectionString),
             }
         )
 );

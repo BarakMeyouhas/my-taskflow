@@ -9,16 +9,20 @@ namespace TaskFlow.Api.Services
     {
         Task<bool> SendUserRegistrationMessageAsync(User user, string password);
         Task<bool> SendMessageAsync<T>(string queueName, T message);
+        bool IsAvailable();
     }
 
     public class QueueService : IQueueService
     {
-        private readonly QueueServiceClient _queueServiceClient;
+        private readonly QueueServiceClient? _queueServiceClient;
         private readonly ILogger<QueueService> _logger;
+        private readonly bool _isAvailable;
         private const string UserRegistrationQueueName = "user-registration-queue";
 
         public QueueService(IConfiguration configuration, ILogger<QueueService> logger)
         {
+            _logger = logger;
+            
             // Try to get connection string from environment variable first, then fallback to configuration
             var connectionString =
                 Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING")
@@ -27,17 +31,39 @@ namespace TaskFlow.Api.Services
 
             if (string.IsNullOrEmpty(connectionString))
             {
-                throw new InvalidOperationException(
-                    "Azure Storage connection string is not configured. Please set AZURE_STORAGE_CONNECTION_STRING environment variable."
-                );
+                _logger.LogWarning("Azure Storage connection string is not configured. Queue service will be unavailable.");
+                _isAvailable = false;
+                _queueServiceClient = null;
+                return;
             }
 
-            _queueServiceClient = new QueueServiceClient(connectionString);
-            _logger = logger;
+            try
+            {
+                _queueServiceClient = new QueueServiceClient(connectionString);
+                _isAvailable = true;
+                _logger.LogInformation("QueueService initialized successfully with Azure Storage");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to initialize QueueService with Azure Storage");
+                _isAvailable = false;
+                _queueServiceClient = null;
+            }
+        }
+
+        public bool IsAvailable()
+        {
+            return _isAvailable && _queueServiceClient != null;
         }
 
         public async Task<bool> SendUserRegistrationMessageAsync(User user, string password)
         {
+            if (!IsAvailable())
+            {
+                _logger.LogWarning("Queue service is not available. Cannot send user registration message.");
+                return false;
+            }
+
             try
             {
                 var message = new
@@ -64,9 +90,15 @@ namespace TaskFlow.Api.Services
 
         public async Task<bool> SendMessageAsync<T>(string queueName, T message)
         {
+            if (!IsAvailable())
+            {
+                _logger.LogWarning("Queue service is not available. Cannot send message to queue: {QueueName}", queueName);
+                return false;
+            }
+
             try
             {
-                var queueClient = _queueServiceClient.GetQueueClient(queueName);
+                var queueClient = _queueServiceClient!.GetQueueClient(queueName);
 
                 // Ensure queue exists
                 await queueClient.CreateIfNotExistsAsync();

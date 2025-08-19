@@ -187,6 +187,23 @@ namespace TaskFlow.Api.Controllers
                     return BadRequest("Username or email already exists");
                 }
 
+                // Check if queue service is available
+                if (!_queueService.IsAvailable())
+                {
+                    _logger.LogWarning(
+                        "Queue service is not available. Cannot process user registration."
+                    );
+                    return StatusCode(
+                        503,
+                        new
+                        {
+                            error = "Service temporarily unavailable",
+                            details = "User registration service is currently unavailable. Please try again later.",
+                            code = "QUEUE_SERVICE_UNAVAILABLE",
+                        }
+                    );
+                }
+
                 // Create user object (without password hash - will be done by the function)
                 var newUser = new User
                 {
