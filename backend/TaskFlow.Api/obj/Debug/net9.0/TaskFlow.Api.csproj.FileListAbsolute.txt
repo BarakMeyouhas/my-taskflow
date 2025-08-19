@@ -172,3 +172,6 @@ C:\Dev\Portfolio\Next.js\my-taskflow\backend\TaskFlow.Api\bin\Debug\net9.0\__azu
 C:\Dev\Portfolio\Next.js\my-taskflow\backend\TaskFlow.Api\bin\Debug\net9.0\__azurite_db_queue_extent__.json
 C:\Dev\Portfolio\Next.js\my-taskflow\backend\TaskFlow.Api\bin\Debug\net9.0\__azurite_db_queue__.json
 C:\Dev\Portfolio\Next.js\my-taskflow\backend\TaskFlow.Api\bin\Debug\net9.0\__azurite_db_table__.json
+C:\Dev\Portfolio\Next.js\my-taskflow\backend\TaskFlow.Api\bin\Debug\net9.0\appsettings.Production.json
+C:\Dev\Portfolio\Next.js\my-taskflow\backend\TaskFlow.Api\bin\Debug\net9.0\DotNetEnv.dll
+C:\Dev\Portfolio\Next.js\my-taskflow\backend\TaskFlow.Api\bin\Debug\net9.0\Sprache.dll

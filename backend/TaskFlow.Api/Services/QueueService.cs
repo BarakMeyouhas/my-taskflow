@@ -22,7 +22,7 @@ namespace TaskFlow.Api.Services
         public QueueService(IConfiguration configuration, ILogger<QueueService> logger)
         {
             _logger = logger;
-            
+
             // Try to get connection string from environment variable first, then fallback to configuration
             var connectionString =
                 Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING")
@@ -31,7 +31,9 @@ namespace TaskFlow.Api.Services
 
             if (string.IsNullOrEmpty(connectionString))
             {
-                _logger.LogWarning("Azure Storage connection string is not configured. Queue service will be unavailable.");
+                _logger.LogWarning(
+                    "Azure Storage connection string is not configured. Queue service will be unavailable."
+                );
                 _isAvailable = false;
                 _queueServiceClient = null;
                 return;
@@ -60,7 +62,9 @@ namespace TaskFlow.Api.Services
         {
             if (!IsAvailable())
             {
-                _logger.LogWarning("Queue service is not available. Cannot send user registration message.");
+                _logger.LogWarning(
+                    "Queue service is not available. Cannot send user registration message."
+                );
                 return false;
             }
 
@@ -92,7 +96,10 @@ namespace TaskFlow.Api.Services
         {
             if (!IsAvailable())
             {
-                _logger.LogWarning("Queue service is not available. Cannot send message to queue: {QueueName}", queueName);
+                _logger.LogWarning(
+                    "Queue service is not available. Cannot send message to queue: {QueueName}",
+                    queueName
+                );
                 return false;
             }
 
