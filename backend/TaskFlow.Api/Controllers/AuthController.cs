@@ -126,23 +126,42 @@ namespace TaskFlow.Api.Controllers
         {
             try
             {
-                // Log connection attempt details
-                Console.WriteLine($"=== DATABASE CONNECTION TEST ===");
-                Console.WriteLine($"Attempting to connect to database...");
-                Console.WriteLine($"Database provider: {db.Database.ProviderName}");
-                Console.WriteLine($"Database name: {db.Database.GetDbConnection().Database}");
-                Console.WriteLine($"Server: {db.Database.GetDbConnection().DataSource}");
+                Console.WriteLine("=== DATABASE CONNECTION TEST ===");
 
-                var userCount = db.Users.Count();
+                var canConnect = db.Database.CanConnect();
+                Console.WriteLine($"Can connect: {canConnect}");
 
-                Console.WriteLine($"Connection successful! User count: {userCount}");
-                Console.WriteLine($"=== END DATABASE TEST ===");
+                if (!canConnect)
+                {
+                    return StatusCode(500, new { error = "Cannot connect to database" });
+                }
+
+                int? userCount = null;
+                try
+                {
+                    if (db.Users != null)
+                    {
+                        userCount = db.Users.Count();
+                        Console.WriteLine($"User count: {userCount}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("DbSet Users is null");
+                    }
+                }
+                catch (Exception innerEx)
+                {
+                    Console.WriteLine($"Error querying Users table: {innerEx.Message}");
+                }
+
+                Console.WriteLine("=== END DATABASE TEST ===");
 
                 return Ok(
                     new
                     {
                         message = "Database connection working!",
-                        userCount = userCount,
+                        canConnect,
+                        userCount,
                         timestamp = DateTime.UtcNow,
                         connectionInfo = new
                         {
@@ -155,38 +174,8 @@ namespace TaskFlow.Api.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"=== DATABASE CONNECTION ERROR ===");
-                Console.WriteLine($"Error Type: {ex.GetType().Name}");
-                Console.WriteLine($"Error Message: {ex.Message}");
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-
-                if (ex.InnerException != null)
-                {
-                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
-                }
-
-                Console.WriteLine($"=== END DATABASE ERROR ===");
-
-                // Enhanced error handling to show inner exception details
-                var errorDetails = new
-                {
-                    error = "Database error",
-                    details = ex.Message,
-                    exceptionType = ex.GetType().Name,
-                    stackTrace = ex.StackTrace,
-                    innerException = ex.InnerException != null
-                        ? new
-                        {
-                            message = ex.InnerException.Message,
-                            type = ex.InnerException.GetType().Name,
-                            stackTrace = ex.InnerException.StackTrace,
-                        }
-                        : null,
-                    // Show all inner exceptions in the chain
-                    allInnerExceptions = GetAllInnerExceptions(ex),
-                };
-
-                return StatusCode(500, errorDetails);
+                Console.WriteLine($"DATABASE ERROR: {ex}");
+                return StatusCode(500, new { error = ex.Message, stack = ex.StackTrace });
             }
         }
 
