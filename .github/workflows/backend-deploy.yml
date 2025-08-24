@@ -11,7 +11,7 @@ on:
 jobs:
   test:
     runs-on: windows-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     
     steps:
       - uses: actions/checkout@v4
@@ -25,6 +25,21 @@ jobs:
         working-directory: ./backend/TaskFlow.Api
         run: dotnet restore
         
+      - name: Install Test Dependencies
+        working-directory: ./backend/TaskFlow.Api
+        run: |
+          echo "=== Installing Test Dependencies ==="
+          dotnet add package Newtonsoft.Json
+          dotnet add package Microsoft.NET.Test.Sdk
+          dotnet add package xunit
+          dotnet add package xunit.runner.visualstudio
+          dotnet add package Moq
+          echo "=== Test Dependencies Installed ==="
+        
+      - name: Restore Test Dependencies
+        working-directory: ./backend/TaskFlow.Api
+        run: dotnet restore
+        
       - name: Run Unit Tests
         working-directory: ./backend/TaskFlow.Api
         run: dotnet test --no-build --verbosity normal --logger "console;verbosity=detailed"
@@ -33,9 +48,15 @@ jobs:
         if: always()
         run: |
           echo "=== Unit Test Results ==="
-          echo "Tests completed successfully!"
+          if ($LASTEXITCODE -eq 0) {
+            echo "✅ All tests passed successfully!"
+          } else {
+            echo "❌ Some tests failed. Check the logs above for details."
+          }
+          
   build:
     runs-on: windows-latest
+    needs: test
     timeout-minutes: 30
     
     steps:
