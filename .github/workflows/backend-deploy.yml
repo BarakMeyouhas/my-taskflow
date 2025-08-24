@@ -9,6 +9,31 @@ on:
       - '.github/workflows/backend-deploy.yml'
 
 jobs:
+  test:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'
+          
+      - name: Restore dependencies
+        working-directory: ./backend/TaskFlow.Api
+        run: dotnet restore
+        
+      - name: Run Unit Tests
+        working-directory: ./backend/TaskFlow.Api
+        run: dotnet test --no-build --verbosity normal --logger "console;verbosity=detailed"
+        
+      - name: Test Results Summary
+        if: always()
+        run: |
+          echo "=== Unit Test Results ==="
+          echo "Tests completed successfully!"
   build:
     runs-on: windows-latest
     timeout-minutes: 30

@@ -1,9 +1,12 @@
+using System.Data;
 using System.Text;
+using Azure.Storage.Queues;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using TaskFlow.Api.Data;
+using TaskFlow.Api.Middleware;
 using TaskFlow.Api.Services;
 
 // Load environment variables from .env file
@@ -65,7 +68,7 @@ Console.WriteLine(
     $"Azure Storage Connection: {(string.IsNullOrEmpty(azureStorageConnectionString) ? "NOT CONFIGURED" : "Configured")}"
 );
 
-// Add database context with retry logic
+// Add database context with retry logic (Entity Framework)
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         connectionString,
@@ -80,17 +83,54 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     )
 );
 
-// Temporarily disable QueueService for testing startup
-// try
-// {
-//     builder.Services.AddScoped<IQueueService, QueueService>();
-//     Console.WriteLine("QueueService registered successfully");
-// }
-// catch (Exception ex)
-// {
-//     Console.WriteLine($"ERROR: Failed to register QueueService: {ex.Message}");
-//     // Continue without queue service for now
-// }
+// Add Dapper connection (for services that use Dapper)
+builder.Services.AddScoped<IDbConnection>(provider =>
+{
+    var connection = new Microsoft.Data.SqlClient.SqlConnection(connectionString);
+    return connection;
+});
+
+// Register Azure Storage services
+if (!string.IsNullOrEmpty(azureStorageConnectionString))
+{
+    try
+    {
+        // Register QueueServiceClient as singleton
+        builder.Services.AddSingleton<QueueServiceClient>(provider =>
+        {
+            return new QueueServiceClient(azureStorageConnectionString);
+        });
+        Console.WriteLine("QueueServiceClient registered successfully");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"ERROR: Failed to register QueueServiceClient: {ex.Message}");
+    }
+}
+else
+{
+    // Register null QueueServiceClient when no connection string is available
+    builder.Services.AddSingleton<QueueServiceClient>(_ => null!);
+    Console.WriteLine("QueueServiceClient registered as null (no connection string)");
+}
+
+// Register application services
+try
+{
+    // Core services
+    builder.Services.AddScoped<IUserService, UserService>();
+    builder.Services.AddScoped<IJwtService, JwtService>();
+    builder.Services.AddScoped<IGreetingService, GreetingServiceDapper>(); // Now using Dapper version
+
+    // Queue service (depends on QueueServiceClient)
+    builder.Services.AddScoped<IQueueService, QueueService>();
+
+    Console.WriteLine("All application services registered successfully");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"ERROR: Failed to register application services: {ex.Message}");
+}
 
 builder.Services.AddControllers();
 
@@ -137,6 +177,55 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 
+// ===== MIDDLEWARE EXAMPLES - Learning about middleware concepts =====
+
+// Global exception handling middleware (should be one of the first middleware in the pipeline)
+app.UseGlobalExceptionHandler();
+
+// Request logging middleware (logs detailed information about each request)
+app.UseRequestLogging();
+
+// Custom headers middleware - Adds custom headers to responses
+app.Use(
+    async (context, next) =>
+    {
+        // Add custom headers before calling next middleware
+        context.Response.Headers.Append("X-Powered-By", "TaskFlow-API");
+        context.Response.Headers.Append("X-Request-ID", Guid.NewGuid().ToString());
+
+        await next();
+    }
+);
+
+// Simple authentication check middleware (for demonstration)
+app.Use(
+    async (context, next) =>
+    {
+        // Skip authentication for health check and test endpoints
+        if (
+            context.Request.Path.StartsWithSegments("/")
+            || context.Request.Path.StartsWithSegments("/test")
+            || context.Request.Path.StartsWithSegments("/weatherforecast")
+        )
+        {
+            await next();
+            return;
+        }
+
+        // For other endpoints, check if Authorization header exists
+        if (!context.Request.Headers.ContainsKey("Authorization"))
+        {
+            context.Response.StatusCode = 401;
+            await context.Response.WriteAsync("Authorization header required");
+            return;
+        }
+
+        await next();
+    }
+);
+
+// ===== END MIDDLEWARE EXAMPLES =====
+
 // Enable CORS
 app.UseCors("AllowAll");
 
@@ -148,7 +237,7 @@ app.MapControllers();
 // בריאות בסיסית ל־root "/"
 app.MapGet(
     "/",
-    () =>
+    (IQueueService queueService) =>
         Results.Ok(
             new
             {
@@ -158,6 +247,7 @@ app.MapGet(
                 environment = app.Environment.EnvironmentName,
                 databaseConfigured = !string.IsNullOrEmpty(connectionString),
                 azureStorageConfigured = !string.IsNullOrEmpty(azureStorageConnectionString),
+                azureStorageAvailable = queueService.IsAvailable(),
                 note = "Database context enabled with retry logic",
             }
         )

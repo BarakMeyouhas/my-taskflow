@@ -15,30 +15,29 @@ namespace TaskFlow.Api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;
-
-        // Temporarily disabled queue service for startup testing
-        // private readonly IQueueService _queueService;
+        private readonly IUserService _userService;
+        private readonly IJwtService _jwtService;
+        private readonly IQueueService _queueService;
 
         public AuthController(
-            ILogger<AuthController> logger
-        // Temporarily disabled queue service for startup testing
-        // IQueueService queueService
+            ILogger<AuthController> logger,
+            IUserService userService,
+            IJwtService jwtService,
+            IQueueService queueService
         )
         {
             _logger = logger;
-            // _queueService = queueService;
+            _userService = userService;
+            _jwtService = jwtService;
+            _queueService = queueService;
         }
 
         [HttpPost("login")]
-        public IActionResult Login(
-            [FromBody] UserLoginRequest request,
-            [FromServices] AppDbContext db
-        )
+        public async Task<IActionResult> Login([FromBody] UserLoginRequest request)
         {
             try
             {
-                // Log the incoming request
-                Console.WriteLine($"Login attempt for username: {request?.Username}");
+                _logger.LogInformation("Login attempt for username: {Username}", request?.Username);
 
                 // Validate request
                 if (
@@ -47,38 +46,32 @@ namespace TaskFlow.Api.Controllers
                     || string.IsNullOrEmpty(request.Password)
                 )
                 {
-                    Console.WriteLine("Login failed: Invalid request data");
+                    _logger.LogWarning("Login failed: Invalid request data");
                     return BadRequest("Username and password are required");
                 }
 
-                Console.WriteLine("Attempting to query database...");
-
-                // Find user in database
-                var user = db.Users.FirstOrDefault(u => u.Username == request.Username);
-
-                Console.WriteLine($"User found: {user != null}");
+                // Authenticate user using service
+                var user = await _userService.AuthenticateUserAsync(
+                    request.Username,
+                    request.Password
+                );
 
                 if (user == null)
                 {
-                    Console.WriteLine("Login failed: User not found");
+                    _logger.LogWarning(
+                        "Login failed: Invalid credentials for username: {Username}",
+                        request.Username
+                    );
                     return Unauthorized("Invalid username or password");
                 }
 
-                Console.WriteLine("Verifying password...");
+                // Generate JWT token using service
+                var token = _jwtService.GenerateToken(user.Username);
 
-                // Verify password hash
-                if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-                {
-                    Console.WriteLine("Login failed: Invalid password");
-                    return Unauthorized("Invalid username or password");
-                }
-
-                Console.WriteLine("Generating JWT token...");
-
-                // Generate token and return user info
-                var token = GenerateJwtToken(user.Username);
-
-                Console.WriteLine("Login successful");
+                _logger.LogInformation(
+                    "Login successful for username: {Username}",
+                    request.Username
+                );
 
                 return Ok(
                     new
@@ -95,19 +88,11 @@ namespace TaskFlow.Api.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception with full details
-                Console.WriteLine($"=== LOGIN ERROR ===");
-                Console.WriteLine($"Error Type: {ex.GetType().Name}");
-                Console.WriteLine($"Error Message: {ex.Message}");
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-
-                if (ex.InnerException != null)
-                {
-                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
-                }
-
-                Console.WriteLine($"=== END LOGIN ERROR ===");
-
+                _logger.LogError(
+                    ex,
+                    "Error during login for username: {Username}",
+                    request?.Username
+                );
                 return StatusCode(
                     500,
                     new { error = "Internal server error", details = ex.Message }
@@ -122,59 +107,27 @@ namespace TaskFlow.Api.Controllers
         }
 
         [HttpGet("db-test")]
-        public IActionResult TestDatabase([FromServices] AppDbContext db)
+        public async Task<IActionResult> TestDatabase()
         {
             try
             {
-                Console.WriteLine("=== DATABASE CONNECTION TEST ===");
+                _logger.LogInformation("Testing database connection...");
 
-                var canConnect = db.Database.CanConnect();
-                Console.WriteLine($"Can connect: {canConnect}");
-
-                if (!canConnect)
-                {
-                    return StatusCode(500, new { error = "Cannot connect to database" });
-                }
-
-                int? userCount = null;
-                try
-                {
-                    if (db.Users != null)
-                    {
-                        userCount = db.Users.Count();
-                        Console.WriteLine($"User count: {userCount}");
-                    }
-                    else
-                    {
-                        Console.WriteLine("DbSet Users is null");
-                    }
-                }
-                catch (Exception innerEx)
-                {
-                    Console.WriteLine($"Error querying Users table: {innerEx.Message}");
-                }
-
-                Console.WriteLine("=== END DATABASE TEST ===");
+                // Test user service to verify database connectivity
+                var testUser = await _userService.GetUserByUsernameAsync("test");
 
                 return Ok(
                     new
                     {
                         message = "Database connection working!",
-                        canConnect,
-                        userCount,
                         timestamp = DateTime.UtcNow,
-                        connectionInfo = new
-                        {
-                            provider = db.Database.ProviderName,
-                            database = db.Database.GetDbConnection().Database,
-                            server = db.Database.GetDbConnection().DataSource,
-                        },
+                        note = "Database connectivity verified through UserService",
                     }
                 );
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"DATABASE ERROR: {ex}");
+                _logger.LogError(ex, "Database connection test failed");
                 return StatusCode(500, new { error = ex.Message, stack = ex.StackTrace });
             }
         }
@@ -225,11 +178,7 @@ namespace TaskFlow.Api.Controllers
         }
 
         [HttpPost("register")]
-        public IActionResult Register(
-            [FromBody] UserRegisterRequest request
-        // Temporarily disabled database dependency for startup testing
-        // [FromServices] AppDbContext db
-        )
+        public async Task<IActionResult> Register([FromBody] UserRegisterRequest request)
         {
             try
             {
@@ -243,68 +192,65 @@ namespace TaskFlow.Api.Controllers
                     return BadRequest("Username, email, and password are required");
                 }
 
-                // Temporarily disabled database operations for startup testing
-                // // Check if user already exists
-                // if (db.Users.Any(u => u.Username == request.Username || u.Email == request.Email))
-                // {
-                //     return BadRequest("Username or email already exists");
-                // }
+                // Check if user already exists
+                if (await _userService.UserExistsAsync(request.Username, request.Email))
+                {
+                    return BadRequest("Username or email already exists");
+                }
 
                 // Check if queue service is available
-                // if (!_queueService.IsAvailable())
-                // {
-                //     _logger.LogWarning(
-                //         "Queue service is not available. Cannot process user registration."
-                //     );
-                //     return StatusCode(
-                //         503,
-                //         new
-                //         {
-                //             error = "Service temporarily unavailable",
-                //             details = "User registration service is currently unavailable. Please try again later.",
-                //             code = "QUEUE_SERVICE_UNAVAILABLE",
-                //         }
-                //     );
-                // }
-
-                // Create user object (without password hash - will be done by the function)
-                var newUser = new User
+                if (!_queueService.IsAvailable())
                 {
-                    Username = request.Username,
-                    Email = request.Email,
-                    PasswordHash = string.Empty, // Will be set by the function
-                };
+                    _logger.LogWarning(
+                        "Queue service is not available. Cannot process user registration."
+                    );
+                    return StatusCode(
+                        503,
+                        new
+                        {
+                            error = "Service temporarily unavailable",
+                            details = "User registration service is currently unavailable. Please try again later.",
+                            code = "QUEUE_SERVICE_UNAVAILABLE",
+                        }
+                    );
+                }
+
+                // Create user using service
+                var newUser = await _userService.CreateUserAsync(
+                    request.Username,
+                    request.Email,
+                    request.Password
+                );
 
                 // Send registration message to queue
-                // var messageSent = await _queueService.SendUserRegistrationMessageAsync(
-                //     newUser,
-                //     request.Password
-                // );
+                var messageSent = await _queueService.SendUserRegistrationMessageAsync(
+                    newUser,
+                    request.Password
+                );
 
-                // if (!messageSent)
-                // {
-                //     _logger.LogError(
-                //         "Failed to send user registration message to queue for username: {Username}",
-                //         request.Username
-                //     );
-                //     return StatusCode(
-                //         500,
-                //         new { error = "Failed to process registration request" }
-                //     );
-                // }
+                if (!messageSent)
+                {
+                    _logger.LogError(
+                        "Failed to send user registration message to queue for username: {Username}",
+                        request.Username
+                    );
+                    return StatusCode(
+                        500,
+                        new { error = "Failed to process registration request" }
+                    );
+                }
 
-                // _logger.LogInformation(
-                //     "User registration request queued successfully for username: {Username}",
-                //     request.Username
-                // );
+                _logger.LogInformation(
+                    "User registration request queued successfully for username: {Username}",
+                    request.Username
+                );
 
                 return Ok(
                     new
                     {
-                        message = "User registration request received (TEST MODE - no actual processing)",
+                        message = "User registration request received and queued successfully",
                         requestId = Guid.NewGuid().ToString(),
-                        status = "test_mode",
-                        note = "Database and Queue services temporarily disabled for startup testing. This is a simulation only.",
+                        status = "queued",
                         username = request.Username,
                         email = request.Email,
                     }
@@ -312,23 +258,16 @@ namespace TaskFlow.Api.Controllers
             }
             catch (Exception ex)
             {
-                // _logger.LogError(
-                //     ex,
-                //     "Error processing user registration request for username: {Username}",
-                //     request.Username
-                // );
+                _logger.LogError(
+                    ex,
+                    "Error processing user registration request for username: {Username}",
+                    request.Username
+                );
                 return StatusCode(
                     500,
                     new { error = "Internal server error", details = ex.Message }
                 );
             }
-        }
-
-        public class UserRegisterRequest
-        {
-            public string Username { get; set; }
-            public string Email { get; set; }
-            public string Password { get; set; }
         }
     }
 
@@ -340,8 +279,8 @@ namespace TaskFlow.Api.Controllers
 
     public class UserRegisterRequest
     {
-        public string Username { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
+        public string Username { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
     }
 }

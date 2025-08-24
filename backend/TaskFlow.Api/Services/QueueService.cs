@@ -19,37 +19,21 @@ namespace TaskFlow.Api.Services
         private readonly bool _isAvailable;
         private const string UserRegistrationQueueName = "user-registration-queue";
 
-        public QueueService(IConfiguration configuration, ILogger<QueueService> logger)
+        public QueueService(QueueServiceClient? queueServiceClient, ILogger<QueueService> logger)
         {
+            _queueServiceClient = queueServiceClient;
             _logger = logger;
+            _isAvailable = _queueServiceClient != null;
 
-            // Try to get connection string from environment variable first, then fallback to configuration
-            var connectionString =
-                Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING")
-                ?? configuration.GetConnectionString("AzureStorage")
-                ?? configuration["AzureWebJobsStorage"];
-
-            if (string.IsNullOrEmpty(connectionString))
+            if (_isAvailable)
             {
-                _logger.LogWarning(
-                    "Azure Storage connection string is not configured. Queue service will be unavailable."
-                );
-                _isAvailable = false;
-                _queueServiceClient = null;
-                return;
-            }
-
-            try
-            {
-                _queueServiceClient = new QueueServiceClient(connectionString);
-                _isAvailable = true;
                 _logger.LogInformation("QueueService initialized successfully with Azure Storage");
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError(ex, "Failed to initialize QueueService with Azure Storage");
-                _isAvailable = false;
-                _queueServiceClient = null;
+                _logger.LogWarning(
+                    "QueueService initialized without Azure Storage - service will be unavailable"
+                );
             }
         }
 

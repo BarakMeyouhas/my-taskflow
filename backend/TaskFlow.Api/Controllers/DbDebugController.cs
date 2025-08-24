@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TaskFlow.Api.Data;
+using TaskFlow.Api.Services;
 
 namespace TaskFlow.Api.Controllers
 {
@@ -9,10 +10,18 @@ namespace TaskFlow.Api.Controllers
     public class DbDebugController : ControllerBase
     {
         private readonly AppDbContext _db;
+        private readonly IGreetingService _greetingService;
+        private readonly IQueueService _queueService;
 
-        public DbDebugController(AppDbContext db)
+        public DbDebugController(
+            AppDbContext db,
+            IGreetingService greetingService,
+            IQueueService queueService
+        )
         {
             _db = db;
+            _greetingService = greetingService;
+            _queueService = queueService;
         }
 
         [HttpGet("test-connection")]
@@ -27,7 +36,7 @@ namespace TaskFlow.Api.Controllers
                 Console.WriteLine($"Can connect: {canConnect}");
 
                 int? userCount = null;
-                string usersError = null;
+                string? usersError = null;
 
                 try
                 {
@@ -77,6 +86,99 @@ namespace TaskFlow.Api.Controllers
                         innerException = ex.InnerException?.Message,
                     }
                 );
+            }
+        }
+
+        [HttpGet("test-azure-storage")]
+        public IActionResult TestAzureStorage()
+        {
+            try
+            {
+                Console.WriteLine("=== AZURE STORAGE CONNECTION TEST ===");
+
+                var isAvailable = _queueService.IsAvailable();
+                Console.WriteLine($"Azure Storage available: {isAvailable}");
+
+                Console.WriteLine("=== AZURE STORAGE TEST END ===");
+
+                return Ok(
+                    new
+                    {
+                        azureStorageAvailable = isAvailable,
+                        timestamp = DateTime.UtcNow,
+                        note = "Azure Storage connectivity verified through QueueService",
+                    }
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"AZURE STORAGE TEST ERROR: {ex}");
+                return StatusCode(500, new { error = ex.Message, stackTrace = ex.StackTrace });
+            }
+        }
+
+        [HttpGet("greet/{name}")]
+        public IActionResult Greet(string name)
+        {
+            try
+            {
+                var greeting = _greetingService.SayHello(name);
+                return Ok(new { message = greeting, name = name });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        [HttpGet("greet-with-logger/{name}")]
+        public IActionResult GreetWithLogger(
+            string name,
+            [FromServices] ILogger<DbDebugController> logger
+        )
+        {
+            try
+            {
+                logger.LogInformation("Greeting endpoint called for name: {Name}", name);
+                var greeting = _greetingService.SayHello(name);
+                return Ok(
+                    new
+                    {
+                        message = greeting,
+                        name = name,
+                        timestamp = DateTime.UtcNow,
+                    }
+                );
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error in greeting endpoint for name: {Name}", name);
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        [HttpGet("greet-method-injection/{name}")]
+        public IActionResult GreetMethodInjection(
+            string name,
+            [FromServices] ILogger<GreetingServiceDapper> logger
+        )
+        {
+            try
+            {
+                // Method Injection - passing logger as parameter
+                var greeting = _greetingService.SayHelloWithLogger(name, logger);
+                return Ok(
+                    new
+                    {
+                        message = greeting,
+                        name = name,
+                        injectionType = "Method Injection",
+                    }
+                );
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
             }
         }
     }
