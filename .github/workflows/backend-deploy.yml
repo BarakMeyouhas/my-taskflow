@@ -9,8 +9,54 @@ on:
       - '.github/workflows/backend-deploy.yml'
 
 jobs:
+  
+          
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'
+          
+      - name: Restore dependencies
+        working-directory: ./backend/TaskFlow.Api
+        run: dotnet restore
+        
+      - name: Build
+        working-directory: ./backend/TaskFlow.Api
+        run: dotnet build --no-restore --configuration Release
+        
+      - name: Publish
+        working-directory: ./backend/TaskFlow.Api
+        run: dotnet publish --no-build --configuration Release --output ./publish
+        
+      - name: Create Deployment Package
+        working-directory: ./backend/TaskFlow.Api
+        shell: cmd
+        run: |
+          echo "=== Creating backend deployment package ==="
+          echo "Current directory: %CD%"
+          echo "Creating zip archive..."
+          
+          powershell -Command "Compress-Archive -Path ./publish/* -DestinationPath ../backend-deployment.zip -Force"
+          
+          echo "=== Backend deployment package created ==="
+          dir ..\backend-deployment.zip
+          
+      - name: Upload Backend Deployment Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-build
+          path: ./backend/backend-deployment.zip
+
   test:
     runs-on: windows-latest
+    needs: build
     timeout-minutes: 20
     
     steps:
@@ -53,50 +99,6 @@ jobs:
           } else {
             echo "❌ Some tests failed. Check the logs above for details."
           }
-          
-  build:
-    runs-on: windows-latest
-    needs: test
-    timeout-minutes: 30
-    
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '9.0.x'
-          
-      - name: Restore dependencies
-        working-directory: ./backend/TaskFlow.Api
-        run: dotnet restore
-        
-      - name: Build
-        working-directory: ./backend/TaskFlow.Api
-        run: dotnet build --no-restore --configuration Release
-        
-      - name: Publish
-        working-directory: ./backend/TaskFlow.Api
-        run: dotnet publish --no-build --configuration Release --output ./publish
-        
-      - name: Create Deployment Package
-        working-directory: ./backend/TaskFlow.Api
-        shell: cmd
-        run: |
-          echo "=== Creating backend deployment package ==="
-          echo "Current directory: %CD%"
-          echo "Creating zip archive..."
-          
-          powershell -Command "Compress-Archive -Path ./publish/* -DestinationPath ../backend-deployment.zip -Force"
-          
-          echo "=== Backend deployment package created ==="
-          dir ..\backend-deployment.zip
-          
-      - name: Upload Backend Deployment Package
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-build
-          path: ./backend/backend-deployment.zip
           
   deploy:
     runs-on: ubuntu-latest
