@@ -2,6 +2,39 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"label": "clean (backend)",
+			"command": "dotnet",
+			"args": [
+				"clean",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary"
+			],
+			"type": "process",
+			"problemMatcher": "$msCompile",
+			"options": {
+				"cwd": "${workspaceFolder}/backend/TaskFlow.Api"
+			}
+		},
+		{
+			"label": "build (backend)",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary"
+			],
+			"type": "process",
+			"dependsOn": "clean (backend)",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": "$msCompile",
+			"options": {
+				"cwd": "${workspaceFolder}/backend/TaskFlow.Api"
+			}
+		},
+		{
 			"label": "clean (functions)",
 			"command": "dotnet",
 			"args": [
@@ -25,10 +58,6 @@
 			],
 			"type": "process",
 			"dependsOn": "clean (functions)",
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			},
 			"problemMatcher": "$msCompile",
 			"options": {
 				"cwd": "${workspaceFolder}/functions"

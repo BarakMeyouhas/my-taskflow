@@ -2,10 +2,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Attach to .NET Functions",
+            "name": "Launch Backend API",
             "type": "coreclr",
-            "request": "attach",
-            "processId": "${command:azureFunctions.pickProcess}"
+            "request": "launch",
+            "preLaunchTask": "build (backend)",
+            "program": "${workspaceFolder}/backend/TaskFlow.Api/bin/Debug/net9.0/TaskFlow.Api.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/backend/TaskFlow.Api",
+            "console": "internalConsole",
+            "stopAtEntry": false,
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
         }
     ]
 }
