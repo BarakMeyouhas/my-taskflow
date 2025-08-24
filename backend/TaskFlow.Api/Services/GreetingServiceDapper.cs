@@ -19,8 +19,8 @@ namespace TaskFlow.Api.Services
             ILogger<GreetingServiceDapper> logger
         )
         {
-            _dbConnection = dbConnection;
-            _logger = logger;
+            _dbConnection = dbConnection ?? throw new ArgumentNullException(nameof(dbConnection));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public string SayHello(string name)
