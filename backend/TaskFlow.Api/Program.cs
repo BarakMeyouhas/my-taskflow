@@ -208,6 +208,7 @@ app.Use(
             context.Request.Path.StartsWithSegments("/")
             || context.Request.Path.StartsWithSegments("/test")
             || context.Request.Path.StartsWithSegments("/weatherforecast")
+            || context.Request.Path.StartsWithSegments("/api/auth") // ✅ Allow auth endpoints
         )
         {
             await next();
