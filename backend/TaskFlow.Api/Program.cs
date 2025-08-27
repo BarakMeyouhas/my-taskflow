@@ -155,6 +155,15 @@ builder
                     jwtKey = envJwtKey;
                 }
             }
+            Console.WriteLine($"=== JWT KEY DEBUG ===");
+            Console.WriteLine(
+                $"Environment JWT_KEY: {(string.IsNullOrEmpty(jwtKey) ? "NOT SET" : string.Concat(jwtKey.AsSpan(0, Math.Min(10, jwtKey.Length)), "..."))}"
+            );
+            Console.WriteLine(
+                $"Config JwtSettings:Key: {(string.IsNullOrEmpty(builder.Configuration["JwtSettings:Key"]) ? "NOT SET" : string.Concat(builder.Configuration["JwtSettings:Key"]!.AsSpan(0, Math.Min(10, builder.Configuration["JwtSettings:Key"]!.Length)), "..."))}"
+            );
+            Console.WriteLine($"Final JWT Key Length: {jwtKey?.Length ?? 0}");
+            Console.WriteLine($"=== END JWT DEBUG ===");
         }
 
         options.TokenValidationParameters = new TokenValidationParameters
