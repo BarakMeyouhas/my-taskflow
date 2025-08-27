@@ -146,7 +146,7 @@ builder
         {
             // Fallback to configuration if environment variable not set
             jwtKey = builder.Configuration["JwtSettings:Key"];
-            // Substitute environment variable placeholder if present
+            // Substitute environment variable placeholder if present!
             if (jwtKey?.Contains("${JWT_KEY}") == true)
             {
                 var envJwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
