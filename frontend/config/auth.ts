@@ -10,9 +10,9 @@ export const authConfig = {
   
   // Auth endpoints
   endpoints: {
-    register: '/api/auth/register',
-    login: '/api/auth/login',
-    verify: '/api/auth/verify',
+    register: 'https://taskflowbackend-g3anf0c9g5eac9ce.westeurope-01.azurewebsites.net/api/auth/register',
+    login: 'https://taskflowbackend-g3anf0c9g5eac9ce.westeurope-01.azurewebsites.net/api/auth/login',
+    verify: 'https://taskflowbackend-g3anf0c9g5eac9ce.westeurope-01.azurewebsites.net/api/auth/verify',
   },
   
   // Protected routes that require authentication
