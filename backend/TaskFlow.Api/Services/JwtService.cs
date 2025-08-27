@@ -29,7 +29,7 @@ namespace TaskFlow.Api.Services
             _jwtKey =
                 Environment.GetEnvironmentVariable("JWT_KEY")
                 ?? configuration["JwtSettings:Key"]
-                ?? "SuperSecretKey12345SuperSecretKey12345SuperSecretKey12345";
+                ?? "SuperSecretKey12345SuperSecretKey12345SuperSecretKey12345SuperSecretKey12345SuperSecretKey12345SuperSecretKey12345";
             _issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "taskflow";
             _audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "taskflow";
         }
