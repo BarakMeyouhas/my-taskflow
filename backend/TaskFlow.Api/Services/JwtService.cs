@@ -32,6 +32,31 @@ namespace TaskFlow.Api.Services
                 ?? "SuperSecretKey12345SuperSecretKey12345SuperSecretKey12345SuperSecretKey12345SuperSecretKey12345SuperSecretKey12345";
             _issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "taskflow";
             _audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "taskflow";
+
+            // Debug logging
+            _logger.LogInformation("=== JWT SERVICE DEBUG ===");
+            _logger.LogInformation(
+                "Environment JWT_KEY: {JwtKey}",
+                string.IsNullOrEmpty(Environment.GetEnvironmentVariable("JWT_KEY"))
+                    ? "NOT SET"
+                    : Environment
+                        .GetEnvironmentVariable("JWT_KEY")!
+                        .Substring(
+                            0,
+                            Math.Min(10, Environment.GetEnvironmentVariable("JWT_KEY")!.Length)
+                        ) + "..."
+            );
+            _logger.LogInformation(
+                "Config JwtSettings:Key: {ConfigKey}",
+                string.IsNullOrEmpty(configuration["JwtSettings:Key"])
+                    ? "NOT SET"
+                    : configuration["JwtSettings:Key"]!.Substring(
+                        0,
+                        Math.Min(10, configuration["JwtSettings:Key"]!.Length)
+                    ) + "..."
+            );
+            _logger.LogInformation("Final JWT Key Length: {KeyLength}", _jwtKey?.Length ?? 0);
+            _logger.LogInformation("=== END JWT DEBUG ===");
         }
 
         public string GenerateToken(string username)
