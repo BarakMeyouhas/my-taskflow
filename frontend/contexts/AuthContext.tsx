@@ -1,4 +1,6 @@
 "use client";
+import { authConfig } from '@/config/auth';
+
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
@@ -55,7 +57,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       // TODO: Verify token with backend
       // For now, we'll check if token exists and has a valid format
-      const response = await fetch('/api/auth/verify', {
+      const response = await fetch(`${authConfig.endpoints.verify}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -83,7 +85,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Set loading state during login to prevent component flashing
       setIsLoading(true);
       
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${authConfig.endpoints.login}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -113,7 +115,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (username: string, email: string, password: string): Promise<boolean> => {
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch(`${authConfig.endpoints.register}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
