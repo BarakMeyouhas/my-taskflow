@@ -176,8 +176,10 @@ builder
 var app = builder.Build();
 
 app.UseHttpsRedirection();
+app.UseCors("AllowAll");
 
 // ===== MIDDLEWARE EXAMPLES - Learning about middleware concepts =====
+// Enable CORS
 
 // Global exception handling middleware (should be one of the first middleware in the pipeline)
 app.UseGlobalExceptionHandler();
@@ -225,9 +227,6 @@ app.Use(
 );
 
 // ===== END MIDDLEWARE EXAMPLES =====
-
-// Enable CORS
-app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
