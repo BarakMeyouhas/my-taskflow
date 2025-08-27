@@ -27,9 +27,16 @@ namespace TaskFlow.Api.Services
 
             // Get JWT settings from configuration
             _jwtKey =
-                Environment.GetEnvironmentVariable("JWT_KEY")
-                ?? configuration["JwtSettings:Key"]
-                ?? "SuperSecretKey12345SuperSecretKey12345SuperSecretKey12345SuperSecretKey12345SuperSecretKey12345SuperSecretKey12345";
+                Environment.GetEnvironmentVariable("JWT_KEY") ?? configuration["JwtSettings:Key"]!;
+
+            // Ensure JWT key is configured
+            if (string.IsNullOrEmpty(_jwtKey))
+            {
+                throw new InvalidOperationException(
+                    "JWT_KEY is not configured. Please set JWT_KEY environment variable or JwtSettings:Key in configuration."
+                );
+            }
+
             _issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "taskflow";
             _audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "taskflow";
 
