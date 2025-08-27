@@ -137,50 +137,8 @@ builder.Services.AddControllers();
 // Add services to the container.
 builder.Services.AddOpenApi();
 
-builder
-    .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
-        if (string.IsNullOrEmpty(jwtKey))
-        {
-            // Fallback to configuration if environment variable not set
-            jwtKey = builder.Configuration["JwtSettings:Key"];
-            // Substitute environment variable placeholder if present!
-            if (jwtKey?.Contains("${JWT_KEY}") == true)
-            {
-                var envJwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
-                if (!string.IsNullOrEmpty(envJwtKey))
-                {
-                    jwtKey = envJwtKey;
-                }
-            }
-            Console.WriteLine($"=== JWT KEY DEBUG ===");
-            Console.WriteLine(
-                $"Environment JWT_KEY: {(string.IsNullOrEmpty(jwtKey) ? "NOT SET" : string.Concat(jwtKey.AsSpan(0, Math.Min(10, jwtKey.Length)), "..."))}"
-            );
-            Console.WriteLine(
-                $"Config JwtSettings:Key: {(string.IsNullOrEmpty(builder.Configuration["JwtSettings:Key"]) ? "NOT SET" : string.Concat(builder.Configuration["JwtSettings:Key"]!.AsSpan(0, Math.Min(10, builder.Configuration["JwtSettings:Key"]!.Length)), "..."))}"
-            );
-            Console.WriteLine($"Final JWT Key Length: {jwtKey?.Length ?? 0}");
-            Console.WriteLine($"=== END JWT DEBUG ===");
-        }
-
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "taskflow",
-            ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "taskflow",
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(
-                    jwtKey ?? "SuperSecretKey12345SuperSecretKey12345SuperSecretKey12345"
-                )
-            ),
-        };
-    });
+// Remove JWT Bearer configuration - using JwtService instead
+builder.Services.AddAuthentication();
 
 var app = builder.Build();
 
