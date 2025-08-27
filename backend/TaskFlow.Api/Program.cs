@@ -219,7 +219,8 @@ app.Use(
         if (!context.Request.Headers.ContainsKey("Authorization"))
         {
             context.Response.StatusCode = 401;
-            await context.Response.WriteAsync("Authorization header required");
+            context.Response.ContentType = "application/json"; // ✅ Set content type
+            await context.Response.WriteAsync("{\"error\":\"Authorization header required\"}"); // ✅ Return JSON
             return;
         }
 
