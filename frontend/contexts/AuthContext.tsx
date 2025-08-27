@@ -94,7 +94,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     password: string
   ): Promise<boolean> => {
     try {
-      // Set loading state during login to prevent component flashing
       setIsLoading(true);
 
       const response = await fetch(`${authConfig.endpoints.login}`, {
@@ -111,15 +110,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(data.user);
         return true;
       } else {
-        // Handle both JSON and text responses
+        // Handle error response - read body only once
         let errorMessage = "Login failed";
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorData.error || errorMessage;
-        } catch {
-          // If not JSON, read as text
+        const contentType = response.headers.get("content-type");
+
+        if (contentType && contentType.includes("application/json")) {
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorData.error || errorMessage;
+          } catch {
+            errorMessage = "Invalid response format";
+          }
+        } else {
+          // Read as text only if not JSON
           errorMessage = await response.text();
         }
+
         throw new Error(errorMessage);
       }
     } catch (error) {
