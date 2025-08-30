@@ -7,7 +7,7 @@ namespace TaskFlow.Api.Services
 {
     public interface IQueueService
     {
-        Task<bool> SendUserRegistrationMessageAsync(User user, string password);
+        Task<bool> SendUserRegistrationMessageAsync(User user);
         Task<bool> SendMessageAsync<T>(string queueName, T message);
         bool IsAvailable();
     }
@@ -42,12 +42,13 @@ namespace TaskFlow.Api.Services
             return _isAvailable && _queueServiceClient != null;
         }
 
-        public async Task<bool> SendUserRegistrationMessageAsync(User user, string password)
+        public async Task<bool> SendUserRegistrationMessageAsync(User user)
         {
             if (!IsAvailable())
             {
                 _logger.LogWarning(
-                    "Queue service is not available. Cannot send user registration message."
+                    "Queue service is not available. Cannot send user registration message for user: {Username}",
+                    user.Username
                 );
                 return false;
             }
@@ -58,12 +59,34 @@ namespace TaskFlow.Api.Services
                 {
                     Username = user.Username,
                     Email = user.Email,
-                    Password = password,
                     RequestedAt = DateTime.UtcNow,
                     RequestId = Guid.NewGuid().ToString(),
                 };
 
-                return await SendMessageAsync(UserRegistrationQueueName, message);
+                _logger.LogInformation(
+                    "Sending user registration message to queue for user: {Username} with RequestId: {RequestId}",
+                    user.Username,
+                    message.RequestId
+                );
+
+                var result = await SendMessageAsync(UserRegistrationQueueName, message);
+
+                if (result)
+                {
+                    _logger.LogInformation(
+                        "User registration message sent successfully to queue for user: {Username}",
+                        user.Username
+                    );
+                }
+                else
+                {
+                    _logger.LogWarning(
+                        "Failed to send user registration message to queue for user: {Username}",
+                        user.Username
+                    );
+                }
+
+                return result;
             }
             catch (Exception ex)
             {

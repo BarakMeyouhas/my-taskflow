@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TaskFlow.Functions.Data;
+using TaskFlow.Functions.Services;
 
 //test!
 var host = new HostBuilder()
@@ -21,6 +22,12 @@ var host = new HostBuilder()
 
             options.UseSqlServer(connectionString);
         });
+
+        // Add Email Service
+        services.AddScoped<IEmailService, EmailService>();
+        
+        // Add Retry Service
+        services.AddScoped<IRetryService, RetryService>();
 
         // Add logging
         services.AddLogging();

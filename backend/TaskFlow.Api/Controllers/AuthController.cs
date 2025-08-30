@@ -222,37 +222,51 @@ namespace TaskFlow.Api.Controllers
                     request.Password
                 );
 
-                // Send registration message to queue
-                var messageSent = await _queueService.SendUserRegistrationMessageAsync(
-                    newUser,
-                    request.Password
+                // Send registration message to queue for post-processing
+                _logger.LogInformation(
+                    "Sending user registration message to queue for post-processing tasks. Username: {Username}",
+                    request.Username
                 );
+
+                var messageSent = await _queueService.SendUserRegistrationMessageAsync(newUser);
 
                 if (!messageSent)
                 {
                     _logger.LogError(
-                        "Failed to send user registration message to queue for username: {Username}",
+                        "Failed to send user registration message to queue for username: {Username}. User was created but post-processing tasks cannot be queued.",
                         request.Username
                     );
-                    return StatusCode(
-                        500,
-                        new { error = "Failed to process registration request" }
+
+                    // User was created successfully, but post-processing failed
+                    // Return success with a warning about post-processing
+                    return Ok(
+                        new
+                        {
+                            message = "User registered successfully. Post-processing tasks could not be queued.",
+                            requestId = Guid.NewGuid().ToString(),
+                            status = "registered",
+                            username = request.Username,
+                            email = request.Email,
+                            warning = "Post-processing tasks (welcome email, analytics) may be delayed",
+                            note = "Please contact support if you don't receive a welcome email within 24 hours",
+                        }
                     );
                 }
 
                 _logger.LogInformation(
-                    "User registration request queued successfully for username: {Username}",
+                    "User registration completed successfully. Post-processing tasks queued for username: {Username}",
                     request.Username
                 );
 
                 return Ok(
                     new
                     {
-                        message = "User registration request received and queued successfully",
+                        message = "User registered successfully. Post-processing tasks have been queued.",
                         requestId = Guid.NewGuid().ToString(),
-                        status = "queued",
+                        status = "registered",
                         username = request.Username,
                         email = request.Email,
+                        note = "Welcome email will be sent shortly",
                     }
                 );
             }
