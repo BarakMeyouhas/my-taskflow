@@ -17,7 +17,11 @@ namespace TaskFlow.Functions.Services
         private readonly string _mailFromAddress;
         private readonly string _domain;
 
-        public EmailService(IConfiguration configuration, ILogger<EmailService> logger, IRetryService retryService)
+        public EmailService(
+            IConfiguration configuration,
+            ILogger<EmailService> logger,
+            IRetryService retryService
+        )
         {
             var connectionString = configuration["AzureCommunicationServicesConnectionString"];
             if (string.IsNullOrEmpty(connectionString))
@@ -48,10 +52,18 @@ namespace TaskFlow.Functions.Services
                 );
 
                 // Use retry logic for email sending
-                var response = await _retryService.ExecuteWithRetryAsync(async () =>
-                {
-                    return await _emailClient.SendAsync(Azure.WaitUntil.Completed, emailMessage);
-                }, "Send welcome email", maxRetries: 3, delayMs: 2000);
+                var response = await _retryService.ExecuteWithRetryAsync(
+                    async () =>
+                    {
+                        return await _emailClient.SendAsync(
+                            Azure.WaitUntil.Completed,
+                            emailMessage
+                        );
+                    },
+                    "Send welcome email",
+                    maxRetries: 3,
+                    delayMs: 2000
+                );
 
                 if (response.Value.Status == EmailSendStatus.Succeeded)
                 {

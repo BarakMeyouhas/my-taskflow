@@ -55,6 +55,49 @@ This document describes the complete user registration flow in the TaskFlow appl
 - **Domain**: `4b34d6ec-157a-4d30-8277-bdfb85f57fc8.azurecomm.net`
 - **From Address**: `DoNotReply@4b34d6ec-157a-4d30-8277-bdfb85f57fc8.azurecomm.net`
 
+## Critical Configuration Requirements
+
+### ⚠️ **MOST IMPORTANT: Azure Function App Configuration**
+
+**All these settings must be configured in your Azure Function App → Configuration → Application settings:**
+
+#### **1. AzureWebJobsStorage (CRITICAL)**
+```
+Name: AzureWebJobsStorage
+Value: DefaultEndpointsProtocol=https;AccountName=YOUR_STORAGE_ACCOUNT;AccountKey=YOUR_STORAGE_KEY;EndpointSuffix=core.windows.net
+```
+**Purpose**: Enables queue listener to connect to Azure Storage
+**Without this**: Queue listener will never start, function will never execute
+
+#### **2. AzureCommunicationServicesConnectionString (CRITICAL)**
+```
+Name: AzureCommunicationServicesConnectionString
+Value: endpoint=https://YOUR_DOMAIN.communication.azure.com/;accesskey=YOUR_ACCESS_KEY
+```
+**Purpose**: Enables email service to send welcome emails
+**Without this**: Function will crash when trying to create EmailService
+
+#### **3. DefaultConnection (Optional)**
+```
+Name: DefaultConnection
+Value: Server=tcp:YOUR_SERVER.database.windows.net,1433;Initial Catalog=YOUR_DB;...
+```
+**Purpose**: Database connection for any database operations in functions
+
+#### **4. FUNCTIONS_WORKER_RUNTIME**
+```
+Name: FUNCTIONS_WORKER_RUNTIME
+Value: dotnet-isolated
+```
+
+### **Local vs Azure Configuration Mismatch**
+
+**⚠️ CRITICAL ISSUE**: Your `local.settings.json` has these settings, but **Azure Function App needs them in Application settings**
+
+- **Local development**: Reads from `local.settings.json`
+- **Azure deployment**: Reads from **Application settings**
+- **No automatic sync**: You must manually configure both
+
 ## User Registration Flow
 
 ### Step 1: User Submits Registration Form
@@ -175,6 +218,121 @@ var response = await _retryService.ExecuteWithRetryAsync(async () =>
 - **Professional Styling**: Modern CSS with proper formatting
 - **Call-to-Action**: Launch button for immediate engagement
 
+## Troubleshooting Guide
+
+### **Step-by-Step Debugging Process**
+
+#### **1. Check if Function App is Running**
+- **Go to**: Function App → Overview
+- **Look for**: Status "Running"
+- **Check**: Any error messages or warnings
+
+#### **2. Check Queue Listener Status**
+**In Application Insights, run this query:**
+```kusto
+traces
+| where timestamp > ago(1h)
+| where message contains "Started the listener" or message contains "Stopped the listener"
+| order by timestamp desc
+| project timestamp, message, customDimensions
+```
+
+**Expected Results:**
+```
+[timestamp] Started the listener 'Microsoft.Azure.WebJobs.Extensions.Storage.Common.Listeners.QueueListener' for function 'UserRegistration'
+```
+
+**If no results**: Queue listener is not working
+
+#### **3. Check Function Executions**
+**In Application Insights, run this query:**
+```kusto
+requests
+| where timestamp > ago(1h)
+| where operation_Name == "UserRegistration"
+| order by timestamp desc
+| project timestamp, success, duration, resultCode, customDimensions
+```
+
+**Expected Results:**
+```
+[timestamp] Executing 'UserRegistration' (Reason='New queue message detected...')
+[timestamp] Executed 'UserRegistration' (Succeeded, Duration=...)
+```
+
+**If no results**: Function is never triggered
+
+#### **4. Check for Exceptions**
+**In Application Insights, run this query:**
+```kusto
+exceptions
+| where timestamp > ago(1h)
+| where operation_Name == "UserRegistration"
+| order by timestamp desc
+```
+
+**Look for specific error messages** that indicate configuration issues.
+
+### **Common Issues and Solutions**
+
+#### **Issue 1: Queue Listener Not Starting**
+**Symptoms:**
+- Function app shows "Running" but no queue processing
+- No "Started the listener" messages in logs
+- Queue messages accumulate but never processed
+
+**Causes:**
+- ❌ **AzureWebJobsStorage connection string missing or wrong**
+- ❌ **Storage account doesn't exist**
+- ❌ **Storage account permissions insufficient**
+
+**Solution:**
+1. Verify AzureWebJobsStorage connection string in Function App settings
+2. Check storage account exists and is accessible
+3. Verify storage account has proper permissions
+
+#### **Issue 2: Function Executes But Fails**
+**Symptoms:**
+- Queue listener working (messages processed)
+- Function execution logs appear
+- Function status shows "Failed"
+
+**Causes:**
+- ❌ **AzureCommunicationServicesConnectionString missing**
+- ❌ **Email service configuration wrong**
+- ❌ **Code exception in function logic**
+
+**Solution:**
+1. Add AzureCommunicationServicesConnectionString to Function App settings
+2. Check email service configuration
+3. Review function code for exceptions
+
+#### **Issue 3: No Logs in Application Insights**
+**Symptoms:**
+- Function app appears to be running
+- No logs appearing in Application Insights
+- No function execution tracking
+
+**Causes:**
+- ❌ **Application Insights not connected to Function App**
+- ❌ **Missing APPLICATIONINSIGHTS_INSTRUMENTATIONKEY**
+- ❌ **Logging configuration incorrect**
+
+**Solution:**
+1. Connect Function App to Application Insights
+2. Add APPLICATIONINSIGHTS_INSTRUMENTATIONKEY to Function App settings
+3. Restart Function App
+
+### **Configuration Verification Checklist**
+
+**Before testing user registration, verify these settings in Azure Function App:**
+
+- ✅ **AzureWebJobsStorage**: Correct Azure Storage connection string
+- ✅ **AzureCommunicationServicesConnectionString**: Valid email service connection string
+- ✅ **APPLICATIONINSIGHTS_INSTRUMENTATIONKEY**: Application Insights key (if using)
+- ✅ **FUNCTIONS_WORKER_RUNTIME**: Set to "dotnet-isolated"
+- ✅ **Function App Status**: "Running" with no errors
+
 ## Error Handling & Resilience
 
 ### 1. Individual Task Isolation
@@ -201,15 +359,24 @@ var response = await _retryService.ExecuteWithRetryAsync(async () =>
 ## Configuration
 
 ### 1. Azure Communication Services
-**File**: `functions/local.settings.json`
+**File**: `functions/local.settings.json` (Local Development)
+**Azure Function App**: Configuration → Application settings
 ```json
 {
-  "AzureCommunicationServicesConnectionString": "YOUR_CONNECTION_STRING_HERE"
+  "AzureCommunicationServicesConnectionString": "endpoint=https://taskflowemail.europe.communication.azure.com/;accesskey=YOUR_ACCESS_KEY"
 }
 ```
 
 ### 2. Queue Configuration
-**File**: `functions/local.settings.json`
+**File**: `functions/local.settings.json` (Local Development)
+**Azure Function App**: Configuration → Application settings
+```json
+{
+  "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=YOUR_STORAGE_ACCOUNT;AccountKey=YOUR_STORAGE_KEY;EndpointSuffix=core.windows.net"
+}
+```
+
+**Local Development Alternative:**
 ```json
 {
   "AzureWebJobsStorage": "UseDevelopmentStorage=true"
@@ -218,31 +385,44 @@ var response = await _retryService.ExecuteWithRetryAsync(async () =>
 
 ### 3. Database Connection
 **File**: `backend/TaskFlow.Api/appsettings.json`
+**Azure Function App**: Configuration → Application settings (if needed)
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "YOUR_DATABASE_CONNECTION_STRING"
+    "DefaultConnection": "Server=tcp:YOUR_SERVER.database.windows.net,1433;Initial Catalog=YOUR_DB;..."
   }
+}
+```
+
+### 4. Application Insights (Recommended)
+**Azure Function App**: Configuration → Application settings
+```json
+{
+  "APPLICATIONINSIGHTS_CONNECTION_STRING": "YOUR_APPLICATION_INSIGHTS_CONNECTION_STRING",
+  "APPLICATIONINSIGHTS_INSTRUMENTATIONKEY": "YOUR_INSTRUMENTATION_KEY"
 }
 ```
 
 ## Deployment Considerations
 
 ### 1. Environment Variables
-- Set `AzureCommunicationServicesConnectionString` in production
+- **CRITICAL**: Set `AzureWebJobsStorage` in production
+- **CRITICAL**: Set `AzureCommunicationServicesConnectionString` in production
+- **CRITICAL**: Set `APPLICATIONINSIGHTS_INSTRUMENTATIONKEY` in production
 - Configure proper database connection strings
 - Set appropriate logging levels
 
 ### 2. Azure Resources
 - **Azure Communication Services**: Email domain verification
-- **Azure Storage Account**: Queue storage
+- **Azure Storage Account**: Queue storage with proper permissions
 - **Azure Functions**: Hosting for post-processing logic
-- **Application Insights**: Monitoring and logging
+- **Application Insights**: Monitoring and logging (highly recommended)
 
 ### 3. Security
 - **Connection Strings**: Store securely in Azure Key Vault
 - **Email Domain**: Verify domain ownership in Azure Communication Services
 - **Network Security**: Configure appropriate firewall rules
+- **Storage Account**: Use managed identity when possible
 
 ## Testing
 
@@ -271,6 +451,12 @@ npm run dev
 - Verify email template rendering
 - Test retry logic with simulated failures
 
+### 4. Production Testing
+- **Always test configuration** after deployment
+- **Verify all connection strings** are set correctly
+- **Check Application Insights** for proper logging
+- **Test complete user registration flow**
+
 ## Monitoring & Troubleshooting
 
 ### 1. Key Metrics to Monitor
@@ -278,17 +464,57 @@ npm run dev
 - Queue message processing time
 - Email delivery success rate
 - Post-processing task completion rates
+- Function execution success/failure rates
 
 ### 2. Common Issues
 - **Queue Service Unavailable**: Check Azure Storage connection
 - **Email Sending Failures**: Verify Azure Communication Services configuration
 - **Database Connection Issues**: Check connection strings and network access
 - **Function Execution Failures**: Review Azure Functions logs
+- **No Logs in Application Insights**: Check Application Insights connection
 
 ### 3. Log Analysis
 - **Request ID Tracking**: Follow user journey from registration to completion
 - **Error Correlation**: Link failures across different components
 - **Performance Analysis**: Identify bottlenecks in the flow
+- **Configuration Issues**: Look for missing connection string errors
+
+### 4. Debugging Queries for Application Insights
+
+#### **Check Function Executions:**
+```kusto
+requests
+| where timestamp > ago(1h)
+| where operation_Name == "UserRegistration"
+| order by timestamp desc
+| project timestamp, success, duration, resultCode, customDimensions
+```
+
+#### **Check Queue Processing:**
+```kusto
+traces
+| where timestamp > ago(1h)
+| where message contains "queue" or message contains "Queue"
+| order by timestamp desc
+| project timestamp, message, customDimensions
+```
+
+#### **Check for Errors:**
+```kusto
+exceptions
+| where timestamp > ago(1h)
+| where operation_Name == "UserRegistration"
+| order by timestamp desc
+```
+
+#### **Check Listener Status:**
+```kusto
+traces
+| where timestamp > ago(1h)
+| where message contains "Started the listener" or message contains "Stopped the listener"
+| order by timestamp desc
+| project timestamp, message, customDimensions
+```
 
 ## Benefits of This Architecture
 
@@ -339,10 +565,23 @@ npm run dev
 - Regional email service endpoints
 - Disaster recovery capabilities
 
+### 5. **Configuration Management**
+- Azure Key Vault integration
+- Environment-specific configuration
+- Automated configuration validation
+
 ---
 
 ## Summary
 
 The TaskFlow user registration system implements a robust, scalable architecture that ensures users are registered successfully while providing a seamless post-processing experience. By separating concerns between the API (user creation) and Azure Functions (post-processing), the system achieves high reliability, maintainability, and user satisfaction.
 
+**⚠️ CRITICAL LESSON**: The most common cause of Azure Functions not working is **missing or incorrect configuration in Application settings**. Always verify these settings before debugging code:
+
+1. **AzureWebJobsStorage**: For queue processing
+2. **AzureCommunicationServicesConnectionString**: For email service
+3. **APPLICATIONINSIGHTS_INSTRUMENTATIONKEY**: For monitoring
+
 The implementation follows Azure best practices, includes comprehensive error handling and retry logic, and provides full observability through structured logging and monitoring. This architecture serves as a solid foundation for future enhancements and scaling requirements.
+
+**Remember**: In Azure, 80% of "broken" functions are actually configuration issues, not code problems. Always check your connection strings first!

@@ -25,7 +25,7 @@ var host = new HostBuilder()
 
         // Add Email Service
         services.AddScoped<IEmailService, EmailService>();
-        
+
         // Add Retry Service
         services.AddScoped<IRetryService, RetryService>();
 
