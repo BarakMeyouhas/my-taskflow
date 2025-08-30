@@ -69,7 +69,7 @@ namespace TaskFlow.Functions
                     "Critical error processing user registration message: {MessageText}",
                     message.MessageText
                 );
-                // Only re-throw for critical errors (deserialization, etc.)
+                // Only re-throw for critical errors (deserialization, etc..)
                 // Post-processing task failures are handled individually and don't break the flow
                 throw;
             }
