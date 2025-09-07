@@ -1,0 +1,191 @@
+---
+description: Documents the TaskFlow project directory structure and important files
+globs:
+  - "**/*"
+alwaysApply: true
+---
+
+# TaskFlow Project Structure
+
+This document outlines the directory structure and important files in the TaskFlow project - a full-stack task management application.
+
+## Project Overview
+TaskFlow is a multi-tier application consisting of:
+- **Backend**: .NET 9 Minimal API with Entity Framework Core
+- **Frontend**: Next.js 15 with TypeScript and Tailwind CSS
+- **Functions**: Azure Functions for background processing
+- **Database**: SQL Server with local Azurite emulation
+
+## Root Directory Structure
+
+```
+my-taskflow/
+├── .cursor/rules/              # Cursor AI rules and guidelines
+├── backend/                    # .NET API backend
+├── frontend/                   # Next.js React frontend  
+├── functions/                  # Azure Functions
+├── docs/                       # Project documentation
+├── __blobstorage__/           # Azurite blob storage (local dev)
+├── __queuestorage__/          # Azurite queue storage (local dev)
+└── *.json                     # Azurite database files (local dev)
+```
+
+## Backend Structure (`backend/`)
+
+```
+backend/
+├── TaskFlow.Api/              # Main API project
+│   ├── Controllers/           # API controllers
+│   │   ├── AuthController.cs  # Authentication endpoints
+│   │   └── DbDebugController.cs # Database debugging
+│   ├── Data/                  # Data access layer
+│   │   └── AppDbContext.cs    # Entity Framework context
+│   ├── Middleware/            # Custom middleware
+│   │   ├── ExceptionHandlingMiddleware.cs
+│   │   ├── RequestLoggingMiddleware.cs
+│   │   └── README.md
+│   ├── Models/                # Data models
+│   │   └── User.cs           # User entity model
+│   ├── Services/              # Business logic services
+│   │   ├── GreetingService.cs
+│   │   ├── GreetingServiceDapper.cs
+│   │   ├── GreetingServiceDapperTests.cs
+│   │   ├── JwtService.cs      # JWT token handling
+│   │   ├── QueueService.cs    # Message queue operations
+│   │   └── UserService.cs     # User management
+│   ├── Properties/            # Project properties
+│   │   └── launchSettings.json
+│   ├── appsettings.json       # Configuration (base)
+│   ├── appsettings.Development.json
+│   ├── appsettings.Production.json
+│   ├── Program.cs             # Application entry point
+│   ├── TaskFlow.Api.csproj    # Project file
+│   └── TaskFlow.Api.http      # API testing file
+└── package.json               # Node.js dependencies (if any)
+```
+
+## Frontend Structure (`frontend/`)
+
+```
+frontend/
+├── app/                       # Next.js App Router
+│   ├── api/                   # API routes
+│   │   └── auth/             # Authentication API
+│   │       ├── login/route.ts
+│   │       ├── register/route.ts
+│   │       └── verify/route.ts
+│   ├── calendar/page.tsx      # Calendar page
+│   ├── login/page.tsx         # Login page
+│   ├── projects/page.tsx      # Projects page
+│   ├── register/page.tsx      # Registration page
+│   ├── reports/page.tsx       # Reports page
+│   ├── globals.css            # Global styles
+│   ├── layout.tsx             # Root layout
+│   └── page.tsx               # Home page
+├── components/                # Reusable React components
+│   ├── AppShell.tsx          # Main app shell
+│   ├── Dashboard.tsx         # Dashboard component
+│   ├── Footer.tsx            # Footer component
+│   ├── Header.tsx            # Header component
+│   ├── LandingPage.tsx      # Landing page component
+│   ├── ProtectedRoute.tsx   # Route protection
+│   ├── SearchBar.tsx         # Search functionality
+│   ├── Sidebar.tsx           # Navigation sidebar
+│   ├── TaskBoard.tsx         # Task management board
+│   └── TaskCard.tsx          # Individual task card
+├── config/                   # Configuration files
+│   └── auth.ts              # Authentication config
+├── contexts/                 # React contexts
+│   └── AuthContext.tsx      # Authentication context
+├── public/                   # Static assets
+│   ├── *.svg                # Icon files
+├── package.json             # Dependencies and scripts
+├── next.config.js           # Next.js configuration
+├── next.config.ts           # TypeScript Next.js config
+├── tailwind.config.js       # Tailwind CSS config
+├── tsconfig.json            # TypeScript configuration
+├── eslint.config.mjs        # ESLint configuration
+├── postcss.config.mjs       # PostCSS configuration
+├── server.cjs               # Custom server (if needed)
+├── startup.cjs              # Startup script
+├── web.config               # IIS configuration
+├── README.md                # Frontend documentation
+└── README-AUTH.md           # Authentication documentation
+```
+
+## Functions Structure (`functions/`)
+
+```
+functions/
+├── Data/                     # Data access
+│   └── FunctionsDbContext.cs # Functions-specific EF context
+├── Models/                   # Message models
+│   └── UserRegistrationMessage.cs
+├── Services/                 # Background services
+│   ├── EmailService.cs      # Email sending service
+│   └── RetryService.cs      # Retry logic service
+├── Properties/               # Project properties
+│   └── launchSettings.json
+├── Program.cs               # Functions entry point
+├── QueueTrigger1.cs         # Queue trigger function
+├── UserRegistrationFunction.cs # User registration handler
+├── functions.csproj         # Project file
+├── host.json               # Functions host configuration
+├── local.settings.json      # Local development settings
+└── README.md               # Functions documentation
+```
+
+## Documentation (`docs/`)
+
+```
+docs/
+└── TaskFlow_UserRegistration_Architecture.md
+```
+
+## Configuration Files
+
+### Root Level
+- `AZURE_DEPLOYMENT_FIX.md` - Azure deployment troubleshooting
+- `CI_CD_LOGGING_GUIDE.md` - CI/CD logging guidelines
+- `*.json` - Azurite local storage files
+
+### Development Storage (Local)
+- `__blobstorage__/` - Azurite blob storage emulation
+- `__queuestorage__/` - Azurite queue storage emulation
+- `__azurite_db_*.json` - Azurite database files
+
+## Key File Purposes
+
+### Backend Files
+- `Program.cs` - API startup and configuration
+- `AppDbContext.cs` - Database context and migrations
+- `JwtService.cs` - JWT token generation and validation
+- `UserService.cs` - User management business logic
+- `QueueService.cs` - Message queue operations
+
+### Frontend Files
+- `layout.tsx` - Root layout with providers
+- `AuthContext.tsx` - Authentication state management
+- `ProtectedRoute.tsx` - Route protection logic
+- `TaskBoard.tsx` - Main task management interface
+
+### Functions Files
+- `UserRegistrationFunction.cs` - Handles user registration workflow
+- `EmailService.cs` - Sends welcome emails
+- `RetryService.cs` - Implements retry patterns
+
+## Development Workflow
+
+1. **Backend Development**: Work in `backend/TaskFlow.Api/`
+2. **Frontend Development**: Work in `frontend/`
+3. **Background Processing**: Work in `functions/`
+4. **Documentation**: Update files in `docs/`
+5. **Rules**: Add/modify rules in `.cursor/rules/`
+
+## Important Notes
+
+- **Azurite Files**: The `__*storage__` directories and `*.json` files are generated by Azurite for local development
+- **Build Outputs**: `bin/` and `obj/` directories contain build artifacts
+- **Node Modules**: `node_modules/` contains frontend dependencies
+- **Configuration**: Environment-specific configs use `.Development.json` and `.Production.json` suffixes
+```

@@ -259,3 +259,4 @@ C:\Dev\Portfolio\Next.js\my-taskflow\backend\TaskFlow.Api\obj\Debug\net9.0\refin
 C:\Dev\Portfolio\Next.js\my-taskflow\backend\TaskFlow.Api\obj\Debug\net9.0\TaskFlow.Api.pdb
 C:\Dev\Portfolio\Next.js\my-taskflow\backend\TaskFlow.Api\obj\Debug\net9.0\TaskFlow.Api.genruntimeconfig.cache
 C:\Dev\Portfolio\Next.js\my-taskflow\backend\TaskFlow.Api\obj\Debug\net9.0\ref\TaskFlow.Api.dll
+C:\Dev\Portfolio\Next.js\my-taskflow\backend\TaskFlow.Api\bin\Debug\net9.0\Azure.Communication.Email.dll

@@ -1,0 +1,340 @@
+---
+alwaysApply: true
+description:Enforces our internal developer guidelines and best practices.
+globs:
+---
+
+# Cursor Rules — Day-to-Day Engineering
+> Prefer clarity over cleverness. When in doubt, choose the simplest thing that works.
+
+## Scope / Tech Stack
+- Backend: .NET (Minimal API), Node.js (Express.js)
+- Frontend: Angular, React, TypeScript
+- Databases: SQL Server, MySQL
+- Cloud/DevOps: Azure, CI/CD (GitHub Actions), IaC (Bicep/Terraform)
+- Observability & Analytics: Serilog, App Insights, PostHog
+
+## What to Optimize For
+- Maintainability for the “next maintainer” in 6+ months
+- Correctness, security, and least surprise
+- Small, readable units of code with explicit behavior
+- Consistency over personal preference
+
+---
+
+## 1) General Engineering
+**Do**
+- Single-purpose functions/classes; small, readable units.
+- Code a teammate can understand in 3 minutes.
+- Prefer composition over inheritance; simple data structures.
+- Be explicit (naming/structure); keep conventions consistent.
+- Add short rationale in PRs for non-obvious choices.
+
+**Do Not**
+- Over-engineer abstractions before they’re needed.
+- Hide side effects, use globals, or rely on “magic.”
+- Add new tech that lacks a clear pain solved and an owner.
+
+---
+
+## 2) Security (Always On)
+**Do**
+- Validate & sanitize inputs; enforce server-side checks.
+- Authenticate & authorize every request; assume hostile callers.
+- Enforce **resource-level** authorization on every endpoint.
+- Prevent IDOR/enumeration: never trust client IDs; scope on server; use opaque IDs on public endpoints.
+- Use parameterized queries (Dapper/SQL Server; mysql2/Prisma for MySQL). Validate/escape identifiers.
+- Keep secrets in env/Key Vault/secret store.
+
+**Do Not**
+- Rely on client checks or presence of an ID.
+- Expose predictable sequential IDs without access checks.
+- Log secrets/tokens/PII.
+- Disable cert validation or relax CORS recklessly.
+- Hardcode secrets/connection strings.
+
+---
+
+## 3) API Design (HTTP/Minimal API & Express)
+**Do**
+- Version endpoints (`/v1`), use proper HTTP codes; keep PUT/DELETE idempotent.
+- Validate DTOs in service layer; return clear error models.
+- Use correlation IDs; propagate across services.
+- Support pagination/filter/sort with capped page sizes.
+- Document with OpenAPI/Swagger; maintain examples.
+
+**Do Not**
+- Break backward compatibility without a deprecation plan.
+- Leak internal exception details/stack traces.
+- Build long-running synchronous endpoints.
+
+**Express.js specifics**
+- Use `helmet`, strict CORS, and rate limiting for public APIs.
+- Centralize error-handling middleware; never expose raw stacks.
+- Validate `req` (zod/joi/celebrate); reject unknown fields.
+- Offload CPU-heavy work to queues/jobs.
+- Set `trust proxy` behind load balancers; read client IP safely.
+- Use DB connection pooling, reused across requests.
+
+---
+
+## 4) Data Access (SQL Server & MySQL)
+**Do**
+- Write explicit SQL with **named** parameters; review for N+1.
+- Use transactions with explicit isolation where needed.
+- Add indexes for frequent queries; inspect execution plans.
+- Use connection pooling; reuse clients.
+- MySQL: prefer InnoDB, `utf8mb4`, sane collations; avoid MyISAM.
+- Time: set server/app to UTC; be explicit about timezones.
+- Manage schema via migrations/scripts (Flyway/Prisma); review for locks.
+- Prefer splitting overly complex SQL into smaller queries and combine in app code if it improves readability/maintainability.
+
+**Do Not**
+- `SELECT *` or depend on column order.
+- Build dynamic SQL from user input.
+- Rely on implicit timezone/collation.
+- Ship unreadable multi-join monsters—split if needed.
+- Duplicate query/logic across outputs (PDF vs Website); share SQL & C# logic (DRY).
+
+---
+
+## 5) Frontend (Angular + React + TypeScript)
+**General**
+- Enable **strict TypeScript**.
+- Keep components small; accessible (labels, roles, focus).
+
+**Angular**
+- Use standalone components/feature modules; lazy-load routes.
+- `OnPush` change detection, `HttpInterceptors`, route guards.
+- Keep components thin; move business logic to services.
+- Prefer RxJS with clear lifecycles (`takeUntil`, `firstValueFrom` only when appropriate). Avoid deep nested Observables.
+
+**React**
+- Functional components + hooks; memoize when measured; Error Boundaries.
+- Never mutate props/state; avoid long sync blocks on UI thread.
+
+**UI/UX for Business Apps**
+**Do**
+- Two-level validation: field (on blur) + form (on submit). Keep submit enabled; show error summary at top.
+- Inline error text; mark invalid with `aria-invalid`; associate via `aria-describedby`; move focus to first error on submit.
+- OTP inputs: segmented, auto-advance/backspace, allow paste/auto-fill, WebOTP if available; resend with short cooldown.
+- Date pickers localized; display DD/MM/YYYY; parse pasted dates; enforce min/max; preserve timezone context. Ranges: presets (Last 7/30/90) with explicit inclusive/exclusive labels.
+- Prefer Tailwind or Material; stick to design tokens; 4/8-pt spacing; visible focus; WCAG AA.
+- Responsive tables: sticky headers, column resize, multi-select, bulk actions; persist filters/sort in URL.
+- Feedback: skeletons < 1s; spinner/progress for longer; toasts success/info; inline errors for failures.
+- RTL (Hebrew): logical props (me/ms), mirrored icons, locale-aware number/date.
+- Keyboard support; 44×44px minimum targets.
+- Server-side paging for lists/tables **over 100 records**.
+
+**Do Not**
+- Validate while typing (except constrained masks like phone/OTP).
+- Accept free-text dates without parse/validate.
+- Block paste or auto-correct OTP digits; don’t hide resend.
+- Ship destructive actions without confirm/undo.
+- Typically page **entity items (order items/invoice items/shipment items)**—avoid paging there.
+
+**Authentication UX (OTP-first)**
+- Default 6-digit OTP; paste/autofill; show remaining time; throttle attempts; clear “Resend code.”
+- Provide fallback (magic link or TOTP). Remember trusted devices with explicit consent.
+- Never reveal whether a user exists (“If an account exists, we’ll send a code”).
+
+---
+
+## 6) Testing
+**Do**
+- Unit tests for business logic; integration tests for DB/API; E2E for key flows (multi-feature).
+- Mock only at boundaries; seed realistic data.
+- Keep tests deterministic & fast; run in CI.
+- Add regression tests for every bug fix.
+
+**Do Not**
+- Test brittle implementation details.
+- Skip flaky tests—quarantine and fix promptly.
+- Depend on network/external services in unit tests.
+
+---
+
+## 7) Bug Resolving
+- Reproduce with user steps first; always reproduce locally.
+- Add/extend E2E tests to cover the workflow.
+- Prefer smart logging & monitoring over remote access to user machines.
+- Follow exact action order; document in project Wiki.
+- Challenge assumptions respectfully; request time to prove with data.
+- Guard against biases: ask for alternative causes; revisit anchors.
+
+---
+
+## 8) CI/CD & Branching
+**Do**
+- Build CI/CD **first** (build, test, security scans, deploy to staging) before features.
+- PRs for all changes; require review + green checks.
+- Branch model: `develop → staging`, `main → production`; tag releases.
+- Store pipelines in repo; protect branches.
+- Promote artifacts; keep env parity.
+
+**Workflow**
+1. Branch from `main`:
+2. Naming:
+   - Features: `feature/#tasknumber-description`
+     - e.g., `feature/#123-add-user-authentication`
+   - Bug fixes: `bugfix/#tasknumber-description`
+     - e.g., `bugfix/#234-fix-login-validation-error`
+   - Use lowercase, hyphens, include task number.
+3. Develop changes.
+4. Add tests.
+5. Selectively stage files; review diffs.
+6. Commit to feature branch.
+7. Push branch.
+8. Switch to `develop`.
+9. Refresh local `develop`.
+10. Merge feature branch.
+11. Push `develop`.
+12. Open PR (all checks green).
+13. If rejected, iterate (steps 2–12).
+14. If no CD, deploy `main` to prod manually after PR approval.
+
+**Do Not**
+- Start feature work before CI/CD exists.
+- Commit directly to `main`/`develop`.
+- Change prod config via portal with no tracked change.
+- Store secrets in pipeline YAML (use secret stores).
+
+---
+
+## 9) Observability & Analytics (Serilog + App Insights + PostHog)
+**Do**
+- Structured logs with correlation/user/request IDs.
+- Emit metrics (latency/throughput/error rates) & dashboards.
+- Set SLOs & alerts for key endpoints/jobs.
+- Redact PII; sample high-volume logs.
+- Instrument PostHog with stable taxonomy; tag env & app version.
+- Separate PostHog projects per env; mask inputs; redact sensitive selectors.
+- Respect consent/DNT; proxy via first-party backend when filtering is required.
+
+**Do Not**
+- Use `Console.WriteLine` in production.
+- Log at Error for expected flows.
+- Spam logs/metrics without sampling/aggregation.
+- Send PII/secrets to PostHog; avoid free-text properties.
+- Mix dev/staging traffic with production analytics.
+
+---
+
+## 10) Reliability & Resilience
+**Do**
+- Timeouts; retries with backoff (for transient faults).
+- Circuit breakers, bulkheads; cap concurrency.
+- Idempotent operations (webhooks/functions especially).
+- Use queues (Service Bus/Storage) for decoupling/back-pressure.
+
+**Do Not**
+- Swallow exceptions or rethrow without context.
+- Retry indefinitely—cap attempts and alert.
+- Depend on single-region resources for HA needs.
+
+---
+
+## 11) Performance
+**Do**
+- Measure before optimizing; use profilers & App Insights traces.
+- Batch work; paginate; cache with explicit TTL + invalidation.
+- Use async I/O; avoid sync blocking on async.
+
+**Do Not**
+- Create N+1 queries/chatty APIs.
+- Cache sensitive/highly dynamic data without strategy.
+
+---
+
+## 12) Cloud & Azure
+**Do**
+- Least privilege (RBAC); segment with resource groups.
+- Key Vault, Managed Identity, Private Endpoints where applicable.
+- Enforce policies (SKU allowlists, location, tagging, diagnostics).
+- Use IaC (Bicep/Terraform); parameterize regions/SKUs.
+
+**Do Not**
+- Expose public endpoints by default.
+- Store files locally—use Blob/File storage.
+- Hardcode regions/SKUs (use IaC params).
+
+---
+
+## 13) Feature Flags & Experiments
+**Do**
+- Use PostHog feature flags for risky changes; define owner, rollout, kill switch.
+- Record flag state in logs/telemetry; clean up after rollout.
+- For A/B: define hypothesis, primary metric, min sample size, stop rule in PostHog.
+
+**Do Not**
+- Leave stale flags in code.
+- Gate security/authorization solely behind flags.
+- Run experiments without success metrics/guardrails.
+
+---
+
+## 14) Documentation & Knowledge
+**Do**
+- Maintain README, quickstart, ADRs for important decisions.
+- Update API docs/examples with each change.
+- Write runbooks for jobs/functions and on-call playbooks.
+
+**Do Not**
+- Merge behavior-changing code without updating docs.
+
+---
+
+## 15) Code Style & Tooling
+**Do**
+- C#: enable nullable, analyzers, warnings as errors; standard .NET naming.
+- JS/TS: ESLint + Prettier; strict TS; avoid `any`.
+- Keep consistent folder structures; use conventional commits.
+
+**Do Not**
+- Disable linters without justification.
+- Mix unrelated changes in one PR; keep diffs small.
+
+---
+
+## 16) Privacy & Compliance
+**Do**
+- Classify data; minimize collection; pseudonymize where possible.
+- Honor deletion/retention; scrub request/response logs of PII.
+
+**Do Not**
+- Send PII to third-party analytics without approval.
+- Use production data in non-prod.
+
+---
+
+## 17) Pull Request Checklist (Quick)
+**Reviewer mindset:** Assume you’re the next maintainer.
+
+**Do**
+- Self-review; link issue; explain approach.
+- Add/update tests; run lints/build locally.
+- Update docs/configs/migrations.
+- Check for query/logic duplication across outputs (PDF vs Website); prefer shared code.
+- Prefer clarity: split complex SQL into smaller queries + combine in app code if easier to reason about.
+
+**Do Not**
+- Open giant PRs—split into reviewable slices.
+- Merge with failing checks or unresolved comments.
+- Approve unreadable SQL or duplicated business logic.
+
+---
+
+## 18) Exceptions to Rules
+**Do**
+- Document exception, scope, owner, and sunset date in the PR.
+
+**Do Not**
+- Create silent one-offs that become the new default.
+
+---
+
+## Assistant Behavior in Cursor
+- Generate code in English.
+- Default to secure, production-ready patterns (headers, CORS, validation).
+- Propose simplest viable solution first; call out trade-offs.
+- When unsure, choose explicitness and maintainability over clever tricks.

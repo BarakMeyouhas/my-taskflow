@@ -1,0 +1,511 @@
+# TaskFlow Product Requirements Document (PRD)
+
+## Overview
+TaskFlow is a modern, full-stack task management application designed to streamline productivity for individuals and small teams. It solves the problem of scattered task management across multiple tools by providing a unified, intuitive platform that combines the simplicity of personal task management with powerful collaboration features.
+
+**Target Users:**
+- Students managing academic assignments and projects
+- Freelancers coordinating client work and personal projects  
+- Small teams (3-5 people) needing lightweight project collaboration
+- Professionals seeking a clean, distraction-free task management solution
+
+**Value Proposition:**
+TaskFlow eliminates the complexity of enterprise project management tools while providing the essential features needed for effective task organization and team collaboration, all within a beautiful, responsive interface.
+
+## Core Features
+
+### Task Management (CRUD)
+- **What it does:** Complete Create, Read, Update, Delete operations for tasks
+- **Why it's important:** This is the foundational functionality that enables all other features
+- **How it works:** RESTful API endpoints with real-time frontend updates using React state management
+
+### Task Status Management
+- **What it does:** Organize tasks by status (To Do, In Progress, Done)
+- **Why it's important:** Provides immediate visual clarity on project progress and workload distribution
+- **How it works:** Drag-and-drop interface with persistent status updates via WebSocket connections
+
+### Tags and Categories
+- **What it does:** Flexible tagging system for task organization and filtering
+- **Why it's important:** Enables users to organize tasks by project, priority, or topic without rigid folder structures
+- **How it works:** Many-to-many relationship between tasks and tags with autocomplete functionality
+
+### User/Team Collaboration
+- **What it does:** Share tasks with team members and assign roles (viewer, editor, owner)
+- **Why it's important:** Enables seamless teamwork without complex permission systems
+- **How it works:** User invitation system with role-based access control and real-time collaboration
+
+### Smart Notifications
+- **What it does:** Contextual alerts for deadlines, assignments, and task updates
+- **Why it's important:** Prevents missed deadlines and keeps teams synchronized
+- **How it works:** Email notifications with optional push notifications via Azure Functions
+
+### Advanced Search and Filtering
+- **What it does:** Find tasks by keyword, status, tags, assignee, or date range
+- **Why it's important:** Essential for managing large task volumes efficiently
+- **How it works:** Full-text search with faceted filtering and saved search presets
+
+## User Experience
+
+### User Personas
+
+**Primary: Sarah - Freelance Designer**
+- Manages 3-4 client projects simultaneously
+- Needs to track deadlines and share progress with clients
+- Values clean, distraction-free interface
+- Works across desktop and mobile devices
+
+**Secondary: Marcus - Student**
+- Juggles multiple courses and assignments
+- Needs to prioritize tasks and set reminders
+- Collaborates on group projects
+- Primarily mobile-first user
+
+**Tertiary: Tech Startup Team (4 people)**
+- Small development team needing lightweight project management
+- Requires task assignment and progress visibility
+- Values integration with existing tools
+- Needs both individual and team views
+
+### Key User Flows
+
+**Task Creation Flow:**
+1. User logs in → Dashboard view
+2. Click "Add Task" → Modal/form opens
+3. Enter title, description, due date, tags → Save
+4. Task appears in appropriate status column
+5. Optional: Assign to team member
+
+**Task Management Flow:**
+1. View Kanban board → See all tasks by status
+2. Drag task between columns → Status updates automatically
+3. Click task → View/edit details
+4. Add comments or attachments
+5. Mark as complete → Archive to "Done"
+
+**Collaboration Flow:**
+1. Select task → Click "Share" button
+2. Enter email address → Send invitation
+3. Collaborator receives email → Accepts invitation
+4. Both users see real-time updates
+5. Role-based permissions enforced
+
+### UI/UX Considerations
+
+**Design Principles:**
+- Clean, minimal interface with focus on content
+- Consistent spacing using 8px grid system
+- High contrast ratios for accessibility
+- Intuitive drag-and-drop interactions
+
+**Responsive Design:**
+- Mobile-first approach with progressive enhancement
+- Touch-friendly interface elements (44px minimum)
+- Collapsible sidebar for mobile navigation
+- Optimized for both portrait and landscape orientations
+
+**Accessibility:**
+- WCAG AA compliance
+- Keyboard navigation support
+- Screen reader compatibility
+- High contrast mode support
+- Focus indicators and ARIA labels
+
+## Technical Architecture
+
+### System Components
+
+**Frontend (Next.js 15 + TypeScript)**
+- App Router for file-based routing
+- Tailwind CSS for styling
+- React Query for server state management
+- Zustand for client state management
+- React Hook Form for form handling
+
+**Backend (.NET 9 Minimal API)**
+- Entity Framework Core for data access
+- JWT authentication with refresh tokens
+- SignalR for real-time updates
+- MediatR for CQRS pattern implementation
+- FluentValidation for input validation
+
+**Database (SQL Server)**
+- Azure SQL Database for production
+- Local SQL Server for development
+- Entity Framework migrations for schema management
+- Connection pooling and query optimization
+
+**Background Processing (Azure Functions)**
+- Email notifications via SendGrid
+- File processing and cleanup
+- Scheduled tasks and reminders
+- Queue-based message processing
+
+**Authentication & Authorization**
+- JWT tokens with 15-minute expiry
+- Refresh token rotation
+- Role-based access control (RBAC)
+- OAuth integration (Google, Microsoft)
+
+### Data Models
+
+```csharp
+// Core Entities
+public class User
+{
+    public int Id { get; set; }
+    public string Email { get; set; }
+    public string Name { get; set; }
+    public string PasswordHash { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public List<TaskAssignment> TaskAssignments { get; set; }
+}
+
+public class Task
+{
+    public int Id { get; set; }
+    public string Title { get; set; }
+    public string Description { get; set; }
+    public TaskStatus Status { get; set; }
+    public TaskPriority Priority { get; set; }
+    public DateTime? DueDate { get; set; }
+    public int OwnerId { get; set; }
+    public User Owner { get; set; }
+    public List<TaskTag> TaskTags { get; set; }
+    public List<TaskAssignment> Assignments { get; set; }
+}
+
+public class Tag
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Color { get; set; }
+    public List<TaskTag> TaskTags { get; set; }
+}
+
+public class TaskAssignment
+{
+    public int Id { get; set; }
+    public int TaskId { get; set; }
+    public int UserId { get; set; }
+    public AssignmentRole Role { get; set; }
+    public Task Task { get; set; }
+    public User User { get; set; }
+}
+```
+
+### APIs and Integrations
+
+**Core API Endpoints:**
+```
+Authentication:
+POST /api/auth/register
+POST /api/auth/login
+POST /api/auth/refresh
+POST /api/auth/logout
+
+Tasks:
+GET /api/tasks
+POST /api/tasks
+GET /api/tasks/{id}
+PUT /api/tasks/{id}
+DELETE /api/tasks/{id}
+POST /api/tasks/{id}/assign
+POST /api/tasks/{id}/share
+
+Tags:
+GET /api/tags
+POST /api/tags
+PUT /api/tags/{id}
+DELETE /api/tags/{id}
+
+Search:
+GET /api/search?q={query}&status={status}&tags={tags}
+```
+
+**Third-Party Integrations:**
+- SendGrid for email notifications
+- Azure Blob Storage for file attachments
+- Google Calendar API for deadline sync
+- Microsoft Graph API for Office 365 integration
+
+### Infrastructure Requirements
+
+**Development Environment:**
+- Docker Compose for local development
+- Azurite for Azure Storage emulation
+- SQL Server LocalDB for database
+
+**Production Environment:**
+- Azure App Service for backend hosting
+- Azure Static Web Apps for frontend
+- Azure SQL Database for data persistence
+- Azure Functions for background processing
+- Azure Application Insights for monitoring
+
+**CI/CD Pipeline:**
+- GitHub Actions for automated builds
+- Automated testing on pull requests
+- Staging environment for testing
+- Production deployment with approval gates
+
+## Development Roadmap
+
+### Phase 1: MVP Foundation (Core Functionality)
+**Scope:** Essential task management with basic collaboration
+
+**Features:**
+- User authentication (register/login/logout)
+- Task CRUD operations (Create, Read, Update, Delete)
+- Task status management (To Do, In Progress, Done)
+- Basic list view for task display
+- Simple task assignment to users
+- Basic responsive design
+
+**Technical Requirements:**
+- JWT authentication implementation
+- Entity Framework Core setup with migrations
+- Basic API endpoints for tasks and users
+- React components for task management
+- Mobile-responsive layout
+
+**Success Criteria:**
+- Users can create accounts and log in
+- Users can create, edit, and delete tasks
+- Users can change task status
+- Users can assign tasks to other users
+- Application works on desktop and mobile
+
+### Phase 2: Enhanced User Experience (Visual & Functional Improvements)
+**Scope:** Improved interface and additional task management features
+
+**Features:**
+- Kanban board view with drag-and-drop
+- Tag system for task categorization
+- Advanced search and filtering
+- Task comments and activity log
+- Due date management and calendar view
+- Email notifications for assignments
+- Dark/light theme toggle
+
+**Technical Requirements:**
+- Drag-and-drop library integration (React Beautiful DnD)
+- Real-time updates via SignalR
+- Advanced query capabilities
+- Email service integration
+- Theme system implementation
+- Performance optimizations
+
+**Success Criteria:**
+- Smooth drag-and-drop functionality
+- Users can organize tasks with tags
+- Search returns relevant results quickly
+- Real-time collaboration works seamlessly
+- Email notifications are delivered reliably
+
+### Phase 3: Advanced Collaboration & Integrations
+**Scope:** Team features and external integrations
+
+**Features:**
+- Team workspaces and project organization
+- Advanced permission system (roles and permissions)
+- File attachments and document management
+- Calendar integration (Google Calendar, Outlook)
+- Advanced reporting and analytics dashboard
+- Bulk operations (bulk edit, bulk delete)
+- API for third-party integrations
+
+**Technical Requirements:**
+- File upload and storage system
+- Calendar API integrations
+- Advanced reporting queries
+- Bulk operation endpoints
+- Public API documentation
+- Rate limiting and API security
+
+**Success Criteria:**
+- Teams can organize tasks by projects
+- File attachments work reliably
+- Calendar sync functions correctly
+- Dashboard provides meaningful insights
+- API supports third-party integrations
+
+### Phase 4: Intelligence & Automation (Future Enhancements)
+**Scope:** AI-powered features and advanced automation
+
+**Features:**
+- AI-powered task suggestions and prioritization
+- Automated task creation from emails
+- Smart deadline predictions
+- Voice input for task creation
+- Advanced analytics and insights
+- Custom workflow automation
+- Mobile app (React Native)
+
+**Technical Requirements:**
+- AI/ML service integration
+- Voice recognition capabilities
+- Advanced analytics engine
+- Workflow automation engine
+- React Native mobile app
+- Machine learning model training
+
+## Logical Dependency Chain
+
+### Foundation Layer (Must be built first)
+1. **Database Schema & Authentication**
+   - User model and authentication system
+   - JWT token management
+   - Basic security middleware
+
+2. **Core Task CRUD**
+   - Task entity and basic operations
+   - API endpoints for task management
+   - Basic validation and error handling
+
+### Usable Frontend Layer (Quick wins for visibility)
+3. **Basic Task Interface**
+   - Task list view with status updates
+   - Simple task creation form
+   - Basic responsive design
+
+4. **User Assignment**
+   - Task assignment functionality
+   - User management interface
+   - Basic collaboration features
+
+### Enhancement Layer (Building upon foundation)
+5. **Visual Improvements**
+   - Kanban board implementation
+   - Drag-and-drop functionality
+   - Improved UI/UX design
+
+6. **Organization Features**
+   - Tag system implementation
+   - Search and filtering
+   - Task categorization
+
+### Collaboration Layer (Team features)
+7. **Real-time Collaboration**
+   - SignalR integration
+   - Live updates and notifications
+   - Activity logging
+
+8. **Advanced Sharing**
+   - Team workspaces
+   - Permission management
+   - File attachments
+
+### Engagement Layer (User retention)
+9. **Notifications & Integrations**
+   - Email notification system
+   - Calendar integrations
+   - Mobile responsiveness
+
+10. **Analytics & Intelligence**
+    - Usage analytics
+    - Performance insights
+    - Future AI features
+
+## Risks and Mitigations
+
+### Technical Challenges
+
+**Risk:** Complex drag-and-drop implementation causing performance issues
+**Mitigation:** 
+- Use proven library (React Beautiful DnD)
+- Implement virtualization for large task lists
+- Add performance monitoring and optimization
+
+**Risk:** Real-time collaboration complexity
+**Mitigation:**
+- Start with simple SignalR implementation
+- Implement conflict resolution strategies
+- Add comprehensive error handling
+
+**Risk:** Database performance with large task volumes
+**Mitigation:**
+- Implement proper indexing strategy
+- Use pagination for large datasets
+- Add database query optimization
+
+### MVP Scope Management
+
+**Risk:** Feature creep delaying MVP delivery
+**Mitigation:**
+- Strict adherence to Phase 1 scope
+- Regular scope review meetings
+- Clear definition of "done" criteria
+
+**Risk:** Over-engineering early features
+**Mitigation:**
+- Start with simple implementations
+- Refactor and improve iteratively
+- Focus on user value over technical perfection
+
+### Resource Constraints
+
+**Risk:** Limited development team capacity
+**Mitigation:**
+- Modular development approach
+- Clear task prioritization
+- Regular progress reviews and adjustments
+
+**Risk:** Integration complexity with third-party services
+**Mitigation:**
+- Start with mock implementations
+- Implement proper error handling
+- Plan for service failures and fallbacks
+
+## Appendix
+
+### Research Findings
+
+**Competitive Analysis:**
+- **Trello:** Excellent drag-and-drop, limited collaboration features
+- **Todoist:** Strong task management, complex interface
+- **Asana:** Powerful but overwhelming for small teams
+- **Notion:** Flexible but not task-focused
+
+**Key Insights:**
+- Users prefer simple, clean interfaces
+- Drag-and-drop is essential for task management
+- Real-time collaboration is highly valued
+- Mobile experience is critical for adoption
+
+### Technical Specifications
+
+**Performance Requirements:**
+- Page load time: < 2 seconds
+- API response time: < 500ms
+- Real-time updates: < 100ms latency
+- Mobile performance: 60fps animations
+
+**Security Requirements:**
+- HTTPS everywhere
+- JWT token security
+- Input validation and sanitization
+- SQL injection prevention
+- XSS protection
+
+**Scalability Considerations:**
+- Support for 10,000+ users
+- Handle 100,000+ tasks
+- Real-time updates for 100+ concurrent users
+- Horizontal scaling capability
+
+### Future Expansion Opportunities
+
+**Potential Integrations:**
+- Slack/Teams notifications
+- GitHub issue synchronization
+- Time tracking integration
+- Project management tool imports
+
+**Advanced Features:**
+- AI-powered task prioritization
+- Automated workflow creation
+- Advanced reporting and analytics
+- Custom field support
+- API marketplace
+
+This PRD provides a comprehensive roadmap for building TaskFlow as a modern, scalable task management solution that balances simplicity with powerful collaboration features.

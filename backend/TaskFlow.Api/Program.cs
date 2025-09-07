@@ -125,6 +125,9 @@ try
     // Queue service (depends on QueueServiceClient)
     builder.Services.AddScoped<IQueueService, QueueService>();
 
+    // Add to the services registration section (around line 121)
+    builder.Services.AddScoped<ITaskService, TaskService>();
+
     Console.WriteLine("All application services registered successfully");
 }
 catch (Exception ex)
@@ -166,7 +169,7 @@ app.Use(
     }
 );
 
-// Simple authentication check middleware (for demonstration)
+// Update the authentication middleware section (around line 173)
 app.Use(
     async (context, next) =>
     {
@@ -176,6 +179,7 @@ app.Use(
             || context.Request.Path.StartsWithSegments("/test")
             || context.Request.Path.StartsWithSegments("/weatherforecast")
             || context.Request.Path.StartsWithSegments("/api/auth") // ✅ Allow auth endpoints
+            || context.Request.Path.StartsWithSegments("/api/DbDebug") // ✅ Allow debug endpoints
         )
         {
             await next();
@@ -186,8 +190,8 @@ app.Use(
         if (!context.Request.Headers.ContainsKey("Authorization"))
         {
             context.Response.StatusCode = 401;
-            context.Response.ContentType = "application/json"; // ✅ Set content type
-            await context.Response.WriteAsync("{\"error\":\"Authorization header required\"}"); // ✅ Return JSON
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsync("{\"error\":\"Authorization header required\"}");
             return;
         }
 

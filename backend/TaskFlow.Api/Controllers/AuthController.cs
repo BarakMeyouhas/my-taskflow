@@ -283,6 +283,14 @@ namespace TaskFlow.Api.Controllers
                 );
             }
         }
+
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            // For JWT tokens, logout is typically handled client-side
+            // by removing the token from storage
+            return Ok(new { message = "Logged out successfully" });
+        }
     }
 
     public class UserLoginRequest

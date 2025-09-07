@@ -181,5 +181,91 @@ namespace TaskFlow.Api.Controllers
                 return StatusCode(500, new { error = ex.Message });
             }
         }
+
+        [HttpGet("users")]
+        public IActionResult GetAllUsers()
+        {
+            try
+            {
+                var users = _db.Users.ToList();
+                return Ok(
+                    new
+                    {
+                        count = users.Count,
+                        users = users.Select(u => new
+                        {
+                            u.Id,
+                            u.Username,
+                            u.Email,
+                            hasPassword = !string.IsNullOrEmpty(u.PasswordHash),
+                        }),
+                    }
+                );
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        [HttpGet("tasks")]
+        public IActionResult GetAllTasks()
+        {
+            try
+            {
+                var tasks = _db.Tasks.Include(t => t.Owner).ToList();
+                return Ok(
+                    new
+                    {
+                        count = tasks.Count,
+                        tasks = tasks.Select(t => new
+                        {
+                            t.Id,
+                            t.Title,
+                            t.Description,
+                            t.Status,
+                            t.Priority,
+                            t.DueDate,
+                            t.CreatedAt,
+                            t.UpdatedAt,
+                            OwnerId = t.OwnerId,
+                            OwnerName = t.Owner?.Username,
+                        }),
+                    }
+                );
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        [HttpGet("database-info")]
+        public IActionResult GetDatabaseInfo()
+        {
+            try
+            {
+                var canConnect = _db.Database.CanConnect();
+                var userCount = canConnect ? _db.Users.Count() : 0;
+                var taskCount = canConnect ? _db.Tasks.Count() : 0;
+
+                return Ok(
+                    new
+                    {
+                        canConnect = canConnect,
+                        databaseName = _db.Database.GetDbConnection().Database,
+                        serverName = _db.Database.GetDbConnection().DataSource,
+                        provider = _db.Database.ProviderName,
+                        userCount = userCount,
+                        taskCount = taskCount,
+                        timestamp = DateTime.UtcNow,
+                    }
+                );
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
     }
 }
