@@ -12,11 +12,18 @@ namespace TaskFlow.Api.Controllers
     public class TaskController : ControllerBase
     {
         private readonly ITaskService _taskService;
+        private readonly IUserService _userService; // Add this line
+
         private readonly ILogger<TaskController> _logger;
 
-        public TaskController(ITaskService taskService, ILogger<TaskController> logger)
+        public TaskController(
+            ITaskService taskService,
+            ILogger<TaskController> logger,
+            IUserService userService
+        )
         {
             _taskService = taskService;
+            _userService = userService;
             _logger = logger;
         }
 
@@ -220,6 +227,130 @@ namespace TaskFlow.Api.Controllers
             }
         }
 
+        // POST /api/tasks/{id}/assign (assign task to user)
+        [HttpPost("{id}/assign")]
+        public async Task<IActionResult> AssignTask(int id, [FromBody] AssignTaskRequest request)
+        {
+            try
+            {
+                var assignedByUserId = GetCurrentUserId();
+                if (assignedByUserId == null)
+                    return Unauthorized("User not authenticated");
+
+                if (request == null || string.IsNullOrEmpty(request.UserEmail))
+                    return BadRequest("User email is required");
+
+                // Look up user by email
+                var user = await _userService.GetUserByEmailAsync(request.UserEmail);
+                if (user == null)
+                    return NotFound("User not found");
+
+                // Check if user is trying to assign to themselves
+                if (user.Id == assignedByUserId.Value)
+                    return BadRequest("Cannot assign task to yourself");
+
+                // Assign the task
+                var success = await _taskService.AssignTaskToUserAsync(
+                    id,
+                    user.Id,
+                    assignedByUserId.Value,
+                    request.Role ?? AssignmentRole.Viewer
+                );
+
+                if (!success)
+                    return NotFound("Task not found or access denied");
+
+                return Ok(
+                    new
+                    {
+                        message = "Task assigned successfully",
+                        taskId = id,
+                        assignedTo = new
+                        {
+                            userId = user.Id,
+                            username = user.Username,
+                            email = user.Email,
+                        },
+                        role = request.Role ?? AssignmentRole.Viewer,
+                        assignedAt = DateTime.UtcNow,
+                    }
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error assigning task {TaskId}", id);
+                return StatusCode(500, new { error = "Internal server error" });
+            }
+        }
+
+        // Add these additional endpoints for managing assignments
+
+        [HttpGet("{id}/assignments")]
+        public async Task<IActionResult> GetTaskAssignments(int id)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                if (userId == null)
+                    return Unauthorized("User not authenticated");
+
+                // Check if user has access to this task
+                var task = await _taskService.GetTaskByIdAsync(id, userId.Value);
+                if (task == null)
+                    return NotFound("Task not found");
+
+                // Get assignments for this task
+                var assignments = await _taskService.GetTaskAssignmentsAsync(id);
+
+                return Ok(
+                    new
+                    {
+                        taskId = id,
+                        assignments = assignments.Select(a => new
+                        {
+                            a.Id,
+                            userId = a.UserId,
+                            username = a.User?.Username,
+                            email = a.User?.Email,
+                            role = a.Role,
+                            assignedAt = a.AssignedAt,
+                            assignedBy = a.AssignedBy?.Username,
+                        }),
+                    }
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving assignments for task {TaskId}", id);
+                return StatusCode(500, new { error = "Internal server error" });
+            }
+        }
+
+        [HttpDelete("{id}/assignments/{assignmentId}")]
+        public async Task<IActionResult> RemoveTaskAssignment(int id, int assignmentId)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                if (userId == null)
+                    return Unauthorized("User not authenticated");
+
+                var success = await _taskService.RemoveTaskAssignmentAsync(
+                    assignmentId,
+                    userId.Value
+                );
+                if (!success)
+                    return NotFound("Assignment not found or access denied");
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error removing assignment {AssignmentId}", assignmentId);
+                return StatusCode(500, new { error = "Internal server error" });
+            }
+        }
+
         // Helper method to get current user ID from JWT token
         private int? GetCurrentUserId()
         {
@@ -260,5 +391,11 @@ namespace TaskFlow.Api.Controllers
         public TaskStatus? Status { get; set; }
         public TaskPriority? Priority { get; set; }
         public DateTime? DueDate { get; set; }
+    }
+
+    public class AssignTaskRequest
+    {
+        public string UserEmail { get; set; } = string.Empty;
+        public AssignmentRole? Role { get; set; }
     }
 }

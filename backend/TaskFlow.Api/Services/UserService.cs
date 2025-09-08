@@ -10,6 +10,7 @@ namespace TaskFlow.Api.Services
         Task<bool> UserExistsAsync(string username, string email);
         Task<User> CreateUserAsync(string username, string email, string password);
         Task<User?> GetUserByUsernameAsync(string username);
+        Task<User?> GetUserByEmailAsync(string email);
     }
 
     public class UserService : IUserService
@@ -116,6 +117,19 @@ namespace TaskFlow.Api.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting user by username: {Username}", username);
+                throw;
+            }
+        }
+
+        public async Task<User?> GetUserByEmailAsync(string email)
+        {
+            try
+            {
+                return await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting user by email: {Email}", email);
                 throw;
             }
         }

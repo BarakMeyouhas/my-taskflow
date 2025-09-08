@@ -512,6 +512,10 @@ img, video {
   margin-left: -.25rem;
 }
 
+.mb-1 {
+  margin-bottom: .25rem;
+}
+
 .mb-2 {
   margin-bottom: .5rem;
 }
@@ -652,6 +656,10 @@ img, video {
   height: 100%;
 }
 
+.max-h-\[90vh\] {
+  max-height: 90vh;
+}
+
 .min-h-screen {
   min-height: 100vh;
 }
@@ -724,6 +732,10 @@ img, video {
   max-width: 32rem;
 }
 
+.max-w-md {
+  max-width: 28rem;
+}
+
 .flex-1 {
   flex: 1;
 }
@@ -775,10 +787,6 @@ img, video {
   flex-direction: column;
 }
 
-.flex-wrap {
-  flex-wrap: wrap;
-}
-
 .items-start {
   align-items: flex-start;
 }
@@ -797,10 +805,6 @@ img, video {
 
 .gap-1 {
   gap: .25rem;
-}
-
-.gap-2 {
-  gap: .5rem;
 }
 
 .gap-3 {
@@ -986,6 +990,11 @@ img, video {
   border-color: rgba(0, 0, 0, 0);
 }
 
+.bg-black {
+  --tw-bg-opacity: 1;
+  background-color: rgba(0, 0, 0, var(--tw-bg-opacity, 1));
+}
+
 .bg-black\/40 {
   background-color: rgba(0, 0, 0, .4);
 }
@@ -1077,11 +1086,6 @@ img, video {
 
 .bg-white\/60 {
   background-color: rgba(255, 255, 255, .6);
-}
-
-.bg-yellow-100 {
-  --tw-bg-opacity: 1;
-  background-color: rgba(254, 249, 195, var(--tw-bg-opacity, 1));
 }
 
 .bg-opacity-50 {
@@ -1441,11 +1445,6 @@ img, video {
   color: rgba(255, 255, 255, var(--tw-text-opacity, 1));
 }
 
-.text-yellow-800 {
-  --tw-text-opacity: 1;
-  color: rgba(133, 77, 14, var(--tw-text-opacity, 1));
-}
-
 .antialiased {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -1478,6 +1477,12 @@ img, video {
 .shadow-sm {
   --tw-shadow: 0 1px 2px 0 rgba(0, 0, 0, .05);
   --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 rgba(0, 0, 0, 0)), var(--tw-ring-shadow, 0 0 rgba(0, 0, 0, 0)), var(--tw-shadow);
+}
+
+.shadow-xl {
+  --tw-shadow: 0 20px 25px -5px rgba(0, 0, 0, .1), 0 8px 10px -6px rgba(0, 0, 0, .1);
+  --tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 rgba(0, 0, 0, 0)), var(--tw-ring-shadow, 0 0 rgba(0, 0, 0, 0)), var(--tw-shadow);
 }
 

@@ -106,5 +106,34 @@ namespace TaskFlow.Api.Services
             );
             return true;
         }
+
+        public async Task<IEnumerable<TaskAssignment>> GetTaskAssignmentsAsync(int taskId)
+        {
+            return await _dbContext
+                .TaskAssignments.Where(ta => ta.TaskId == taskId)
+                .Include(ta => ta.User)
+                .Include(ta => ta.AssignedBy)
+                .ToListAsync();
+        }
+
+        public async Task<bool> RemoveTaskAssignmentAsync(int assignmentId, int userId)
+        {
+            var assignment = await _dbContext
+                .TaskAssignments.Include(ta => ta.Task)
+                .FirstOrDefaultAsync(ta => ta.Id == assignmentId);
+
+            if (assignment == null)
+                return false;
+
+            // Only task owner or the assigned user can remove the assignment
+            if (assignment.Task.OwnerId != userId && assignment.UserId != userId)
+                return false;
+
+            _dbContext.TaskAssignments.Remove(assignment);
+            await _dbContext.SaveChangesAsync();
+
+            _logger.LogInformation("Assignment {AssignmentId} removed", assignmentId);
+            return true;
+        }
     }
 }

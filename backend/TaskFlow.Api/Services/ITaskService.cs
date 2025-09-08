@@ -15,5 +15,7 @@ namespace TaskFlow.Api.Services
             int assignedByUserId,
             AssignmentRole role
         );
+        Task<IEnumerable<TaskAssignment>> GetTaskAssignmentsAsync(int taskId);
+        Task<bool> RemoveTaskAssignmentAsync(int assignmentId, int userId);
     }
 }
