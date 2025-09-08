@@ -3,7 +3,7 @@ import Modal from './ui/Modal';
 import ModalHeader from './ui/ModalHeader';
 import ModalBody from './ui/ModalBody';
 import ModalFooter from './ui/ModalFooter';
-import { Button, IconButton } from './ui';
+import { Button, IconButton, TagBadge } from './ui';
 import { Task } from '../types/task';
 
 export interface TaskDetailsModalProps {
@@ -113,6 +113,18 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
             <div>
               <h3 className="text-label text-gray-700 space-small">Description</h3>
               <p className="text-body text-gray-600 whitespace-pre-wrap">{task.description}</p>
+            </div>
+          )}
+
+          {/* Tags */}
+          {task.tags && task.tags.length > 0 && (
+            <div>
+              <h3 className="text-label text-gray-700 space-small">Tags</h3>
+              <div className="flex flex-wrap gap-2">
+                {task.tags.map(tag => (
+                  <TagBadge key={tag.id} tag={tag} size="md" />
+                ))}
+              </div>
             </div>
           )}
 

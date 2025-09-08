@@ -55,6 +55,15 @@ namespace TaskFlow.Api.Controllers
                             t.UpdatedAt,
                             OwnerId = t.OwnerId,
                             OwnerName = t.Owner?.Username,
+                            Tags = t.TaskTags?.Select(tt => new
+                            {
+                                tt.Tag.Id,
+                                tt.Tag.Name,
+                                tt.Tag.Color,
+                                tt.Tag.Description,
+                                tt.Tag.CreatedAt,
+                                tt.Tag.UpdatedAt,
+                            }) ?? Enumerable.Empty<object>(),
                         }),
                     }
                 );
@@ -93,6 +102,15 @@ namespace TaskFlow.Api.Controllers
                         task.UpdatedAt,
                         OwnerId = task.OwnerId,
                         OwnerName = task.Owner?.Username,
+                        Tags = task.TaskTags?.Select(tt => new
+                        {
+                            tt.Tag.Id,
+                            tt.Tag.Name,
+                            tt.Tag.Color,
+                            tt.Tag.Description,
+                            tt.Tag.CreatedAt,
+                            tt.Tag.UpdatedAt,
+                        }) ?? Enumerable.Empty<object>(),
                     }
                 );
             }

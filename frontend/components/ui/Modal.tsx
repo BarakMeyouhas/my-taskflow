@@ -106,7 +106,7 @@ const Modal: React.FC<ModalProps> = ({
     >
       <div
         ref={modalRef}
-        className={`bg-white rounded-lg shadow-xl w-full max-h-[90vh] overflow-hidden ${sizeClasses[size]} ${className}`}
+        className={`bg-white rounded-lg shadow-xl w-full max-h-[90vh] overflow-hidden flex flex-col ${sizeClasses[size]} ${className}`}
       >
         {children}
       </div>

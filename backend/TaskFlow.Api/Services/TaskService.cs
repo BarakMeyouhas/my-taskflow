@@ -20,6 +20,8 @@ namespace TaskFlow.Api.Services
             return await _dbContext
                 .Tasks.Where(t => t.OwnerId == userId)
                 .Include(t => t.Owner)
+                .Include(t => t.TaskTags)
+                .ThenInclude(tt => tt.Tag)
                 .OrderByDescending(t => t.CreatedAt)
                 .ToListAsync();
         }
@@ -29,6 +31,8 @@ namespace TaskFlow.Api.Services
             return await _dbContext
                 .Tasks.Where(t => t.Id == taskId && t.OwnerId == userId)
                 .Include(t => t.Owner)
+                .Include(t => t.TaskTags)
+                .ThenInclude(tt => tt.Tag)
                 .FirstOrDefaultAsync();
         }
 

@@ -1,5 +1,617 @@
 (globalThis.TURBOPACK = globalThis.TURBOPACK || []).push([typeof document === "object" ? document.currentScript : undefined, {
 
+"[project]/services/tagService.ts [app-client] (ecmascript)": ((__turbopack_context__) => {
+"use strict";
+
+var { k: __turbopack_refresh__, m: module } = __turbopack_context__;
+{
+__turbopack_context__.s({
+    "tagService": ()=>tagService
+});
+var __TURBOPACK__imported__module__$5b$project$5d2f$config$2f$auth$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/config/auth.ts [app-client] (ecmascript)");
+;
+class TagService {
+    getAuthHeaders() {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            throw new Error("No authentication token found");
+        }
+        return {
+            "Content-Type": "application/json",
+            Authorization: "Bearer ".concat(token)
+        };
+    }
+    getBaseUrl() {
+        return __TURBOPACK__imported__module__$5b$project$5d2f$config$2f$auth$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["authConfig"].backendUrl;
+    }
+    async getTags() {
+        try {
+            const response = await fetch("".concat(this.getBaseUrl(), "/api/tag"), {
+                headers: this.getAuthHeaders()
+            });
+            if (!response.ok) {
+                throw new Error("Failed to fetch tags: ".concat(response.statusText));
+            }
+            const data = await response.json();
+            return data.tags || [];
+        } catch (error) {
+            console.error("Error fetching tags:", error);
+            throw error;
+        }
+    }
+    async getTagById(id) {
+        try {
+            const response = await fetch("".concat(this.getBaseUrl(), "/api/tag/").concat(id), {
+                headers: this.getAuthHeaders()
+            });
+            if (!response.ok) {
+                throw new Error("Failed to fetch tag: ".concat(response.statusText));
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error("Error fetching tag:", error);
+            throw error;
+        }
+    }
+    async createTag(tagData) {
+        try {
+            const response = await fetch("".concat(this.getBaseUrl(), "/api/tag"), {
+                method: "POST",
+                headers: this.getAuthHeaders(),
+                body: JSON.stringify(tagData)
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                let errorMessage = "Failed to create tag: ".concat(response.statusText);
+                try {
+                    const errorData = JSON.parse(errorText);
+                    errorMessage = errorData.error || errorData.message || errorMessage;
+                } catch (e) {
+                    errorMessage = errorText || errorMessage;
+                }
+                throw new Error(errorMessage);
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error("Error creating tag:", error);
+            throw error;
+        }
+    }
+    async updateTag(id, tagData) {
+        try {
+            const response = await fetch("".concat(this.getBaseUrl(), "/api/tag/").concat(id), {
+                method: "PUT",
+                headers: this.getAuthHeaders(),
+                body: JSON.stringify(tagData)
+            });
+            if (!response.ok) {
+                const errorData = await response.json().catch(()=>({}));
+                throw new Error(errorData.error || errorData.message || "Failed to update tag: ".concat(response.statusText));
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error("Error updating tag:", error);
+            throw error;
+        }
+    }
+    async deleteTag(id) {
+        try {
+            const response = await fetch("".concat(this.getBaseUrl(), "/api/tag/").concat(id), {
+                method: "DELETE",
+                headers: this.getAuthHeaders()
+            });
+            if (!response.ok) {
+                const errorData = await response.json().catch(()=>({}));
+                throw new Error(errorData.error || errorData.message || "Failed to delete tag: ".concat(response.statusText));
+            }
+        } catch (error) {
+            console.error("Error deleting tag:", error);
+            throw error;
+        }
+    }
+    async searchTags(searchTerm) {
+        try {
+            const response = await fetch("".concat(this.getBaseUrl(), "/api/tag/search?q=").concat(encodeURIComponent(searchTerm)), {
+                headers: this.getAuthHeaders()
+            });
+            if (!response.ok) {
+                throw new Error("Failed to search tags: ".concat(response.statusText));
+            }
+            const data = await response.json();
+            return data.tags || [];
+        } catch (error) {
+            console.error("Error searching tags:", error);
+            throw error;
+        }
+    }
+    async assignTagToTask(taskId, tagId) {
+        try {
+            const response = await fetch("".concat(this.getBaseUrl(), "/api/tag/").concat(tagId, "/assign/").concat(taskId), {
+                method: "POST",
+                headers: this.getAuthHeaders()
+            });
+            if (!response.ok) {
+                const errorData = await response.json().catch(()=>({}));
+                throw new Error(errorData.error || errorData.message || "Failed to assign tag to task: ".concat(response.statusText));
+            }
+        } catch (error) {
+            console.error("Error assigning tag to task:", error);
+            throw error;
+        }
+    }
+    async removeTagFromTask(taskId, tagId) {
+        try {
+            const response = await fetch("".concat(this.getBaseUrl(), "/api/tag/").concat(tagId, "/assign/").concat(taskId), {
+                method: "DELETE",
+                headers: this.getAuthHeaders()
+            });
+            if (!response.ok) {
+                const errorData = await response.json().catch(()=>({}));
+                throw new Error(errorData.error || errorData.message || "Failed to remove tag from task: ".concat(response.statusText));
+            }
+        } catch (error) {
+            console.error("Error removing tag from task:", error);
+            throw error;
+        }
+    }
+    async getTagsForTask(taskId) {
+        try {
+            const response = await fetch("".concat(this.getBaseUrl(), "/api/tag/task/").concat(taskId), {
+                headers: this.getAuthHeaders()
+            });
+            if (!response.ok) {
+                throw new Error("Failed to fetch tags for task: ".concat(response.statusText));
+            }
+            const data = await response.json();
+            return data.tags || [];
+        } catch (error) {
+            console.error("Error fetching tags for task:", error);
+            throw error;
+        }
+    }
+}
+const tagService = new TagService();
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(module, globalThis.$RefreshHelpers$);
+}
+}}),
+"[project]/components/ui/TagBadge.tsx [app-client] (ecmascript)": ((__turbopack_context__) => {
+"use strict";
+
+var { k: __turbopack_refresh__, m: module } = __turbopack_context__;
+{
+__turbopack_context__.s({
+    "default": ()=>__TURBOPACK__default__export__
+});
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+;
+const TagBadge = (param)=>{
+    let { tag, size = 'md', removable = false, onRemove, className = '' } = param;
+    const sizeClasses = {
+        sm: 'px-2 py-1 text-xs',
+        md: 'px-2.5 py-1 text-sm',
+        lg: 'px-3 py-1.5 text-base'
+    };
+    const baseClasses = 'inline-flex items-center gap-1.5 rounded-full font-medium transition-colors';
+    // Use tag color if available, otherwise use default colors
+    const getTagStyles = ()=>{
+        if (tag.color) {
+            return {
+                backgroundColor: tag.color,
+                color: getContrastColor(tag.color)
+            };
+        }
+        // Default color scheme based on tag name hash
+        const hash = tag.name.split('').reduce((a, b)=>{
+            a = (a << 5) - a + b.charCodeAt(0);
+            return a & a;
+        }, 0);
+        const colors = [
+            'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+            'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+            'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+            'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200',
+            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+            'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
+            'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+            'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+        ];
+        return colors[Math.abs(hash) % colors.length];
+    };
+    const handleRemove = (e)=>{
+        e.stopPropagation();
+        onRemove === null || onRemove === void 0 ? void 0 : onRemove(tag.id);
+    };
+    const tagStyles = tag.color ? getTagStyles() : getTagStyles();
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+        className: "".concat(baseClasses, " ").concat(sizeClasses[size], " ").concat(tagStyles, " ").concat(className),
+        style: tag.color ? {
+            backgroundColor: tag.color,
+            color: getContrastColor(tag.color)
+        } : undefined,
+        title: tag.description || tag.name,
+        children: [
+            tag.name,
+            removable && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                onClick: handleRemove,
+                className: "ml-1 hover:opacity-70 transition-opacity",
+                "aria-label": "Remove ".concat(tag.name, " tag"),
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                    className: "w-3 h-3",
+                    fill: "currentColor",
+                    viewBox: "0 0 20 20",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                        fillRule: "evenodd",
+                        d: "M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z",
+                        clipRule: "evenodd"
+                    }, void 0, false, {
+                        fileName: "[project]/components/ui/TagBadge.tsx",
+                        lineNumber: 77,
+                        columnNumber: 13
+                    }, ("TURBOPACK compile-time value", void 0))
+                }, void 0, false, {
+                    fileName: "[project]/components/ui/TagBadge.tsx",
+                    lineNumber: 76,
+                    columnNumber: 11
+                }, ("TURBOPACK compile-time value", void 0))
+            }, void 0, false, {
+                fileName: "[project]/components/ui/TagBadge.tsx",
+                lineNumber: 71,
+                columnNumber: 9
+            }, ("TURBOPACK compile-time value", void 0))
+        ]
+    }, void 0, true, {
+        fileName: "[project]/components/ui/TagBadge.tsx",
+        lineNumber: 64,
+        columnNumber: 5
+    }, ("TURBOPACK compile-time value", void 0));
+};
+_c = TagBadge;
+// Helper function to determine if text should be light or dark based on background color
+function getContrastColor(hexColor) {
+    // Remove # if present
+    const hex = hexColor.replace('#', '');
+    // Convert to RGB
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    // Calculate luminance
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    // Return white for dark backgrounds, black for light backgrounds
+    return luminance > 0.5 ? '#000000' : '#ffffff';
+}
+const __TURBOPACK__default__export__ = TagBadge;
+var _c;
+__turbopack_context__.k.register(_c, "TagBadge");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(module, globalThis.$RefreshHelpers$);
+}
+}}),
+"[project]/components/TagFilter.tsx [app-client] (ecmascript)": ((__turbopack_context__) => {
+"use strict";
+
+var { k: __turbopack_refresh__, m: module } = __turbopack_context__;
+{
+__turbopack_context__.s({
+    "default": ()=>__TURBOPACK__default__export__
+});
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$tagService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/services/tagService.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$TagBadge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/ui/TagBadge.tsx [app-client] (ecmascript)");
+;
+var _s = __turbopack_context__.k.signature();
+;
+;
+;
+const TagFilter = (param)=>{
+    let { selectedTags, onTagsChange, className = '' } = param;
+    _s();
+    const [availableTags, setAvailableTags] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [isOpen, setIsOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [searchTerm, setSearchTerm] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('');
+    // Load available tags
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "TagFilter.useEffect": ()=>{
+            loadTags();
+        }
+    }["TagFilter.useEffect"], []);
+    const loadTags = async ()=>{
+        try {
+            setIsLoading(true);
+            const tags = await __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$tagService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["tagService"].getTags();
+            setAvailableTags(tags);
+        } catch (error) {
+            console.error('Failed to load tags:', error);
+        } finally{
+            setIsLoading(false);
+        }
+    };
+    const handleTagToggle = (tag)=>{
+        const isSelected = selectedTags.some((t)=>t.id === tag.id);
+        if (isSelected) {
+            // Remove tag from selection
+            onTagsChange(selectedTags.filter((t)=>t.id !== tag.id));
+        } else {
+            // Add tag to selection
+            onTagsChange([
+                ...selectedTags,
+                tag
+            ]);
+        }
+    };
+    const handleRemoveTag = (tagId)=>{
+        onTagsChange(selectedTags.filter((t)=>t.id !== tagId));
+    };
+    const filteredTags = availableTags.filter((tag)=>tag.name.toLowerCase().includes(searchTerm.toLowerCase()) && !selectedTags.some((selected)=>selected.id === tag.id));
+    const clearAllTags = ()=>{
+        onTagsChange([]);
+    };
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "relative ".concat(className),
+        children: [
+            selectedTags.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "mb-2",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "flex items-center justify-between mb-1",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "text-sm text-gray-600 dark:text-gray-400",
+                                children: [
+                                    "Filtered by tags (",
+                                    selectedTags.length,
+                                    "):"
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/components/TagFilter.tsx",
+                                lineNumber: 70,
+                                columnNumber: 13
+                            }, ("TURBOPACK compile-time value", void 0)),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                onClick: clearAllTags,
+                                className: "text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200",
+                                children: "Clear all"
+                            }, void 0, false, {
+                                fileName: "[project]/components/TagFilter.tsx",
+                                lineNumber: 73,
+                                columnNumber: 13
+                            }, ("TURBOPACK compile-time value", void 0))
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/components/TagFilter.tsx",
+                        lineNumber: 69,
+                        columnNumber: 11
+                    }, ("TURBOPACK compile-time value", void 0)),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "flex flex-wrap gap-1",
+                        children: selectedTags.map((tag)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$TagBadge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                tag: tag,
+                                removable: true,
+                                onRemove: ()=>handleRemoveTag(tag.id),
+                                size: "sm"
+                            }, tag.id, false, {
+                                fileName: "[project]/components/TagFilter.tsx",
+                                lineNumber: 82,
+                                columnNumber: 15
+                            }, ("TURBOPACK compile-time value", void 0)))
+                    }, void 0, false, {
+                        fileName: "[project]/components/TagFilter.tsx",
+                        lineNumber: 80,
+                        columnNumber: 11
+                    }, ("TURBOPACK compile-time value", void 0))
+                ]
+            }, void 0, true, {
+                fileName: "[project]/components/TagFilter.tsx",
+                lineNumber: 68,
+                columnNumber: 9
+            }, ("TURBOPACK compile-time value", void 0)),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "relative",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                        onClick: ()=>setIsOpen(!isOpen),
+                        className: "inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-500 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                className: "w-4 h-4 mr-2",
+                                fill: "none",
+                                stroke: "currentColor",
+                                viewBox: "0 0 24 24",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                    strokeWidth: 2,
+                                    d: "M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                                }, void 0, false, {
+                                    fileName: "[project]/components/TagFilter.tsx",
+                                    lineNumber: 101,
+                                    columnNumber: 13
+                                }, ("TURBOPACK compile-time value", void 0))
+                            }, void 0, false, {
+                                fileName: "[project]/components/TagFilter.tsx",
+                                lineNumber: 100,
+                                columnNumber: 11
+                            }, ("TURBOPACK compile-time value", void 0)),
+                            "Filter by Tags",
+                            selectedTags.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "ml-2 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs font-medium px-2 py-0.5 rounded-full",
+                                children: selectedTags.length
+                            }, void 0, false, {
+                                fileName: "[project]/components/TagFilter.tsx",
+                                lineNumber: 105,
+                                columnNumber: 13
+                            }, ("TURBOPACK compile-time value", void 0))
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/components/TagFilter.tsx",
+                        lineNumber: 96,
+                        columnNumber: 9
+                    }, ("TURBOPACK compile-time value", void 0)),
+                    isOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "absolute z-10 mt-1 w-80 bg-white dark:bg-gray-700 rounded-md shadow-lg border border-gray-200 dark:border-gray-600",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "p-3",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "relative mb-3",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none",
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                                className: "h-4 w-4 text-gray-400 dark:text-gray-500",
+                                                fill: "none",
+                                                stroke: "currentColor",
+                                                viewBox: "0 0 24 24",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                    strokeLinecap: "round",
+                                                    strokeLinejoin: "round",
+                                                    strokeWidth: 2,
+                                                    d: "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/components/TagFilter.tsx",
+                                                    lineNumber: 119,
+                                                    columnNumber: 21
+                                                }, ("TURBOPACK compile-time value", void 0))
+                                            }, void 0, false, {
+                                                fileName: "[project]/components/TagFilter.tsx",
+                                                lineNumber: 118,
+                                                columnNumber: 19
+                                            }, ("TURBOPACK compile-time value", void 0))
+                                        }, void 0, false, {
+                                            fileName: "[project]/components/TagFilter.tsx",
+                                            lineNumber: 117,
+                                            columnNumber: 17
+                                        }, ("TURBOPACK compile-time value", void 0)),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                            type: "text",
+                                            placeholder: "Search tags...",
+                                            value: searchTerm,
+                                            onChange: (e)=>setSearchTerm(e.target.value),
+                                            className: "block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-500 rounded-md leading-5 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                        }, void 0, false, {
+                                            fileName: "[project]/components/TagFilter.tsx",
+                                            lineNumber: 122,
+                                            columnNumber: 17
+                                        }, ("TURBOPACK compile-time value", void 0))
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/components/TagFilter.tsx",
+                                    lineNumber: 116,
+                                    columnNumber: 15
+                                }, ("TURBOPACK compile-time value", void 0)),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "max-h-48 overflow-y-auto",
+                                    children: isLoading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "text-center py-4",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"
+                                            }, void 0, false, {
+                                                fileName: "[project]/components/TagFilter.tsx",
+                                                lineNumber: 135,
+                                                columnNumber: 21
+                                            }, ("TURBOPACK compile-time value", void 0)),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "text-sm text-gray-500 dark:text-gray-400 mt-2",
+                                                children: "Loading tags..."
+                                            }, void 0, false, {
+                                                fileName: "[project]/components/TagFilter.tsx",
+                                                lineNumber: 136,
+                                                columnNumber: 21
+                                            }, ("TURBOPACK compile-time value", void 0))
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/components/TagFilter.tsx",
+                                        lineNumber: 134,
+                                        columnNumber: 19
+                                    }, ("TURBOPACK compile-time value", void 0)) : filteredTags.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "space-y-1",
+                                        children: filteredTags.map((tag)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                onClick: ()=>handleTagToggle(tag),
+                                                className: "w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-md transition-colors",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$TagBadge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                    tag: tag,
+                                                    size: "sm"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/components/TagFilter.tsx",
+                                                    lineNumber: 146,
+                                                    columnNumber: 25
+                                                }, ("TURBOPACK compile-time value", void 0))
+                                            }, tag.id, false, {
+                                                fileName: "[project]/components/TagFilter.tsx",
+                                                lineNumber: 141,
+                                                columnNumber: 23
+                                            }, ("TURBOPACK compile-time value", void 0)))
+                                    }, void 0, false, {
+                                        fileName: "[project]/components/TagFilter.tsx",
+                                        lineNumber: 139,
+                                        columnNumber: 19
+                                    }, ("TURBOPACK compile-time value", void 0)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "text-center py-4",
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "text-sm text-gray-500 dark:text-gray-400",
+                                            children: searchTerm ? 'No tags found matching your search' : 'No tags available'
+                                        }, void 0, false, {
+                                            fileName: "[project]/components/TagFilter.tsx",
+                                            lineNumber: 152,
+                                            columnNumber: 21
+                                        }, ("TURBOPACK compile-time value", void 0))
+                                    }, void 0, false, {
+                                        fileName: "[project]/components/TagFilter.tsx",
+                                        lineNumber: 151,
+                                        columnNumber: 19
+                                    }, ("TURBOPACK compile-time value", void 0))
+                                }, void 0, false, {
+                                    fileName: "[project]/components/TagFilter.tsx",
+                                    lineNumber: 132,
+                                    columnNumber: 15
+                                }, ("TURBOPACK compile-time value", void 0))
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/components/TagFilter.tsx",
+                            lineNumber: 114,
+                            columnNumber: 13
+                        }, ("TURBOPACK compile-time value", void 0))
+                    }, void 0, false, {
+                        fileName: "[project]/components/TagFilter.tsx",
+                        lineNumber: 113,
+                        columnNumber: 11
+                    }, ("TURBOPACK compile-time value", void 0))
+                ]
+            }, void 0, true, {
+                fileName: "[project]/components/TagFilter.tsx",
+                lineNumber: 95,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0)),
+            isOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "fixed inset-0 z-5",
+                onClick: ()=>setIsOpen(false)
+            }, void 0, false, {
+                fileName: "[project]/components/TagFilter.tsx",
+                lineNumber: 165,
+                columnNumber: 9
+            }, ("TURBOPACK compile-time value", void 0))
+        ]
+    }, void 0, true, {
+        fileName: "[project]/components/TagFilter.tsx",
+        lineNumber: 65,
+        columnNumber: 5
+    }, ("TURBOPACK compile-time value", void 0));
+};
+_s(TagFilter, "SfVufn+bd8tf4Ml8pGoVWQWT/hw=");
+_c = TagFilter;
+const __TURBOPACK__default__export__ = TagFilter;
+var _c;
+__turbopack_context__.k.register(_c, "TagFilter");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(module, globalThis.$RefreshHelpers$);
+}
+}}),
 "[project]/components/SearchBar.tsx [app-client] (ecmascript)": ((__turbopack_context__) => {
 "use strict";
 
@@ -9,6 +621,8 @@ __turbopack_context__.s({
     "default": ()=>__TURBOPACK__default__export__
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$TagFilter$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/TagFilter.tsx [app-client] (ecmascript)");
+;
 ;
 const SearchBar = (param)=>{
     let { selectedTags = [], onTagsChange = ()=>{} } = param;
@@ -73,32 +687,10 @@ const SearchBar = (param)=>{
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "flex items-center space-x-3 ml-4",
                         children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                className: "inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-500 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
-                                        className: "w-4 h-4 mr-2",
-                                        fill: "none",
-                                        stroke: "currentColor",
-                                        viewBox: "0 0 24 24",
-                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                                            strokeLinecap: "round",
-                                            strokeLinejoin: "round",
-                                            strokeWidth: 2,
-                                            d: "M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/SearchBar.tsx",
-                                            lineNumber: 38,
-                                            columnNumber: 15
-                                        }, ("TURBOPACK compile-time value", void 0))
-                                    }, void 0, false, {
-                                        fileName: "[project]/components/SearchBar.tsx",
-                                        lineNumber: 37,
-                                        columnNumber: 13
-                                    }, ("TURBOPACK compile-time value", void 0)),
-                                    "Filter"
-                                ]
-                            }, void 0, true, {
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$TagFilter$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                selectedTags: selectedTags,
+                                onTagsChange: onTagsChange
+                            }, void 0, false, {
                                 fileName: "[project]/components/SearchBar.tsx",
                                 lineNumber: 36,
                                 columnNumber: 11
@@ -118,19 +710,19 @@ const SearchBar = (param)=>{
                                             d: "M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"
                                         }, void 0, false, {
                                             fileName: "[project]/components/SearchBar.tsx",
-                                            lineNumber: 46,
+                                            lineNumber: 44,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     }, void 0, false, {
                                         fileName: "[project]/components/SearchBar.tsx",
-                                        lineNumber: 45,
+                                        lineNumber: 43,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     "Sort"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/SearchBar.tsx",
-                                lineNumber: 44,
+                                lineNumber: 42,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -148,19 +740,19 @@ const SearchBar = (param)=>{
                                             d: "M12 6v6m0 0v6m0-6h6m-6 0H6"
                                         }, void 0, false, {
                                             fileName: "[project]/components/SearchBar.tsx",
-                                            lineNumber: 54,
+                                            lineNumber: 52,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     }, void 0, false, {
                                         fileName: "[project]/components/SearchBar.tsx",
-                                        lineNumber: 53,
+                                        lineNumber: 51,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     "Add Task"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/SearchBar.tsx",
-                                lineNumber: 52,
+                                lineNumber: 50,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
@@ -183,7 +775,7 @@ const SearchBar = (param)=>{
                         children: "Quick filters:"
                     }, void 0, false, {
                         fileName: "[project]/components/SearchBar.tsx",
-                        lineNumber: 63,
+                        lineNumber: 61,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -194,7 +786,7 @@ const SearchBar = (param)=>{
                                 children: "Due Today"
                             }, void 0, false, {
                                 fileName: "[project]/components/SearchBar.tsx",
-                                lineNumber: 65,
+                                lineNumber: 63,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -202,7 +794,7 @@ const SearchBar = (param)=>{
                                 children: "Overdue"
                             }, void 0, false, {
                                 fileName: "[project]/components/SearchBar.tsx",
-                                lineNumber: 68,
+                                lineNumber: 66,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -210,7 +802,7 @@ const SearchBar = (param)=>{
                                 children: "My Tasks"
                             }, void 0, false, {
                                 fileName: "[project]/components/SearchBar.tsx",
-                                lineNumber: 71,
+                                lineNumber: 69,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -218,19 +810,19 @@ const SearchBar = (param)=>{
                                 children: "High Priority"
                             }, void 0, false, {
                                 fileName: "[project]/components/SearchBar.tsx",
-                                lineNumber: 74,
+                                lineNumber: 72,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/SearchBar.tsx",
-                        lineNumber: 64,
+                        lineNumber: 62,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/SearchBar.tsx",
-                lineNumber: 62,
+                lineNumber: 60,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0))
         ]
@@ -248,6 +840,379 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
     __turbopack_context__.k.registerExports(module, globalThis.$RefreshHelpers$);
 }
 }}),
+"[project]/components/ui/TagSelector.tsx [app-client] (ecmascript)": ((__turbopack_context__) => {
+"use strict";
+
+var { k: __turbopack_refresh__, m: module } = __turbopack_context__;
+{
+__turbopack_context__.s({
+    "default": ()=>__TURBOPACK__default__export__
+});
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$tagService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/services/tagService.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$TagBadge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/ui/TagBadge.tsx [app-client] (ecmascript)");
+;
+var _s = __turbopack_context__.k.signature();
+;
+;
+;
+const TagSelector = (param)=>{
+    let { selectedTags, onTagsChange, placeholder = "Search or select tags...", maxTags, allowCreate = true, className = '', disabled = false } = param;
+    _s();
+    const [isOpen, setIsOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [searchTerm, setSearchTerm] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('');
+    const [availableTags, setAvailableTags] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const inputRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const dropdownRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    // Load available tags
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "TagSelector.useEffect": ()=>{
+            loadAvailableTags();
+        }
+    }["TagSelector.useEffect"], []);
+    // Search tags when search term changes
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "TagSelector.useEffect": ()=>{
+            if (searchTerm.trim()) {
+                searchTags(searchTerm);
+            } else {
+                loadAvailableTags();
+            }
+        }
+    }["TagSelector.useEffect"], [
+        searchTerm
+    ]);
+    // Close dropdown when clicking outside
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "TagSelector.useEffect": ()=>{
+            const handleClickOutside = {
+                "TagSelector.useEffect.handleClickOutside": (event)=>{
+                    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                        setIsOpen(false);
+                    }
+                }
+            }["TagSelector.useEffect.handleClickOutside"];
+            document.addEventListener('mousedown', handleClickOutside);
+            return ({
+                "TagSelector.useEffect": ()=>document.removeEventListener('mousedown', handleClickOutside)
+            })["TagSelector.useEffect"];
+        }
+    }["TagSelector.useEffect"], []);
+    const loadAvailableTags = async ()=>{
+        try {
+            setIsLoading(true);
+            setError(null);
+            const tags = await __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$tagService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["tagService"].getTags();
+            // Filter out already selected tags
+            const filteredTags = tags.filter((tag)=>!selectedTags.some((selected)=>selected.id === tag.id));
+            setAvailableTags(filteredTags);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to load tags');
+        } finally{
+            setIsLoading(false);
+        }
+    };
+    const searchTags = async (term)=>{
+        try {
+            setIsLoading(true);
+            setError(null);
+            const tags = await __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$tagService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["tagService"].searchTags(term);
+            // Filter out already selected tags
+            const filteredTags = tags.filter((tag)=>!selectedTags.some((selected)=>selected.id === tag.id));
+            setAvailableTags(filteredTags);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to search tags');
+        } finally{
+            setIsLoading(false);
+        }
+    };
+    const handleTagSelect = (tag)=>{
+        if (maxTags && selectedTags.length >= maxTags) {
+            return;
+        }
+        onTagsChange([
+            ...selectedTags,
+            tag
+        ]);
+        setSearchTerm('');
+        setIsOpen(false);
+    };
+    const handleTagRemove = (tagId)=>{
+        onTagsChange(selectedTags.filter((tag)=>tag.id !== tagId));
+    };
+    const handleCreateTag = async ()=>{
+        if (!allowCreate || !searchTerm.trim()) return;
+        try {
+            setIsLoading(true);
+            setError(null);
+            const newTag = await __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$tagService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["tagService"].createTag({
+                name: searchTerm.trim(),
+                color: generateRandomColor()
+            });
+            onTagsChange([
+                ...selectedTags,
+                newTag
+            ]);
+            setSearchTerm('');
+            setIsOpen(false);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to create tag');
+        } finally{
+            setIsLoading(false);
+        }
+    };
+    const generateRandomColor = ()=>{
+        const colors = [
+            '#3B82F6',
+            '#10B981',
+            '#8B5CF6',
+            '#F59E0B',
+            '#EF4444',
+            '#06B6D4',
+            '#84CC16',
+            '#F97316',
+            '#EC4899',
+            '#6366F1'
+        ];
+        return colors[Math.floor(Math.random() * colors.length)];
+    };
+    const handleInputFocus = ()=>{
+        if (!disabled) {
+            setIsOpen(true);
+        }
+    };
+    const handleKeyDown = (e)=>{
+        if (e.key === 'Enter' && searchTerm.trim()) {
+            e.preventDefault();
+            if (availableTags.length > 0) {
+                handleTagSelect(availableTags[0]);
+            } else if (allowCreate) {
+                handleCreateTag();
+            }
+        } else if (e.key === 'Escape') {
+            setIsOpen(false);
+        }
+    };
+    const canCreateTag = allowCreate && searchTerm.trim() && !availableTags.some((tag)=>tag.name.toLowerCase() === searchTerm.toLowerCase());
+    // Debug info
+    console.log('TagSelector Debug:', {
+        allowCreate,
+        searchTerm: searchTerm.trim(),
+        canCreateTag,
+        availableTagsCount: availableTags.length
+    });
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "relative ".concat(className),
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "flex flex-wrap gap-2 mb-2",
+                children: selectedTags.map((tag)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$TagBadge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                        tag: tag,
+                        size: "sm",
+                        removable: true,
+                        onRemove: handleTagRemove
+                    }, tag.id, false, {
+                        fileName: "[project]/components/ui/TagSelector.tsx",
+                        lineNumber: 174,
+                        columnNumber: 11
+                    }, ("TURBOPACK compile-time value", void 0)))
+            }, void 0, false, {
+                fileName: "[project]/components/ui/TagSelector.tsx",
+                lineNumber: 172,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0)),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "relative",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                        ref: inputRef,
+                        type: "text",
+                        value: searchTerm,
+                        onChange: (e)=>setSearchTerm(e.target.value),
+                        onFocus: handleInputFocus,
+                        onKeyDown: handleKeyDown,
+                        placeholder: placeholder,
+                        disabled: disabled,
+                        className: "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                    }, void 0, false, {
+                        fileName: "[project]/components/ui/TagSelector.tsx",
+                        lineNumber: 186,
+                        columnNumber: 9
+                    }, ("TURBOPACK compile-time value", void 0)),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                            className: "w-4 h-4 text-gray-400",
+                            fill: "none",
+                            stroke: "currentColor",
+                            viewBox: "0 0 24 24",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                strokeLinecap: "round",
+                                strokeLinejoin: "round",
+                                strokeWidth: 2,
+                                d: "M19 9l-7 7-7-7"
+                            }, void 0, false, {
+                                fileName: "[project]/components/ui/TagSelector.tsx",
+                                lineNumber: 201,
+                                columnNumber: 13
+                            }, ("TURBOPACK compile-time value", void 0))
+                        }, void 0, false, {
+                            fileName: "[project]/components/ui/TagSelector.tsx",
+                            lineNumber: 200,
+                            columnNumber: 11
+                        }, ("TURBOPACK compile-time value", void 0))
+                    }, void 0, false, {
+                        fileName: "[project]/components/ui/TagSelector.tsx",
+                        lineNumber: 199,
+                        columnNumber: 9
+                    }, ("TURBOPACK compile-time value", void 0))
+                ]
+            }, void 0, true, {
+                fileName: "[project]/components/ui/TagSelector.tsx",
+                lineNumber: 185,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0)),
+            isOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                ref: dropdownRef,
+                className: "absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto",
+                children: [
+                    isLoading && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "px-3 py-2 text-sm text-gray-500 dark:text-gray-400",
+                        children: "Loading..."
+                    }, void 0, false, {
+                        fileName: "[project]/components/ui/TagSelector.tsx",
+                        lineNumber: 213,
+                        columnNumber: 13
+                    }, ("TURBOPACK compile-time value", void 0)),
+                    error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "px-3 py-2 text-sm text-red-600 dark:text-red-400",
+                        children: error
+                    }, void 0, false, {
+                        fileName: "[project]/components/ui/TagSelector.tsx",
+                        lineNumber: 219,
+                        columnNumber: 13
+                    }, ("TURBOPACK compile-time value", void 0)),
+                    !isLoading && !error && availableTags.length === 0 && !searchTerm.trim() && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "px-3 py-2 text-sm text-gray-500 dark:text-gray-400",
+                        children: "No tags available"
+                    }, void 0, false, {
+                        fileName: "[project]/components/ui/TagSelector.tsx",
+                        lineNumber: 225,
+                        columnNumber: 13
+                    }, ("TURBOPACK compile-time value", void 0)),
+                    !isLoading && !error && availableTags.length === 0 && searchTerm.trim() && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "px-3 py-2 text-sm text-gray-500 dark:text-gray-400",
+                        children: "No tags found"
+                    }, void 0, false, {
+                        fileName: "[project]/components/ui/TagSelector.tsx",
+                        lineNumber: 231,
+                        columnNumber: 13
+                    }, ("TURBOPACK compile-time value", void 0)),
+                    availableTags.map((tag)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                            onClick: ()=>handleTagSelect(tag),
+                            className: "w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$TagBadge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                tag: tag,
+                                size: "sm"
+                            }, void 0, false, {
+                                fileName: "[project]/components/ui/TagSelector.tsx",
+                                lineNumber: 243,
+                                columnNumber: 15
+                            }, ("TURBOPACK compile-time value", void 0))
+                        }, tag.id, false, {
+                            fileName: "[project]/components/ui/TagSelector.tsx",
+                            lineNumber: 238,
+                            columnNumber: 13
+                        }, ("TURBOPACK compile-time value", void 0))),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "px-3 py-1 text-xs text-gray-400 border-t border-gray-200 dark:border-gray-600",
+                        children: [
+                            "Debug: allowCreate=",
+                            allowCreate.toString(),
+                            ', searchTerm="',
+                            searchTerm.trim(),
+                            '", canCreate=',
+                            canCreateTag.toString()
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/components/ui/TagSelector.tsx",
+                        lineNumber: 248,
+                        columnNumber: 11
+                    }, ("TURBOPACK compile-time value", void 0)),
+                    canCreateTag && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                        onClick: handleCreateTag,
+                        className: "w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none border-t border-gray-200 dark:border-gray-600",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "flex items-center gap-2",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                    className: "w-4 h-4 text-green-500",
+                                    fill: "none",
+                                    stroke: "currentColor",
+                                    viewBox: "0 0 24 24",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                        strokeLinecap: "round",
+                                        strokeLinejoin: "round",
+                                        strokeWidth: 2,
+                                        d: "M12 6v6m0 0v6m0-6h6m-6 0H6"
+                                    }, void 0, false, {
+                                        fileName: "[project]/components/ui/TagSelector.tsx",
+                                        lineNumber: 260,
+                                        columnNumber: 19
+                                    }, ("TURBOPACK compile-time value", void 0))
+                                }, void 0, false, {
+                                    fileName: "[project]/components/ui/TagSelector.tsx",
+                                    lineNumber: 259,
+                                    columnNumber: 17
+                                }, ("TURBOPACK compile-time value", void 0)),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    className: "text-sm text-green-600 dark:text-green-400",
+                                    children: [
+                                        'Create "',
+                                        searchTerm.trim(),
+                                        '"'
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/components/ui/TagSelector.tsx",
+                                    lineNumber: 262,
+                                    columnNumber: 17
+                                }, ("TURBOPACK compile-time value", void 0))
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/components/ui/TagSelector.tsx",
+                            lineNumber: 258,
+                            columnNumber: 15
+                        }, ("TURBOPACK compile-time value", void 0))
+                    }, void 0, false, {
+                        fileName: "[project]/components/ui/TagSelector.tsx",
+                        lineNumber: 254,
+                        columnNumber: 13
+                    }, ("TURBOPACK compile-time value", void 0))
+                ]
+            }, void 0, true, {
+                fileName: "[project]/components/ui/TagSelector.tsx",
+                lineNumber: 208,
+                columnNumber: 9
+            }, ("TURBOPACK compile-time value", void 0))
+        ]
+    }, void 0, true, {
+        fileName: "[project]/components/ui/TagSelector.tsx",
+        lineNumber: 170,
+        columnNumber: 5
+    }, ("TURBOPACK compile-time value", void 0));
+};
+_s(TagSelector, "7L+e4V6LpQedwjdiJ8LgJEPP0Ao=");
+_c = TagSelector;
+const __TURBOPACK__default__export__ = TagSelector;
+var _c;
+__turbopack_context__.k.register(_c, "TagSelector");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(module, globalThis.$RefreshHelpers$);
+}
+}}),
 "[project]/components/TaskEditForm.tsx [app-client] (ecmascript)": ((__turbopack_context__) => {
 "use strict";
 
@@ -258,9 +1223,11 @@ __turbopack_context__.s({
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$TagSelector$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/ui/TagSelector.tsx [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
+;
 ;
 const TaskEditForm = (param)=>{
     let { isOpen, onClose, task, onSubmit } = param;
@@ -275,6 +1242,7 @@ const TaskEditForm = (param)=>{
     });
     const [errors, setErrors] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({});
     const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [selectedTags, setSelectedTags] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
     // Populate form when task changes
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "TaskEditForm.useEffect": ()=>{
@@ -286,6 +1254,7 @@ const TaskEditForm = (param)=>{
                     priority: task.priority,
                     dueDate: task.dueDate ? task.dueDate.split('T')[0] : ""
                 });
+                setSelectedTags(task.tags || []); // Populate existing tags
                 setErrors({}); // Clear any previous errors
             }
         }
@@ -324,7 +1293,7 @@ const TaskEditForm = (param)=>{
         }
         setIsLoading(true);
         try {
-            await onSubmit(task.id, formData);
+            await onSubmit(task.id, formData, selectedTags);
             onClose();
         } catch (error) {
             setErrors({
@@ -350,7 +1319,7 @@ const TaskEditForm = (param)=>{
                                 children: "Edit Task"
                             }, void 0, false, {
                                 fileName: "[project]/components/TaskEditForm.tsx",
-                                lineNumber: 97,
+                                lineNumber: 101,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -368,23 +1337,23 @@ const TaskEditForm = (param)=>{
                                         d: "M6 18L18 6M6 6l12 12"
                                     }, void 0, false, {
                                         fileName: "[project]/components/TaskEditForm.tsx",
-                                        lineNumber: 103,
+                                        lineNumber: 107,
                                         columnNumber: 17
                                     }, ("TURBOPACK compile-time value", void 0))
                                 }, void 0, false, {
                                     fileName: "[project]/components/TaskEditForm.tsx",
-                                    lineNumber: 102,
+                                    lineNumber: 106,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0))
                             }, void 0, false, {
                                 fileName: "[project]/components/TaskEditForm.tsx",
-                                lineNumber: 98,
+                                lineNumber: 102,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/TaskEditForm.tsx",
-                        lineNumber: 96,
+                        lineNumber: 100,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -396,7 +1365,7 @@ const TaskEditForm = (param)=>{
                                 children: errors.general
                             }, void 0, false, {
                                 fileName: "[project]/components/TaskEditForm.tsx",
-                                lineNumber: 110,
+                                lineNumber: 114,
                                 columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -407,7 +1376,7 @@ const TaskEditForm = (param)=>{
                                         children: "Title *"
                                     }, void 0, false, {
                                         fileName: "[project]/components/TaskEditForm.tsx",
-                                        lineNumber: 116,
+                                        lineNumber: 120,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -420,7 +1389,7 @@ const TaskEditForm = (param)=>{
                                         placeholder: "Enter task title"
                                     }, void 0, false, {
                                         fileName: "[project]/components/TaskEditForm.tsx",
-                                        lineNumber: 119,
+                                        lineNumber: 123,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     errors.title && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -428,13 +1397,13 @@ const TaskEditForm = (param)=>{
                                         children: errors.title
                                     }, void 0, false, {
                                         fileName: "[project]/components/TaskEditForm.tsx",
-                                        lineNumber: 131,
+                                        lineNumber: 135,
                                         columnNumber: 17
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/TaskEditForm.tsx",
-                                lineNumber: 115,
+                                lineNumber: 119,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -445,7 +1414,7 @@ const TaskEditForm = (param)=>{
                                         children: "Description"
                                     }, void 0, false, {
                                         fileName: "[project]/components/TaskEditForm.tsx",
-                                        lineNumber: 136,
+                                        lineNumber: 140,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
@@ -458,13 +1427,13 @@ const TaskEditForm = (param)=>{
                                         placeholder: "Enter task description"
                                     }, void 0, false, {
                                         fileName: "[project]/components/TaskEditForm.tsx",
-                                        lineNumber: 139,
+                                        lineNumber: 143,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/TaskEditForm.tsx",
-                                lineNumber: 135,
+                                lineNumber: 139,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -475,7 +1444,7 @@ const TaskEditForm = (param)=>{
                                         children: "Status"
                                     }, void 0, false, {
                                         fileName: "[project]/components/TaskEditForm.tsx",
-                                        lineNumber: 151,
+                                        lineNumber: 155,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -490,7 +1459,7 @@ const TaskEditForm = (param)=>{
                                                 children: "To Do"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/TaskEditForm.tsx",
-                                                lineNumber: 161,
+                                                lineNumber: 165,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0)),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -498,7 +1467,7 @@ const TaskEditForm = (param)=>{
                                                 children: "In Progress"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/TaskEditForm.tsx",
-                                                lineNumber: 162,
+                                                lineNumber: 166,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0)),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -506,19 +1475,19 @@ const TaskEditForm = (param)=>{
                                                 children: "Done"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/TaskEditForm.tsx",
-                                                lineNumber: 163,
+                                                lineNumber: 167,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/TaskEditForm.tsx",
-                                        lineNumber: 154,
+                                        lineNumber: 158,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/TaskEditForm.tsx",
-                                lineNumber: 150,
+                                lineNumber: 154,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -529,7 +1498,7 @@ const TaskEditForm = (param)=>{
                                         children: "Priority"
                                     }, void 0, false, {
                                         fileName: "[project]/components/TaskEditForm.tsx",
-                                        lineNumber: 168,
+                                        lineNumber: 172,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -544,7 +1513,7 @@ const TaskEditForm = (param)=>{
                                                 children: "Low"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/TaskEditForm.tsx",
-                                                lineNumber: 178,
+                                                lineNumber: 182,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0)),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -552,7 +1521,7 @@ const TaskEditForm = (param)=>{
                                                 children: "Medium"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/TaskEditForm.tsx",
-                                                lineNumber: 179,
+                                                lineNumber: 183,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0)),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -560,19 +1529,19 @@ const TaskEditForm = (param)=>{
                                                 children: "High"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/TaskEditForm.tsx",
-                                                lineNumber: 180,
+                                                lineNumber: 184,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/TaskEditForm.tsx",
-                                        lineNumber: 171,
+                                        lineNumber: 175,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/TaskEditForm.tsx",
-                                lineNumber: 167,
+                                lineNumber: 171,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -583,7 +1552,7 @@ const TaskEditForm = (param)=>{
                                         children: "Due Date"
                                     }, void 0, false, {
                                         fileName: "[project]/components/TaskEditForm.tsx",
-                                        lineNumber: 185,
+                                        lineNumber: 189,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -595,7 +1564,7 @@ const TaskEditForm = (param)=>{
                                         className: "w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 ".concat(errors.dueDate ? "border-red-300" : "border-gray-300")
                                     }, void 0, false, {
                                         fileName: "[project]/components/TaskEditForm.tsx",
-                                        lineNumber: 188,
+                                        lineNumber: 192,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     errors.dueDate && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -603,13 +1572,39 @@ const TaskEditForm = (param)=>{
                                         children: errors.dueDate
                                     }, void 0, false, {
                                         fileName: "[project]/components/TaskEditForm.tsx",
-                                        lineNumber: 199,
+                                        lineNumber: 203,
                                         columnNumber: 17
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/TaskEditForm.tsx",
-                                lineNumber: 184,
+                                lineNumber: 188,
+                                columnNumber: 13
+                            }, ("TURBOPACK compile-time value", void 0)),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        className: "block text-sm font-medium text-gray-700 mb-1",
+                                        children: "Tags"
+                                    }, void 0, false, {
+                                        fileName: "[project]/components/TaskEditForm.tsx",
+                                        lineNumber: 208,
+                                        columnNumber: 15
+                                    }, ("TURBOPACK compile-time value", void 0)),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$TagSelector$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                        selectedTags: selectedTags,
+                                        onTagsChange: setSelectedTags,
+                                        allowCreate: true,
+                                        placeholder: "Select or create tags..."
+                                    }, void 0, false, {
+                                        fileName: "[project]/components/TaskEditForm.tsx",
+                                        lineNumber: 211,
+                                        columnNumber: 15
+                                    }, ("TURBOPACK compile-time value", void 0))
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/components/TaskEditForm.tsx",
+                                lineNumber: 207,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -623,7 +1618,7 @@ const TaskEditForm = (param)=>{
                                                     children: "Created:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/TaskEditForm.tsx",
-                                                    lineNumber: 206,
+                                                    lineNumber: 222,
                                                     columnNumber: 20
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 " ",
@@ -631,7 +1626,7 @@ const TaskEditForm = (param)=>{
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/TaskEditForm.tsx",
-                                            lineNumber: 206,
+                                            lineNumber: 222,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -640,7 +1635,7 @@ const TaskEditForm = (param)=>{
                                                     children: "Last Updated:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/TaskEditForm.tsx",
-                                                    lineNumber: 207,
+                                                    lineNumber: 223,
                                                     columnNumber: 20
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 " ",
@@ -648,7 +1643,7 @@ const TaskEditForm = (param)=>{
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/TaskEditForm.tsx",
-                                            lineNumber: 207,
+                                            lineNumber: 223,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -657,7 +1652,7 @@ const TaskEditForm = (param)=>{
                                                     children: "Owner:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/TaskEditForm.tsx",
-                                                    lineNumber: 208,
+                                                    lineNumber: 224,
                                                     columnNumber: 20
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 " ",
@@ -665,18 +1660,18 @@ const TaskEditForm = (param)=>{
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/TaskEditForm.tsx",
-                                            lineNumber: 208,
+                                            lineNumber: 224,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/TaskEditForm.tsx",
-                                    lineNumber: 205,
+                                    lineNumber: 221,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0))
                             }, void 0, false, {
                                 fileName: "[project]/components/TaskEditForm.tsx",
-                                lineNumber: 204,
+                                lineNumber: 220,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -689,7 +1684,7 @@ const TaskEditForm = (param)=>{
                                         children: "Cancel"
                                     }, void 0, false, {
                                         fileName: "[project]/components/TaskEditForm.tsx",
-                                        lineNumber: 213,
+                                        lineNumber: 229,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -699,39 +1694,39 @@ const TaskEditForm = (param)=>{
                                         children: isLoading ? "Updating..." : "Update Task"
                                     }, void 0, false, {
                                         fileName: "[project]/components/TaskEditForm.tsx",
-                                        lineNumber: 220,
+                                        lineNumber: 236,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/TaskEditForm.tsx",
-                                lineNumber: 212,
+                                lineNumber: 228,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/TaskEditForm.tsx",
-                        lineNumber: 108,
+                        lineNumber: 112,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/TaskEditForm.tsx",
-                lineNumber: 95,
+                lineNumber: 99,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0))
         }, void 0, false, {
             fileName: "[project]/components/TaskEditForm.tsx",
-            lineNumber: 94,
+            lineNumber: 98,
             columnNumber: 7
         }, ("TURBOPACK compile-time value", void 0))
     }, void 0, false, {
         fileName: "[project]/components/TaskEditForm.tsx",
-        lineNumber: 93,
+        lineNumber: 97,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
-_s(TaskEditForm, "cZa7qVob+Su1rBP/kxCka/51KIE=");
+_s(TaskEditForm, "rIeFO9zn6qJhs3GrR73mMcmeIm0=");
 _c = TaskEditForm;
 const __TURBOPACK__default__export__ = TaskEditForm;
 var _c;
@@ -1260,669 +2255,6 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
     __turbopack_context__.k.registerExports(module, globalThis.$RefreshHelpers$);
 }
 }}),
-"[project]/components/ui/TagBadge.tsx [app-client] (ecmascript)": ((__turbopack_context__) => {
-"use strict";
-
-var { k: __turbopack_refresh__, m: module } = __turbopack_context__;
-{
-__turbopack_context__.s({
-    "default": ()=>__TURBOPACK__default__export__
-});
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
-;
-const TagBadge = (param)=>{
-    let { tag, size = 'md', removable = false, onRemove, className = '' } = param;
-    const sizeClasses = {
-        sm: 'px-2 py-1 text-xs',
-        md: 'px-2.5 py-1 text-sm',
-        lg: 'px-3 py-1.5 text-base'
-    };
-    const baseClasses = 'inline-flex items-center gap-1.5 rounded-full font-medium transition-colors';
-    // Use tag color if available, otherwise use default colors
-    const getTagStyles = ()=>{
-        if (tag.color) {
-            return {
-                backgroundColor: tag.color,
-                color: getContrastColor(tag.color)
-            };
-        }
-        // Default color scheme based on tag name hash
-        const hash = tag.name.split('').reduce((a, b)=>{
-            a = (a << 5) - a + b.charCodeAt(0);
-            return a & a;
-        }, 0);
-        const colors = [
-            'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-            'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-            'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-            'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200',
-            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-            'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
-            'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-            'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
-        ];
-        return colors[Math.abs(hash) % colors.length];
-    };
-    const handleRemove = (e)=>{
-        e.stopPropagation();
-        onRemove === null || onRemove === void 0 ? void 0 : onRemove(tag.id);
-    };
-    const tagStyles = tag.color ? getTagStyles() : getTagStyles();
-    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-        className: "".concat(baseClasses, " ").concat(sizeClasses[size], " ").concat(tagStyles, " ").concat(className),
-        style: tag.color ? {
-            backgroundColor: tag.color,
-            color: getContrastColor(tag.color)
-        } : undefined,
-        title: tag.description || tag.name,
-        children: [
-            tag.name,
-            removable && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                onClick: handleRemove,
-                className: "ml-1 hover:opacity-70 transition-opacity",
-                "aria-label": "Remove ".concat(tag.name, " tag"),
-                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
-                    className: "w-3 h-3",
-                    fill: "currentColor",
-                    viewBox: "0 0 20 20",
-                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                        fillRule: "evenodd",
-                        d: "M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z",
-                        clipRule: "evenodd"
-                    }, void 0, false, {
-                        fileName: "[project]/components/ui/TagBadge.tsx",
-                        lineNumber: 77,
-                        columnNumber: 13
-                    }, ("TURBOPACK compile-time value", void 0))
-                }, void 0, false, {
-                    fileName: "[project]/components/ui/TagBadge.tsx",
-                    lineNumber: 76,
-                    columnNumber: 11
-                }, ("TURBOPACK compile-time value", void 0))
-            }, void 0, false, {
-                fileName: "[project]/components/ui/TagBadge.tsx",
-                lineNumber: 71,
-                columnNumber: 9
-            }, ("TURBOPACK compile-time value", void 0))
-        ]
-    }, void 0, true, {
-        fileName: "[project]/components/ui/TagBadge.tsx",
-        lineNumber: 64,
-        columnNumber: 5
-    }, ("TURBOPACK compile-time value", void 0));
-};
-_c = TagBadge;
-// Helper function to determine if text should be light or dark based on background color
-function getContrastColor(hexColor) {
-    // Remove # if present
-    const hex = hexColor.replace('#', '');
-    // Convert to RGB
-    const r = parseInt(hex.substr(0, 2), 16);
-    const g = parseInt(hex.substr(2, 2), 16);
-    const b = parseInt(hex.substr(4, 2), 16);
-    // Calculate luminance
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    // Return white for dark backgrounds, black for light backgrounds
-    return luminance > 0.5 ? '#000000' : '#ffffff';
-}
-const __TURBOPACK__default__export__ = TagBadge;
-var _c;
-__turbopack_context__.k.register(_c, "TagBadge");
-if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
-    __turbopack_context__.k.registerExports(module, globalThis.$RefreshHelpers$);
-}
-}}),
-"[project]/services/tagService.ts [app-client] (ecmascript)": ((__turbopack_context__) => {
-"use strict";
-
-var { k: __turbopack_refresh__, m: module } = __turbopack_context__;
-{
-__turbopack_context__.s({
-    "tagService": ()=>tagService
-});
-var __TURBOPACK__imported__module__$5b$project$5d2f$config$2f$auth$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/config/auth.ts [app-client] (ecmascript)");
-;
-class TagService {
-    getAuthHeaders() {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            throw new Error("No authentication token found");
-        }
-        return {
-            "Content-Type": "application/json",
-            Authorization: "Bearer ".concat(token)
-        };
-    }
-    getBaseUrl() {
-        return __TURBOPACK__imported__module__$5b$project$5d2f$config$2f$auth$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["authConfig"].backendUrl;
-    }
-    async getTags() {
-        try {
-            const response = await fetch("".concat(this.getBaseUrl(), "/api/tag"), {
-                headers: this.getAuthHeaders()
-            });
-            if (!response.ok) {
-                throw new Error("Failed to fetch tags: ".concat(response.statusText));
-            }
-            const data = await response.json();
-            return data.tags || [];
-        } catch (error) {
-            console.error("Error fetching tags:", error);
-            throw error;
-        }
-    }
-    async getTagById(id) {
-        try {
-            const response = await fetch("".concat(this.getBaseUrl(), "/api/tag/").concat(id), {
-                headers: this.getAuthHeaders()
-            });
-            if (!response.ok) {
-                throw new Error("Failed to fetch tag: ".concat(response.statusText));
-            }
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error("Error fetching tag:", error);
-            throw error;
-        }
-    }
-    async createTag(tagData) {
-        try {
-            const response = await fetch("".concat(this.getBaseUrl(), "/api/tag"), {
-                method: "POST",
-                headers: this.getAuthHeaders(),
-                body: JSON.stringify(tagData)
-            });
-            if (!response.ok) {
-                const errorText = await response.text();
-                let errorMessage = "Failed to create tag: ".concat(response.statusText);
-                try {
-                    const errorData = JSON.parse(errorText);
-                    errorMessage = errorData.error || errorData.message || errorMessage;
-                } catch (e) {
-                    errorMessage = errorText || errorMessage;
-                }
-                throw new Error(errorMessage);
-            }
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error("Error creating tag:", error);
-            throw error;
-        }
-    }
-    async updateTag(id, tagData) {
-        try {
-            const response = await fetch("".concat(this.getBaseUrl(), "/api/tag/").concat(id), {
-                method: "PUT",
-                headers: this.getAuthHeaders(),
-                body: JSON.stringify(tagData)
-            });
-            if (!response.ok) {
-                const errorData = await response.json().catch(()=>({}));
-                throw new Error(errorData.error || errorData.message || "Failed to update tag: ".concat(response.statusText));
-            }
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error("Error updating tag:", error);
-            throw error;
-        }
-    }
-    async deleteTag(id) {
-        try {
-            const response = await fetch("".concat(this.getBaseUrl(), "/api/tag/").concat(id), {
-                method: "DELETE",
-                headers: this.getAuthHeaders()
-            });
-            if (!response.ok) {
-                const errorData = await response.json().catch(()=>({}));
-                throw new Error(errorData.error || errorData.message || "Failed to delete tag: ".concat(response.statusText));
-            }
-        } catch (error) {
-            console.error("Error deleting tag:", error);
-            throw error;
-        }
-    }
-    async searchTags(searchTerm) {
-        try {
-            const response = await fetch("".concat(this.getBaseUrl(), "/api/tag/search?q=").concat(encodeURIComponent(searchTerm)), {
-                headers: this.getAuthHeaders()
-            });
-            if (!response.ok) {
-                throw new Error("Failed to search tags: ".concat(response.statusText));
-            }
-            const data = await response.json();
-            return data.tags || [];
-        } catch (error) {
-            console.error("Error searching tags:", error);
-            throw error;
-        }
-    }
-    async assignTagToTask(taskId, tagId) {
-        try {
-            const response = await fetch("".concat(this.getBaseUrl(), "/api/tag/").concat(tagId, "/assign/").concat(taskId), {
-                method: "POST",
-                headers: this.getAuthHeaders()
-            });
-            if (!response.ok) {
-                const errorData = await response.json().catch(()=>({}));
-                throw new Error(errorData.error || errorData.message || "Failed to assign tag to task: ".concat(response.statusText));
-            }
-        } catch (error) {
-            console.error("Error assigning tag to task:", error);
-            throw error;
-        }
-    }
-    async removeTagFromTask(taskId, tagId) {
-        try {
-            const response = await fetch("".concat(this.getBaseUrl(), "/api/tag/").concat(tagId, "/assign/").concat(taskId), {
-                method: "DELETE",
-                headers: this.getAuthHeaders()
-            });
-            if (!response.ok) {
-                const errorData = await response.json().catch(()=>({}));
-                throw new Error(errorData.error || errorData.message || "Failed to remove tag from task: ".concat(response.statusText));
-            }
-        } catch (error) {
-            console.error("Error removing tag from task:", error);
-            throw error;
-        }
-    }
-    async getTagsForTask(taskId) {
-        try {
-            const response = await fetch("".concat(this.getBaseUrl(), "/api/tag/task/").concat(taskId), {
-                headers: this.getAuthHeaders()
-            });
-            if (!response.ok) {
-                throw new Error("Failed to fetch tags for task: ".concat(response.statusText));
-            }
-            const data = await response.json();
-            return data.tags || [];
-        } catch (error) {
-            console.error("Error fetching tags for task:", error);
-            throw error;
-        }
-    }
-}
-const tagService = new TagService();
-if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
-    __turbopack_context__.k.registerExports(module, globalThis.$RefreshHelpers$);
-}
-}}),
-"[project]/components/ui/TagSelector.tsx [app-client] (ecmascript)": ((__turbopack_context__) => {
-"use strict";
-
-var { k: __turbopack_refresh__, m: module } = __turbopack_context__;
-{
-__turbopack_context__.s({
-    "default": ()=>__TURBOPACK__default__export__
-});
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$tagService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/services/tagService.ts [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$TagBadge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/ui/TagBadge.tsx [app-client] (ecmascript)");
-;
-var _s = __turbopack_context__.k.signature();
-;
-;
-;
-const TagSelector = (param)=>{
-    let { selectedTags, onTagsChange, placeholder = "Search or select tags...", maxTags, allowCreate = true, className = '', disabled = false } = param;
-    _s();
-    const [isOpen, setIsOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
-    const [searchTerm, setSearchTerm] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('');
-    const [availableTags, setAvailableTags] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
-    const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
-    const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
-    const inputRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
-    const dropdownRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
-    // Load available tags
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "TagSelector.useEffect": ()=>{
-            loadAvailableTags();
-        }
-    }["TagSelector.useEffect"], []);
-    // Search tags when search term changes
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "TagSelector.useEffect": ()=>{
-            if (searchTerm.trim()) {
-                searchTags(searchTerm);
-            } else {
-                loadAvailableTags();
-            }
-        }
-    }["TagSelector.useEffect"], [
-        searchTerm
-    ]);
-    // Close dropdown when clicking outside
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "TagSelector.useEffect": ()=>{
-            const handleClickOutside = {
-                "TagSelector.useEffect.handleClickOutside": (event)=>{
-                    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                        setIsOpen(false);
-                    }
-                }
-            }["TagSelector.useEffect.handleClickOutside"];
-            document.addEventListener('mousedown', handleClickOutside);
-            return ({
-                "TagSelector.useEffect": ()=>document.removeEventListener('mousedown', handleClickOutside)
-            })["TagSelector.useEffect"];
-        }
-    }["TagSelector.useEffect"], []);
-    const loadAvailableTags = async ()=>{
-        try {
-            setIsLoading(true);
-            setError(null);
-            const tags = await __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$tagService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["tagService"].getTags();
-            // Filter out already selected tags
-            const filteredTags = tags.filter((tag)=>!selectedTags.some((selected)=>selected.id === tag.id));
-            setAvailableTags(filteredTags);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to load tags');
-        } finally{
-            setIsLoading(false);
-        }
-    };
-    const searchTags = async (term)=>{
-        try {
-            setIsLoading(true);
-            setError(null);
-            const tags = await __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$tagService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["tagService"].searchTags(term);
-            // Filter out already selected tags
-            const filteredTags = tags.filter((tag)=>!selectedTags.some((selected)=>selected.id === tag.id));
-            setAvailableTags(filteredTags);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to search tags');
-        } finally{
-            setIsLoading(false);
-        }
-    };
-    const handleTagSelect = (tag)=>{
-        if (maxTags && selectedTags.length >= maxTags) {
-            return;
-        }
-        onTagsChange([
-            ...selectedTags,
-            tag
-        ]);
-        setSearchTerm('');
-        setIsOpen(false);
-    };
-    const handleTagRemove = (tagId)=>{
-        onTagsChange(selectedTags.filter((tag)=>tag.id !== tagId));
-    };
-    const handleCreateTag = async ()=>{
-        if (!allowCreate || !searchTerm.trim()) return;
-        try {
-            setIsLoading(true);
-            setError(null);
-            const newTag = await __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$tagService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["tagService"].createTag({
-                name: searchTerm.trim(),
-                color: generateRandomColor()
-            });
-            onTagsChange([
-                ...selectedTags,
-                newTag
-            ]);
-            setSearchTerm('');
-            setIsOpen(false);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to create tag');
-        } finally{
-            setIsLoading(false);
-        }
-    };
-    const generateRandomColor = ()=>{
-        const colors = [
-            '#3B82F6',
-            '#10B981',
-            '#8B5CF6',
-            '#F59E0B',
-            '#EF4444',
-            '#06B6D4',
-            '#84CC16',
-            '#F97316',
-            '#EC4899',
-            '#6366F1'
-        ];
-        return colors[Math.floor(Math.random() * colors.length)];
-    };
-    const handleInputFocus = ()=>{
-        if (!disabled) {
-            setIsOpen(true);
-        }
-    };
-    const handleKeyDown = (e)=>{
-        if (e.key === 'Enter' && searchTerm.trim()) {
-            e.preventDefault();
-            if (availableTags.length > 0) {
-                handleTagSelect(availableTags[0]);
-            } else if (allowCreate) {
-                handleCreateTag();
-            }
-        } else if (e.key === 'Escape') {
-            setIsOpen(false);
-        }
-    };
-    const canCreateTag = allowCreate && searchTerm.trim() && !availableTags.some((tag)=>tag.name.toLowerCase() === searchTerm.toLowerCase());
-    // Debug info
-    console.log('TagSelector Debug:', {
-        allowCreate,
-        searchTerm: searchTerm.trim(),
-        canCreateTag,
-        availableTagsCount: availableTags.length
-    });
-    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "relative ".concat(className),
-        children: [
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "flex flex-wrap gap-2 mb-2",
-                children: selectedTags.map((tag)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$TagBadge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                        tag: tag,
-                        size: "sm",
-                        removable: true,
-                        onRemove: handleTagRemove
-                    }, tag.id, false, {
-                        fileName: "[project]/components/ui/TagSelector.tsx",
-                        lineNumber: 174,
-                        columnNumber: 11
-                    }, ("TURBOPACK compile-time value", void 0)))
-            }, void 0, false, {
-                fileName: "[project]/components/ui/TagSelector.tsx",
-                lineNumber: 172,
-                columnNumber: 7
-            }, ("TURBOPACK compile-time value", void 0)),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "relative",
-                children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                        ref: inputRef,
-                        type: "text",
-                        value: searchTerm,
-                        onChange: (e)=>setSearchTerm(e.target.value),
-                        onFocus: handleInputFocus,
-                        onKeyDown: handleKeyDown,
-                        placeholder: placeholder,
-                        disabled: disabled,
-                        className: "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                    }, void 0, false, {
-                        fileName: "[project]/components/ui/TagSelector.tsx",
-                        lineNumber: 186,
-                        columnNumber: 9
-                    }, ("TURBOPACK compile-time value", void 0)),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none",
-                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
-                            className: "w-4 h-4 text-gray-400",
-                            fill: "none",
-                            stroke: "currentColor",
-                            viewBox: "0 0 24 24",
-                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                                strokeWidth: 2,
-                                d: "M19 9l-7 7-7-7"
-                            }, void 0, false, {
-                                fileName: "[project]/components/ui/TagSelector.tsx",
-                                lineNumber: 201,
-                                columnNumber: 13
-                            }, ("TURBOPACK compile-time value", void 0))
-                        }, void 0, false, {
-                            fileName: "[project]/components/ui/TagSelector.tsx",
-                            lineNumber: 200,
-                            columnNumber: 11
-                        }, ("TURBOPACK compile-time value", void 0))
-                    }, void 0, false, {
-                        fileName: "[project]/components/ui/TagSelector.tsx",
-                        lineNumber: 199,
-                        columnNumber: 9
-                    }, ("TURBOPACK compile-time value", void 0))
-                ]
-            }, void 0, true, {
-                fileName: "[project]/components/ui/TagSelector.tsx",
-                lineNumber: 185,
-                columnNumber: 7
-            }, ("TURBOPACK compile-time value", void 0)),
-            isOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                ref: dropdownRef,
-                className: "absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto",
-                children: [
-                    isLoading && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "px-3 py-2 text-sm text-gray-500 dark:text-gray-400",
-                        children: "Loading..."
-                    }, void 0, false, {
-                        fileName: "[project]/components/ui/TagSelector.tsx",
-                        lineNumber: 213,
-                        columnNumber: 13
-                    }, ("TURBOPACK compile-time value", void 0)),
-                    error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "px-3 py-2 text-sm text-red-600 dark:text-red-400",
-                        children: error
-                    }, void 0, false, {
-                        fileName: "[project]/components/ui/TagSelector.tsx",
-                        lineNumber: 219,
-                        columnNumber: 13
-                    }, ("TURBOPACK compile-time value", void 0)),
-                    !isLoading && !error && availableTags.length === 0 && !searchTerm.trim() && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "px-3 py-2 text-sm text-gray-500 dark:text-gray-400",
-                        children: "No tags available"
-                    }, void 0, false, {
-                        fileName: "[project]/components/ui/TagSelector.tsx",
-                        lineNumber: 225,
-                        columnNumber: 13
-                    }, ("TURBOPACK compile-time value", void 0)),
-                    !isLoading && !error && availableTags.length === 0 && searchTerm.trim() && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "px-3 py-2 text-sm text-gray-500 dark:text-gray-400",
-                        children: "No tags found"
-                    }, void 0, false, {
-                        fileName: "[project]/components/ui/TagSelector.tsx",
-                        lineNumber: 231,
-                        columnNumber: 13
-                    }, ("TURBOPACK compile-time value", void 0)),
-                    availableTags.map((tag)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                            onClick: ()=>handleTagSelect(tag),
-                            className: "w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none",
-                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$TagBadge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                tag: tag,
-                                size: "sm"
-                            }, void 0, false, {
-                                fileName: "[project]/components/ui/TagSelector.tsx",
-                                lineNumber: 243,
-                                columnNumber: 15
-                            }, ("TURBOPACK compile-time value", void 0))
-                        }, tag.id, false, {
-                            fileName: "[project]/components/ui/TagSelector.tsx",
-                            lineNumber: 238,
-                            columnNumber: 13
-                        }, ("TURBOPACK compile-time value", void 0))),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "px-3 py-1 text-xs text-gray-400 border-t border-gray-200 dark:border-gray-600",
-                        children: [
-                            "Debug: allowCreate=",
-                            allowCreate.toString(),
-                            ', searchTerm="',
-                            searchTerm.trim(),
-                            '", canCreate=',
-                            canCreateTag.toString()
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/components/ui/TagSelector.tsx",
-                        lineNumber: 248,
-                        columnNumber: 11
-                    }, ("TURBOPACK compile-time value", void 0)),
-                    canCreateTag && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                        onClick: handleCreateTag,
-                        className: "w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none border-t border-gray-200 dark:border-gray-600",
-                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "flex items-center gap-2",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
-                                    className: "w-4 h-4 text-green-500",
-                                    fill: "none",
-                                    stroke: "currentColor",
-                                    viewBox: "0 0 24 24",
-                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                                        strokeLinecap: "round",
-                                        strokeLinejoin: "round",
-                                        strokeWidth: 2,
-                                        d: "M12 6v6m0 0v6m0-6h6m-6 0H6"
-                                    }, void 0, false, {
-                                        fileName: "[project]/components/ui/TagSelector.tsx",
-                                        lineNumber: 260,
-                                        columnNumber: 19
-                                    }, ("TURBOPACK compile-time value", void 0))
-                                }, void 0, false, {
-                                    fileName: "[project]/components/ui/TagSelector.tsx",
-                                    lineNumber: 259,
-                                    columnNumber: 17
-                                }, ("TURBOPACK compile-time value", void 0)),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                    className: "text-sm text-green-600 dark:text-green-400",
-                                    children: [
-                                        'Create "',
-                                        searchTerm.trim(),
-                                        '"'
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/components/ui/TagSelector.tsx",
-                                    lineNumber: 262,
-                                    columnNumber: 17
-                                }, ("TURBOPACK compile-time value", void 0))
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/components/ui/TagSelector.tsx",
-                            lineNumber: 258,
-                            columnNumber: 15
-                        }, ("TURBOPACK compile-time value", void 0))
-                    }, void 0, false, {
-                        fileName: "[project]/components/ui/TagSelector.tsx",
-                        lineNumber: 254,
-                        columnNumber: 13
-                    }, ("TURBOPACK compile-time value", void 0))
-                ]
-            }, void 0, true, {
-                fileName: "[project]/components/ui/TagSelector.tsx",
-                lineNumber: 208,
-                columnNumber: 9
-            }, ("TURBOPACK compile-time value", void 0))
-        ]
-    }, void 0, true, {
-        fileName: "[project]/components/ui/TagSelector.tsx",
-        lineNumber: 170,
-        columnNumber: 5
-    }, ("TURBOPACK compile-time value", void 0));
-};
-_s(TagSelector, "7L+e4V6LpQedwjdiJ8LgJEPP0Ao=");
-_c = TagSelector;
-const __TURBOPACK__default__export__ = TagSelector;
-var _c;
-__turbopack_context__.k.register(_c, "TagSelector");
-if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
-    __turbopack_context__.k.registerExports(module, globalThis.$RefreshHelpers$);
-}
-}}),
 "[project]/components/ui/index.ts [app-client] (ecmascript) <locals>": ((__turbopack_context__) => {
 "use strict";
 
@@ -1974,6 +2306,14 @@ __turbopack_context__.s({
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$Button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/ui/Button.tsx [app-client] (ecmascript)");
 }),
+"[project]/components/ui/TagBadge.tsx [app-client] (ecmascript) <export default as TagBadge>": ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s({
+    "TagBadge": ()=>__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$TagBadge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"]
+});
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$TagBadge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/ui/TagBadge.tsx [app-client] (ecmascript)");
+}),
 "[project]/components/TaskDetailsModal.tsx [app-client] (ecmascript)": ((__turbopack_context__) => {
 "use strict";
 
@@ -1989,6 +2329,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$ModalBod
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$ModalFooter$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/ui/ModalFooter.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$index$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$module__evaluation$3e$__ = __turbopack_context__.i("[project]/components/ui/index.ts [app-client] (ecmascript) <module evaluation>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$Button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__ = __turbopack_context__.i("[project]/components/ui/Button.tsx [app-client] (ecmascript) <export default as Button>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$TagBadge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__TagBadge$3e$__ = __turbopack_context__.i("[project]/components/ui/TagBadge.tsx [app-client] (ecmascript) <export default as TagBadge>");
 ;
 ;
 ;
@@ -2162,6 +2503,37 @@ const TaskDetailsModal = (param)=>{
                             lineNumber: 113,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
+                        task.tags && task.tags.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                    className: "text-label text-gray-700 space-small",
+                                    children: "Tags"
+                                }, void 0, false, {
+                                    fileName: "[project]/components/TaskDetailsModal.tsx",
+                                    lineNumber: 122,
+                                    columnNumber: 15
+                                }, ("TURBOPACK compile-time value", void 0)),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex flex-wrap gap-2",
+                                    children: task.tags.map((tag)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$TagBadge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__TagBadge$3e$__["TagBadge"], {
+                                            tag: tag,
+                                            size: "md"
+                                        }, tag.id, false, {
+                                            fileName: "[project]/components/TaskDetailsModal.tsx",
+                                            lineNumber: 125,
+                                            columnNumber: 19
+                                        }, ("TURBOPACK compile-time value", void 0)))
+                                }, void 0, false, {
+                                    fileName: "[project]/components/TaskDetailsModal.tsx",
+                                    lineNumber: 123,
+                                    columnNumber: 15
+                                }, ("TURBOPACK compile-time value", void 0))
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/components/TaskDetailsModal.tsx",
+                            lineNumber: 121,
+                            columnNumber: 13
+                        }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "grid grid-cols-1 md:grid-cols-2 gap-6",
                             children: [
@@ -2172,7 +2544,7 @@ const TaskDetailsModal = (param)=>{
                                             children: "Due Date"
                                         }, void 0, false, {
                                             fileName: "[project]/components/TaskDetailsModal.tsx",
-                                            lineNumber: 123,
+                                            lineNumber: 135,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2190,12 +2562,12 @@ const TaskDetailsModal = (param)=>{
                                                         d: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/TaskDetailsModal.tsx",
-                                                        lineNumber: 126,
+                                                        lineNumber: 138,
                                                         columnNumber: 19
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/TaskDetailsModal.tsx",
-                                                    lineNumber: 125,
+                                                    lineNumber: 137,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2203,19 +2575,19 @@ const TaskDetailsModal = (param)=>{
                                                     children: formatDate(task.dueDate)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/TaskDetailsModal.tsx",
-                                                    lineNumber: 128,
+                                                    lineNumber: 140,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/TaskDetailsModal.tsx",
-                                            lineNumber: 124,
+                                            lineNumber: 136,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/TaskDetailsModal.tsx",
-                                    lineNumber: 122,
+                                    lineNumber: 134,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2225,7 +2597,7 @@ const TaskDetailsModal = (param)=>{
                                             children: "Owner"
                                         }, void 0, false, {
                                             fileName: "[project]/components/TaskDetailsModal.tsx",
-                                            lineNumber: 134,
+                                            lineNumber: 146,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2238,12 +2610,12 @@ const TaskDetailsModal = (param)=>{
                                                         children: ((_task_owner = task.owner) === null || _task_owner === void 0 ? void 0 : (_task_owner_username = _task_owner.username) === null || _task_owner_username === void 0 ? void 0 : _task_owner_username.charAt(0).toUpperCase()) || '?'
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/TaskDetailsModal.tsx",
-                                                        lineNumber: 137,
+                                                        lineNumber: 149,
                                                         columnNumber: 19
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/TaskDetailsModal.tsx",
-                                                    lineNumber: 136,
+                                                    lineNumber: 148,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2251,19 +2623,19 @@ const TaskDetailsModal = (param)=>{
                                                     children: ((_task_owner1 = task.owner) === null || _task_owner1 === void 0 ? void 0 : _task_owner1.username) || 'Unknown'
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/TaskDetailsModal.tsx",
-                                                    lineNumber: 141,
+                                                    lineNumber: 153,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/TaskDetailsModal.tsx",
-                                            lineNumber: 135,
+                                            lineNumber: 147,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/TaskDetailsModal.tsx",
-                                    lineNumber: 133,
+                                    lineNumber: 145,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2273,7 +2645,7 @@ const TaskDetailsModal = (param)=>{
                                             children: "Created"
                                         }, void 0, false, {
                                             fileName: "[project]/components/TaskDetailsModal.tsx",
-                                            lineNumber: 147,
+                                            lineNumber: 159,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2281,13 +2653,13 @@ const TaskDetailsModal = (param)=>{
                                             children: formatDateTime(task.createdAt)
                                         }, void 0, false, {
                                             fileName: "[project]/components/TaskDetailsModal.tsx",
-                                            lineNumber: 148,
+                                            lineNumber: 160,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/TaskDetailsModal.tsx",
-                                    lineNumber: 146,
+                                    lineNumber: 158,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2297,7 +2669,7 @@ const TaskDetailsModal = (param)=>{
                                             children: "Last Updated"
                                         }, void 0, false, {
                                             fileName: "[project]/components/TaskDetailsModal.tsx",
-                                            lineNumber: 153,
+                                            lineNumber: 165,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2305,19 +2677,19 @@ const TaskDetailsModal = (param)=>{
                                             children: formatDateTime(task.updatedAt)
                                         }, void 0, false, {
                                             fileName: "[project]/components/TaskDetailsModal.tsx",
-                                            lineNumber: 154,
+                                            lineNumber: 166,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/TaskDetailsModal.tsx",
-                                    lineNumber: 152,
+                                    lineNumber: 164,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/TaskDetailsModal.tsx",
-                            lineNumber: 120,
+                            lineNumber: 132,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2330,12 +2702,12 @@ const TaskDetailsModal = (param)=>{
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/TaskDetailsModal.tsx",
-                                lineNumber: 160,
+                                lineNumber: 172,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0))
                         }, void 0, false, {
                             fileName: "[project]/components/TaskDetailsModal.tsx",
-                            lineNumber: 159,
+                            lineNumber: 171,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
@@ -2363,7 +2735,7 @@ const TaskDetailsModal = (param)=>{
                                 children: "Edit Task"
                             }, void 0, false, {
                                 fileName: "[project]/components/TaskDetailsModal.tsx",
-                                lineNumber: 167,
+                                lineNumber: 179,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$Button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
@@ -2375,13 +2747,13 @@ const TaskDetailsModal = (param)=>{
                                 children: "Delete Task"
                             }, void 0, false, {
                                 fileName: "[project]/components/TaskDetailsModal.tsx",
-                                lineNumber: 175,
+                                lineNumber: 187,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/TaskDetailsModal.tsx",
-                        lineNumber: 166,
+                        lineNumber: 178,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$Button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
@@ -2390,13 +2762,13 @@ const TaskDetailsModal = (param)=>{
                         children: "Close"
                     }, void 0, false, {
                         fileName: "[project]/components/TaskDetailsModal.tsx",
-                        lineNumber: 185,
+                        lineNumber: 197,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/TaskDetailsModal.tsx",
-                lineNumber: 165,
+                lineNumber: 177,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0))
         ]
@@ -2414,14 +2786,6 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
     __turbopack_context__.k.registerExports(module, globalThis.$RefreshHelpers$);
 }
 }}),
-"[project]/components/ui/TagBadge.tsx [app-client] (ecmascript) <export default as TagBadge>": ((__turbopack_context__) => {
-"use strict";
-
-__turbopack_context__.s({
-    "TagBadge": ()=>__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$TagBadge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"]
-});
-var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$TagBadge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/ui/TagBadge.tsx [app-client] (ecmascript)");
-}),
 "[project]/components/TaskCard.tsx [app-client] (ecmascript)": ((__turbopack_context__) => {
 "use strict";
 
@@ -2489,9 +2853,9 @@ const TaskCard = (param)=>{
         if (!dateString) return "No due date";
         return new Date(dateString).toLocaleDateString();
     };
-    const handleUpdateTask = async (taskId, taskData)=>{
+    const handleUpdateTask = async (taskId, taskData, selectedTags)=>{
         if (onUpdateTask) {
-            await onUpdateTask(taskId, taskData);
+            await onUpdateTask(taskId, taskData, selectedTags);
         }
     };
     const handleDeleteTask = async ()=>{
@@ -4492,15 +4856,40 @@ var _s = __turbopack_context__.k.signature();
 const Dashboard = ()=>{
     _s();
     const [tasks, setTasks] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [filteredTasks, setFilteredTasks] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
     const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
     const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [isTagManagerOpen, setIsTagManagerOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [selectedTags, setSelectedTags] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
     // Load tasks from API on component mount
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "Dashboard.useEffect": ()=>{
             loadTasks();
         }
     }["Dashboard.useEffect"], []);
+    // Filter tasks when selectedTags change
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "Dashboard.useEffect": ()=>{
+            filterTasks();
+        }
+    }["Dashboard.useEffect"], [
+        tasks,
+        selectedTags
+    ]);
+    const filterTasks = ()=>{
+        if (selectedTags.length === 0) {
+            setFilteredTasks(tasks);
+            return;
+        }
+        const filtered = tasks.filter((task)=>{
+            if (!task.tags || task.tags.length === 0) {
+                return false;
+            }
+            // Check if task has any of the selected tags
+            return selectedTags.some((selectedTag)=>task.tags.some((taskTag)=>taskTag.id === selectedTag.id));
+        });
+        setFilteredTasks(filtered);
+    };
     const loadTasks = async ()=>{
         try {
             setIsLoading(true);
@@ -4539,10 +4928,41 @@ const Dashboard = ()=>{
             throw error; // Re-throw to let TaskCreateForm handle the error
         }
     };
-    const handleUpdateTask = async (taskId, taskData)=>{
+    const handleUpdateTask = async (taskId, taskData, selectedTags)=>{
         try {
             const updatedTask = await __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$taskService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["taskService"].updateTask(taskId, taskData);
-            setTasks((prev)=>prev.map((task)=>task.id === taskId ? updatedTask : task));
+            // Handle tag assignments if tags were provided
+            if (selectedTags) {
+                var _currentTask_tags;
+                // Get current task to compare tags
+                const currentTask = tasks.find((t)=>t.id === taskId);
+                const currentTagIds = (currentTask === null || currentTask === void 0 ? void 0 : (_currentTask_tags = currentTask.tags) === null || _currentTask_tags === void 0 ? void 0 : _currentTask_tags.map((tag)=>tag.id)) || [];
+                const selectedTagIds = selectedTags.map((tag)=>tag.id);
+                // Find tags to add and remove
+                const tagsToAdd = selectedTagIds.filter((id)=>!currentTagIds.includes(id));
+                const tagsToRemove = currentTagIds.filter((id)=>!selectedTagIds.includes(id));
+                // Remove tags that are no longer selected
+                for (const tagId of tagsToRemove){
+                    try {
+                        await __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$tagService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["tagService"].removeTagFromTask(taskId, tagId);
+                    } catch (tagError) {
+                        console.error("Failed to remove tag ".concat(tagId, " from task:"), tagError);
+                    }
+                }
+                // Add new tags
+                for (const tagId of tagsToAdd){
+                    try {
+                        await __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$tagService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["tagService"].assignTagToTask(taskId, tagId);
+                    } catch (tagError) {
+                        console.error("Failed to assign tag ".concat(tagId, " to task:"), tagError);
+                    }
+                }
+                // Reload tasks to get updated tag information
+                await loadTasks();
+            } else {
+                // No tag changes, just update the task
+                setTasks((prev)=>prev.map((task)=>task.id === taskId ? updatedTask : task));
+            }
         } catch (error) {
             console.error('Failed to update task:', error);
             throw error; // Re-throw to let TaskEditForm handle the error
@@ -4567,7 +4987,7 @@ const Dashboard = ()=>{
                         className: "animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"
                     }, void 0, false, {
                         fileName: "[project]/components/Dashboard.tsx",
-                        lineNumber: 89,
+                        lineNumber: 151,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -4575,18 +4995,18 @@ const Dashboard = ()=>{
                         children: "Loading tasks..."
                     }, void 0, false, {
                         fileName: "[project]/components/Dashboard.tsx",
-                        lineNumber: 90,
+                        lineNumber: 152,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/Dashboard.tsx",
-                lineNumber: 88,
+                lineNumber: 150,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0))
         }, void 0, false, {
             fileName: "[project]/components/Dashboard.tsx",
-            lineNumber: 87,
+            lineNumber: 149,
             columnNumber: 7
         }, ("TURBOPACK compile-time value", void 0));
     }
@@ -4603,7 +5023,7 @@ const Dashboard = ()=>{
                             children: "Error loading tasks"
                         }, void 0, false, {
                             fileName: "[project]/components/Dashboard.tsx",
-                            lineNumber: 101,
+                            lineNumber: 163,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -4611,7 +5031,7 @@ const Dashboard = ()=>{
                             children: error
                         }, void 0, false, {
                             fileName: "[project]/components/Dashboard.tsx",
-                            lineNumber: 102,
+                            lineNumber: 164,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -4620,32 +5040,35 @@ const Dashboard = ()=>{
                             children: "Retry"
                         }, void 0, false, {
                             fileName: "[project]/components/Dashboard.tsx",
-                            lineNumber: 103,
+                            lineNumber: 165,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/Dashboard.tsx",
-                    lineNumber: 100,
+                    lineNumber: 162,
                     columnNumber: 11
                 }, ("TURBOPACK compile-time value", void 0))
             }, void 0, false, {
                 fileName: "[project]/components/Dashboard.tsx",
-                lineNumber: 99,
+                lineNumber: 161,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0))
         }, void 0, false, {
             fileName: "[project]/components/Dashboard.tsx",
-            lineNumber: 98,
+            lineNumber: 160,
             columnNumber: 7
         }, ("TURBOPACK compile-time value", void 0));
     }
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "min-w-0 bg-gray-50 dark:bg-gray-800",
         children: [
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$SearchBar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$SearchBar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                selectedTags: selectedTags,
+                onTagsChange: setSelectedTags
+            }, void 0, false, {
                 fileName: "[project]/components/Dashboard.tsx",
-                lineNumber: 117,
+                lineNumber: 179,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4663,21 +5086,36 @@ const Dashboard = ()=>{
                                             children: "Task Board"
                                         }, void 0, false, {
                                             fileName: "[project]/components/Dashboard.tsx",
-                                            lineNumber: 122,
+                                            lineNumber: 187,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                             className: "text-gray-600 dark:text-gray-400",
-                                            children: "Manage your team's tasks and track progress"
-                                        }, void 0, false, {
+                                            children: [
+                                                "Manage your team's tasks and track progress",
+                                                selectedTags.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "ml-2 text-blue-600 dark:text-blue-400",
+                                                    children: [
+                                                        "• Filtered by ",
+                                                        selectedTags.length,
+                                                        " tag",
+                                                        selectedTags.length !== 1 ? 's' : ''
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/components/Dashboard.tsx",
+                                                    lineNumber: 191,
+                                                    columnNumber: 19
+                                                }, ("TURBOPACK compile-time value", void 0))
+                                            ]
+                                        }, void 0, true, {
                                             fileName: "[project]/components/Dashboard.tsx",
-                                            lineNumber: 123,
+                                            lineNumber: 188,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/Dashboard.tsx",
-                                    lineNumber: 121,
+                                    lineNumber: 186,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$Button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
@@ -4695,45 +5133,45 @@ const Dashboard = ()=>{
                                             d: "M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
                                         }, void 0, false, {
                                             fileName: "[project]/components/Dashboard.tsx",
-                                            lineNumber: 130,
+                                            lineNumber: 202,
                                             columnNumber: 19
                                         }, void 0)
                                     }, void 0, false, {
                                         fileName: "[project]/components/Dashboard.tsx",
-                                        lineNumber: 129,
+                                        lineNumber: 201,
                                         columnNumber: 17
                                     }, void 0),
                                     children: "Manage Tags"
                                 }, void 0, false, {
                                     fileName: "[project]/components/Dashboard.tsx",
-                                    lineNumber: 125,
+                                    lineNumber: 197,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/Dashboard.tsx",
-                            lineNumber: 120,
+                            lineNumber: 185,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/components/Dashboard.tsx",
-                        lineNumber: 119,
+                        lineNumber: 184,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$TaskBoard$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                        tasks: tasks,
+                        tasks: filteredTasks,
                         onCreateTask: handleCreateTask,
                         onUpdateTask: handleUpdateTask,
                         onDeleteTask: handleDeleteTask
                     }, void 0, false, {
                         fileName: "[project]/components/Dashboard.tsx",
-                        lineNumber: 138,
+                        lineNumber: 210,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/Dashboard.tsx",
-                lineNumber: 118,
+                lineNumber: 183,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$TagManager$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -4741,17 +5179,17 @@ const Dashboard = ()=>{
                 onClose: ()=>setIsTagManagerOpen(false)
             }, void 0, false, {
                 fileName: "[project]/components/Dashboard.tsx",
-                lineNumber: 147,
+                lineNumber: 219,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0))
         ]
     }, void 0, true, {
         fileName: "[project]/components/Dashboard.tsx",
-        lineNumber: 116,
+        lineNumber: 178,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
-_s(Dashboard, "4G2M+jjNSEvXF7w0a6ITBAA4Z/0=");
+_s(Dashboard, "9Vm2coD3nMt5btvbaQ3mZS+ppns=");
 _c = Dashboard;
 const __TURBOPACK__default__export__ = Dashboard;
 var _c;
@@ -5353,4 +5791,4 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 }}),
 }]);
 
-//# sourceMappingURL=_7c80419d._.js.map
+//# sourceMappingURL=_58f5a666._.js.map

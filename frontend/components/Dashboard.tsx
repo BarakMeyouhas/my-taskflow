@@ -10,14 +10,41 @@ import { tagService } from '../services/tagService';
 
 const Dashboard: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isTagManagerOpen, setIsTagManagerOpen] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
 
   // Load tasks from API on component mount
   useEffect(() => {
     loadTasks();
   }, []);
+
+  // Filter tasks when selectedTags change
+  useEffect(() => {
+    filterTasks();
+  }, [tasks, selectedTags]);
+
+  const filterTasks = () => {
+    if (selectedTags.length === 0) {
+      setFilteredTasks(tasks);
+      return;
+    }
+
+    const filtered = tasks.filter(task => {
+      if (!task.tags || task.tags.length === 0) {
+        return false;
+      }
+      
+      // Check if task has any of the selected tags
+      return selectedTags.some(selectedTag => 
+        task.tags!.some(taskTag => taskTag.id === selectedTag.id)
+      );
+    });
+
+    setFilteredTasks(filtered);
+  };
 
   const loadTasks = async () => {
     try {
@@ -58,14 +85,49 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleUpdateTask = async (taskId: number, taskData: UpdateTaskRequest) => {
+  const handleUpdateTask = async (taskId: number, taskData: UpdateTaskRequest, selectedTags?: Tag[]) => {
     try {
       const updatedTask = await taskService.updateTask(taskId, taskData);
-      setTasks(prev => 
-        prev.map(task => 
-          task.id === taskId ? updatedTask : task
-        )
-      );
+      
+      // Handle tag assignments if tags were provided
+      if (selectedTags) {
+        // Get current task to compare tags
+        const currentTask = tasks.find(t => t.id === taskId);
+        const currentTagIds = currentTask?.tags?.map(tag => tag.id) || [];
+        const selectedTagIds = selectedTags.map(tag => tag.id);
+        
+        // Find tags to add and remove
+        const tagsToAdd = selectedTagIds.filter(id => !currentTagIds.includes(id));
+        const tagsToRemove = currentTagIds.filter(id => !selectedTagIds.includes(id));
+        
+        // Remove tags that are no longer selected
+        for (const tagId of tagsToRemove) {
+          try {
+            await tagService.removeTagFromTask(taskId, tagId);
+          } catch (tagError) {
+            console.error(`Failed to remove tag ${tagId} from task:`, tagError);
+          }
+        }
+        
+        // Add new tags
+        for (const tagId of tagsToAdd) {
+          try {
+            await tagService.assignTagToTask(taskId, tagId);
+          } catch (tagError) {
+            console.error(`Failed to assign tag ${tagId} to task:`, tagError);
+          }
+        }
+        
+        // Reload tasks to get updated tag information
+        await loadTasks();
+      } else {
+        // No tag changes, just update the task
+        setTasks(prev => 
+          prev.map(task => 
+            task.id === taskId ? updatedTask : task
+          )
+        );
+      }
     } catch (error) {
       console.error('Failed to update task:', error);
       throw error; // Re-throw to let TaskEditForm handle the error
@@ -114,13 +176,23 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="min-w-0 bg-gray-50 dark:bg-gray-800">
-      <SearchBar />
+      <SearchBar 
+        selectedTags={selectedTags}
+        onTagsChange={setSelectedTags}
+      />
       <div className="p-6">
         <div className="mb-6">
           <div className="flex justify-between items-start">
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Task Board</h1>
-              <p className="text-gray-600 dark:text-gray-400">Manage your team&apos;s tasks and track progress</p>
+              <p className="text-gray-600 dark:text-gray-400">
+                Manage your team&apos;s tasks and track progress
+                {selectedTags.length > 0 && (
+                  <span className="ml-2 text-blue-600 dark:text-blue-400">
+                    • Filtered by {selectedTags.length} tag{selectedTags.length !== 1 ? 's' : ''}
+                  </span>
+                )}
+              </p>
             </div>
             <Button
               variant="outline"
@@ -136,7 +208,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
         <TaskBoard 
-          tasks={tasks} 
+          tasks={filteredTasks} 
           onCreateTask={handleCreateTask}
           onUpdateTask={handleUpdateTask}
           onDeleteTask={handleDeleteTask}

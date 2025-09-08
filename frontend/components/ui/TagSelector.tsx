@@ -158,6 +158,14 @@ const TagSelector: React.FC<TagSelectorProps> = ({
     searchTerm.trim() && 
     !availableTags.some(tag => tag.name.toLowerCase() === searchTerm.toLowerCase());
 
+  // Debug info
+  console.log('TagSelector Debug:', {
+    allowCreate,
+    searchTerm: searchTerm.trim(),
+    canCreateTag,
+    availableTagsCount: availableTags.length
+  });
+
   return (
     <div className={`relative ${className}`}>
       {/* Selected tags */}
@@ -235,6 +243,11 @@ const TagSelector: React.FC<TagSelectorProps> = ({
               <TagBadge tag={tag} size="sm" />
             </button>
           ))}
+
+          {/* Debug info */}
+          <div className="px-3 py-1 text-xs text-gray-400 border-t border-gray-200 dark:border-gray-600">
+            Debug: allowCreate={allowCreate.toString()}, searchTerm="{searchTerm.trim()}", canCreate={canCreateTag.toString()}
+          </div>
 
           {/* Create new tag option */}
           {canCreateTag && (

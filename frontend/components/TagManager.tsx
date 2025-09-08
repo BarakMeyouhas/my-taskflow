@@ -137,7 +137,7 @@ const TagManager: React.FC<TagManagerProps> = ({ isOpen, onClose }) => {
     <Modal isOpen={isOpen} onClose={onClose} size="lg">
       <ModalHeader title="Manage Tags" onClose={onClose} />
 
-      <ModalBody>
+      <ModalBody scrollable={true}>
         {error && (
           <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-md">
             {error}
@@ -302,6 +302,11 @@ const TagManager: React.FC<TagManagerProps> = ({ isOpen, onClose }) => {
       </ModalBody>
 
       <ModalFooter>
+        {/* Debug info - remove this later */}
+        <div className="mb-2 p-1 bg-blue-100 dark:bg-blue-900/20 border border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200 rounded text-xs">
+          Footer Debug: Show Create Button = {(isCreating || editingTag || formData.name.trim()).toString()}
+        </div>
+        
         <div className="flex justify-between w-full">
           <div>
             {(isCreating || editingTag) && (
@@ -311,18 +316,20 @@ const TagManager: React.FC<TagManagerProps> = ({ isOpen, onClose }) => {
             )}
           </div>
           <div className="flex gap-2">
-            {(isCreating || editingTag) && (
-              <Button
-                onClick={handleSaveTag}
-                loading={isLoading}
-                disabled={!formData.name.trim()}
-              >
-                {isCreating ? 'Create Tag' : 'Save Changes'}
-              </Button>
-            )}
-            <Button variant="outline" onClick={onClose}>
+            {/* Test with simple HTML button */}
+            <button
+              onClick={handleSaveTag}
+              disabled={!formData.name.trim()}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isCreating ? 'Create Tag' : editingTag ? 'Save Changes' : 'Create Tag'}
+            </button>
+            <button
+              onClick={onClose}
+              className="px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded-lg hover:bg-gray-50"
+            >
               Close
-            </Button>
+            </button>
           </div>
         </div>
       </ModalFooter>

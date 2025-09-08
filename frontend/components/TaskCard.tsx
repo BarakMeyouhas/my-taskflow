@@ -21,7 +21,7 @@ interface TaskCardProps {
     email: string;
   };
   tags?: Tag[];
-  onUpdateTask?: (taskId: number, taskData: UpdateTaskRequest) => Promise<void>;
+  onUpdateTask?: (taskId: number, taskData: UpdateTaskRequest, selectedTags?: Tag[]) => Promise<void>;
   onDeleteTask?: (taskId: number) => Promise<void>;
 }
 
@@ -88,9 +88,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
     return new Date(dateString).toLocaleDateString();
   };
 
-  const handleUpdateTask = async (taskId: number, taskData: UpdateTaskRequest) => {
+  const handleUpdateTask = async (taskId: number, taskData: UpdateTaskRequest, selectedTags?: Tag[]) => {
     if (onUpdateTask) {
-      await onUpdateTask(taskId, taskData);
+      await onUpdateTask(taskId, taskData, selectedTags);
     }
   };
 

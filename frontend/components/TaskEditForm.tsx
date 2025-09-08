@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import { Task, UpdateTaskRequest } from "../types/task";
+import { Tag } from "../types/tag";
+import TagSelector from "./ui/TagSelector";
 
 interface TaskEditFormProps {
   isOpen: boolean;
   onClose: () => void;
   task: Task | null;
-  onSubmit: (taskId: number, taskData: UpdateTaskRequest) => Promise<void>;
+  onSubmit: (taskId: number, taskData: UpdateTaskRequest, selectedTags?: Tag[]) => Promise<void>;
 }
 
 const TaskEditForm: React.FC<TaskEditFormProps> = ({
@@ -25,6 +27,7 @@ const TaskEditForm: React.FC<TaskEditFormProps> = ({
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
 
   // Populate form when task changes
   useEffect(() => {
@@ -36,6 +39,7 @@ const TaskEditForm: React.FC<TaskEditFormProps> = ({
         priority: task.priority,
         dueDate: task.dueDate ? task.dueDate.split('T')[0] : "", // Convert ISO date to YYYY-MM-DD
       });
+      setSelectedTags(task.tags || []); // Populate existing tags
       setErrors({}); // Clear any previous errors
     }
   }, [task]);
@@ -76,7 +80,7 @@ const TaskEditForm: React.FC<TaskEditFormProps> = ({
     setIsLoading(true);
 
     try {
-      await onSubmit(task.id, formData);
+      await onSubmit(task.id, formData, selectedTags);
       onClose();
     } catch (error) {
       setErrors({
@@ -198,6 +202,18 @@ const TaskEditForm: React.FC<TaskEditFormProps> = ({
               {errors.dueDate && (
                 <p className="mt-1 text-sm text-red-600">{errors.dueDate}</p>
               )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Tags
+              </label>
+              <TagSelector
+                selectedTags={selectedTags}
+                onTagsChange={setSelectedTags}
+                allowCreate={true}
+                placeholder="Select or create tags..."
+              />
             </div>
 
             {/* Task Info */}
