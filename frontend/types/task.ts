@@ -1,3 +1,5 @@
+import { Tag } from './tag';
+
 export interface Task {
   id: number;
   title: string;
@@ -13,6 +15,7 @@ export interface Task {
     username: string;
     email: string;
   };
+  tags?: Tag[];
 }
 
 export interface CreateTaskRequest {

@@ -2,11 +2,13 @@
 
 import React, { useState } from "react";
 import { CreateTaskRequest } from "../types/task";
+import { Tag } from "../types/tag";
+import { TagSelector } from "./ui";
 
 interface TaskCreateFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (taskData: CreateTaskRequest) => Promise<void>;
+  onSubmit: (taskData: CreateTaskRequest, selectedTags?: Tag[]) => Promise<void>;
 }
 
 const TaskCreateForm: React.FC<TaskCreateFormProps> = ({
@@ -20,6 +22,7 @@ const TaskCreateForm: React.FC<TaskCreateFormProps> = ({
     priority: "Medium",
     dueDate: "",
   });
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
 
@@ -59,7 +62,7 @@ const TaskCreateForm: React.FC<TaskCreateFormProps> = ({
     setIsLoading(true);
 
     try {
-      await onSubmit(formData);
+      await onSubmit(formData, selectedTags);
       // Reset form
       setFormData({
         title: "",
@@ -67,6 +70,7 @@ const TaskCreateForm: React.FC<TaskCreateFormProps> = ({
         priority: "Medium",
         dueDate: "",
       });
+      setSelectedTags([]);
       onClose();
     } catch (error) {
       setErrors({
@@ -171,6 +175,19 @@ const TaskCreateForm: React.FC<TaskCreateFormProps> = ({
               {errors.dueDate && (
                 <p className="mt-1 text-sm text-red-600">{errors.dueDate}</p>
               )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Tags
+              </label>
+              <TagSelector
+                selectedTags={selectedTags}
+                onTagsChange={setSelectedTags}
+                placeholder="Select or create tags..."
+                maxTags={5}
+                allowCreate={true}
+              />
             </div>
 
             <div className="flex space-x-3 pt-4">

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import TaskEditForm from "./TaskEditForm";
 import TaskDetailsModal from "./TaskDetailsModal";
-import { Button, IconButton } from "./ui";
+import { Button, IconButton, TagBadge } from "./ui";
 import { Task, UpdateTaskRequest } from "../types/task";
+import { Tag } from "../types/tag";
 
 interface TaskCardProps {
   id: number;
@@ -19,6 +20,7 @@ interface TaskCardProps {
     username: string;
     email: string;
   };
+  tags?: Tag[];
   onUpdateTask?: (taskId: number, taskData: UpdateTaskRequest) => Promise<void>;
   onDeleteTask?: (taskId: number) => Promise<void>;
 }
@@ -34,6 +36,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   updatedAt,
   ownerId,
   owner,
+  tags = [],
   onUpdateTask,
   onDeleteTask,
 }) => {
@@ -109,6 +112,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
     updatedAt,
     ownerId,
     owner,
+    tags,
   };
 
   const EditIcon = (
@@ -166,6 +170,22 @@ const TaskCard: React.FC<TaskCardProps> = ({
           <p className="text-body-small text-gray-600 dark:text-gray-300 space-element overflow-hidden text-ellipsis whitespace-nowrap">
             {description}
           </p>
+        )}
+
+        {/* Tags */}
+        {tags && tags.length > 0 && (
+          <div className="space-element">
+            <div className="flex flex-wrap gap-1">
+              {tags.slice(0, 3).map(tag => (
+                <TagBadge key={tag.id} tag={tag} size="sm" />
+              ))}
+              {tags.length > 3 && (
+                <span className="text-xs text-gray-500 dark:text-gray-400 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full">
+                  +{tags.length - 3} more
+                </span>
+              )}
+            </div>
+          </div>
         )}
 
         {/* Status and Owner */}
