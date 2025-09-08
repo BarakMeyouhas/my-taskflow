@@ -88,26 +88,18 @@ const AuthProvider = (param)=>{
                 setIsLoading(false);
                 return;
             }
-            // TODO: Verify token with backend
-            // For now, we'll check if token exists and has a valid format
-            const response = await fetch("".concat(__TURBOPACK__imported__module__$5b$project$5d2f$config$2f$auth$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["authConfig"].endpoints.verify), {
-                headers: {
-                    Authorization: "Bearer ".concat(token)
-                }
+            // For MVP: Just check if token exists and assume it's valid
+            // TODO: Implement proper token verification when backend endpoint is available
+            setUser({
+                id: "1",
+                username: "Current User",
+                email: "user@example.com" // TODO: Get from token
             });
-            if (response.ok) {
-                const userData = await response.json();
-                setUser(userData.user);
-            } else {
-                // Token is invalid, remove it
-                localStorage.removeItem("token");
-                setUser(null);
-            }
+            setIsLoading(false);
         } catch (error) {
             console.error("Auth check failed:", error);
             localStorage.removeItem("token");
             setUser(null);
-        } finally{
             setIsLoading(false);
         }
     };
@@ -196,7 +188,7 @@ const AuthProvider = (param)=>{
         children: children
     }, void 0, false, {
         fileName: "[project]/contexts/AuthContext.tsx",
-        lineNumber: 181,
+        lineNumber: 173,
         columnNumber: 10
     }, ("TURBOPACK compile-time value", void 0));
 };

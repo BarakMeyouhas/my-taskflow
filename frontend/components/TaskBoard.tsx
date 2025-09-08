@@ -7,9 +7,15 @@ interface TaskBoardProps {
   tasks: Task[];
   onCreateTask?: (taskData: CreateTaskRequest) => Promise<void>;
   onUpdateTask?: (taskId: number, taskData: UpdateTaskRequest) => Promise<void>;
+  onDeleteTask?: (taskId: number) => Promise<void>;
 }
 
-const TaskBoard: React.FC<TaskBoardProps> = ({ tasks, onCreateTask, onUpdateTask }) => {
+const TaskBoard: React.FC<TaskBoardProps> = ({ 
+  tasks, 
+  onCreateTask, 
+  onUpdateTask, 
+  onDeleteTask 
+}) => {
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
 
   const columns = [
@@ -48,6 +54,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ tasks, onCreateTask, onUpdateTask
                   key={task.id} 
                   {...task} 
                   onUpdateTask={onUpdateTask}
+                  onDeleteTask={onDeleteTask}
                 />
               ))}
               

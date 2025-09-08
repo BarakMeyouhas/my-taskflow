@@ -1,99 +1,96 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SearchBar from './SearchBar';
 import TaskBoard from './TaskBoard';
 import { Task, CreateTaskRequest, UpdateTaskRequest } from '../types/task';
+import { taskService } from '../services/taskService';
 
 const Dashboard: React.FC = () => {
-  // Convert sample data to match new interface
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: 1,
-      title: 'Design new landing page',
-      description: 'Create a modern, responsive landing page design for the new product launch',
-      status: 'ToDo',
-      priority: 'High',
-      dueDate: '2024-12-20',
-      createdAt: '2024-12-01T10:00:00Z',
-      updatedAt: '2024-12-01T10:00:00Z',
-      ownerId: 1,
-      owner: {
-        id: 1,
-        username: 'Alex Johnson',
-        email: 'alex@example.com'
-      }
-    },
-    {
-      id: 2,
-      title: 'Implement user authentication',
-      description: 'Set up secure user authentication with JWT tokens and refresh logic',
-      status: 'InProgress',
-      priority: 'High',
-      dueDate: '2024-12-18',
-      createdAt: '2024-12-01T10:00:00Z',
-      updatedAt: '2024-12-01T10:00:00Z',
-      ownerId: 2,
-      owner: {
-        id: 2,
-        username: 'Sarah Miller',
-        email: 'sarah@example.com'
-      }
-    },
-    {
-      id: 3,
-      title: 'Write API documentation',
-      description: 'Create comprehensive API documentation with examples and error codes',
-      status: 'Done',
-      priority: 'Medium',
-      dueDate: '2024-12-22',
-      createdAt: '2024-12-01T10:00:00Z',
-      updatedAt: '2024-12-01T10:00:00Z',
-      ownerId: 3,
-      owner: {
-        id: 3,
-        username: 'Mike Kim',
-        email: 'mike@example.com'
-      }
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Load tasks from API on component mount
+  useEffect(() => {
+    loadTasks();
+  }, []);
+
+  const loadTasks = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const fetchedTasks = await taskService.getTasks();
+      setTasks(fetchedTasks);
+    } catch (error) {
+      console.error('Failed to load tasks:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load tasks');
+    } finally {
+      setIsLoading(false);
     }
-  ]);
+  };
 
   const handleCreateTask = async (taskData: CreateTaskRequest) => {
-    // TODO: Replace with actual API call
-    const newTask: Task = {
-      id: Math.max(...tasks.map(t => t.id)) + 1, // Generate new ID
-      title: taskData.title,
-      description: taskData.description,
-      status: 'ToDo', // New tasks start as ToDo
-      priority: taskData.priority || 'Medium',
-      dueDate: taskData.dueDate,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      ownerId: 1, // TODO: Get from auth context
-      owner: {
-        id: 1,
-        username: 'Current User', // TODO: Get from auth context
-        email: 'user@example.com'
-      }
-    };
-
-    setTasks(prev => [...prev, newTask]);
-    console.log('Task created:', newTask);
+    try {
+      const newTask = await taskService.createTask(taskData);
+      setTasks(prev => [...prev, newTask]);
+    } catch (error) {
+      console.error('Failed to create task:', error);
+      throw error; // Re-throw to let TaskCreateForm handle the error
+    }
   };
 
   const handleUpdateTask = async (taskId: number, taskData: UpdateTaskRequest) => {
-    // TODO: Replace with actual API call
-    setTasks(prev => 
-      prev.map(task => 
-        task.id === taskId 
-          ? { 
-              ...task, 
-              ...taskData, 
-              updatedAt: new Date().toISOString() 
-            }
-          : task
-      )
-    );
-    console.log('Task updated:', taskId, taskData);
+    try {
+      const updatedTask = await taskService.updateTask(taskId, taskData);
+      setTasks(prev => 
+        prev.map(task => 
+          task.id === taskId ? updatedTask : task
+        )
+      );
+    } catch (error) {
+      console.error('Failed to update task:', error);
+      throw error; // Re-throw to let TaskEditForm handle the error
+    }
   };
+
+  const handleDeleteTask = async (taskId: number) => {
+    try {
+      await taskService.deleteTask(taskId);
+      setTasks(prev => prev.filter(task => task.id !== taskId));
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+      throw error;
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading tasks...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+            <p className="font-medium">Error loading tasks</p>
+            <p className="text-sm mt-1">{error}</p>
+            <button 
+              onClick={loadTasks}
+              className="mt-3 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-w-0">
@@ -107,6 +104,7 @@ const Dashboard: React.FC = () => {
           tasks={tasks} 
           onCreateTask={handleCreateTask}
           onUpdateTask={handleUpdateTask}
+          onDeleteTask={handleDeleteTask}
         />
       </div>
     </div>
