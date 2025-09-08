@@ -1,17 +1,25 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import TagFilter from './TagFilter';
+import TaskFilter, { FilterOptions } from './TaskFilter';
 import { Tag } from '../types/tag';
 
 interface SearchBarProps {
-  selectedTags?: Tag[];
-  onTagsChange?: (tags: Tag[]) => void;
+  filters?: FilterOptions;
+  onFiltersChange?: (filters: FilterOptions) => void;
   onSearchChange?: (searchTerm: string) => void;
+  availableTags?: Tag[];
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ 
-  selectedTags = [], 
-  onTagsChange = () => {},
-  onSearchChange = () => {}
+  filters = {
+    status: [],
+    priority: [],
+    tags: [],
+    dueDateRange: {},
+    createdDateRange: {}
+  },
+  onFiltersChange = () => {},
+  onSearchChange = () => {},
+  availableTags = []
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -70,10 +78,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
         {/* Quick Actions */}
         <div className="flex items-center space-x-3 ml-4">
-          {/* Tag Filter */}
-          <TagFilter
-            selectedTags={selectedTags}
-            onTagsChange={onTagsChange}
+          {/* Task Filter */}
+          <TaskFilter
+            filters={filters}
+            onFiltersChange={onFiltersChange}
+            availableTags={availableTags}
           />
 
           {/* Sort Button */}

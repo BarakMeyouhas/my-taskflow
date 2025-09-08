@@ -5,6 +5,7 @@ import TagManager from './TagManager';
 import { Button } from './ui';
 import { Task, CreateTaskRequest, UpdateTaskRequest } from '../types/task';
 import { Tag } from '../types/tag';
+import { FilterOptions } from './TaskFilter';
 import { taskService } from '../services/taskService';
 import { tagService } from '../services/tagService';
 
@@ -14,13 +15,21 @@ const Dashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isTagManagerOpen, setIsTagManagerOpen] = useState(false);
-  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+  const [filters, setFilters] = useState<FilterOptions>({
+    status: [],
+    priority: [],
+    tags: [],
+    dueDateRange: {},
+    createdDateRange: {}
+  });
 
   // Load tasks from API on component mount
   useEffect(() => {
     loadTasks();
+    loadAvailableTags();
   }, []);
 
   // Filter tasks when selectedTags or searchTerm change
@@ -28,13 +37,13 @@ const Dashboard: React.FC = () => {
     if (searchTerm.trim()) {
       performSearch();
     } else {
-      filterTasks();
+      applyFilters();
     }
-  }, [tasks, selectedTags, searchTerm]);
+  }, [tasks, filters, searchTerm]);
 
   const performSearch = async () => {
     if (!searchTerm.trim()) {
-      filterTasks();
+      applyFilters();
       return;
     }
 
@@ -42,54 +51,141 @@ const Dashboard: React.FC = () => {
       setIsSearching(true);
       const searchResults = await taskService.searchTasks(searchTerm);
       
-      // Apply tag filtering to search results if tags are selected
-      if (selectedTags.length > 0) {
-        const filtered = searchResults.filter(task => {
-          if (!task.tags || task.tags.length === 0) {
-            return false;
-          }
-          
-          return selectedTags.some(selectedTag => 
-            task.tags!.some(taskTag => taskTag.id === selectedTag.id)
-          );
-        });
-        setFilteredTasks(filtered);
-      } else {
-        setFilteredTasks(searchResults);
-      }
+      // Apply comprehensive filters to search results
+      const filtered = applyFiltersToTasks(searchResults);
+      setFilteredTasks(filtered);
     } catch (error) {
       console.error('Search failed:', error);
       setError('Search failed. Please try again.');
       // Fallback to local filtering
-      filterTasks();
+      applyFilters();
     } finally {
       setIsSearching(false);
     }
   };
 
-  const filterTasks = () => {
-    if (selectedTags.length === 0) {
-      setFilteredTasks(tasks);
-      return;
-    }
+  const applyFilters = () => {
+    const filtered = applyFiltersToTasks(tasks);
+    setFilteredTasks(filtered);
+  };
 
-    const filtered = tasks.filter(task => {
-      if (!task.tags || task.tags.length === 0) {
+  const applyFiltersToTasks = (tasksToFilter: Task[]): Task[] => {
+    return tasksToFilter.filter(task => {
+      // Status filter
+      if (filters.status.length > 0 && !filters.status.includes(task.status)) {
         return false;
       }
-      
-      // Check if task has any of the selected tags
-      return selectedTags.some(selectedTag => 
-        task.tags!.some(taskTag => taskTag.id === selectedTag.id)
-      );
-    });
 
-    setFilteredTasks(filtered);
+      // Priority filter
+      if (filters.priority.length > 0 && !filters.priority.includes(task.priority)) {
+        return false;
+      }
+
+      // Tags filter
+      if (filters.tags.length > 0) {
+        if (!task.tags || task.tags.length === 0) {
+          return false;
+        }
+        
+        const hasMatchingTag = filters.tags.some(filterTag => 
+          task.tags!.some(taskTag => taskTag.id === filterTag.id)
+        );
+        
+        if (!hasMatchingTag) {
+          return false;
+        }
+      }
+
+      // Due date range filter
+      if (filters.dueDateRange.start || filters.dueDateRange.end) {
+        if (!task.dueDate) {
+          return false;
+        }
+        
+        const taskDueDate = new Date(task.dueDate);
+        
+        if (filters.dueDateRange.start) {
+          const startDate = new Date(filters.dueDateRange.start);
+          if (taskDueDate < startDate) {
+            return false;
+          }
+        }
+        
+        if (filters.dueDateRange.end) {
+          const endDate = new Date(filters.dueDateRange.end);
+          if (taskDueDate > endDate) {
+            return false;
+          }
+        }
+      }
+
+      // Created date range filter
+      if (filters.createdDateRange.start || filters.createdDateRange.end) {
+        const taskCreatedDate = new Date(task.createdAt);
+        
+        if (filters.createdDateRange.start) {
+          const startDate = new Date(filters.createdDateRange.start);
+          if (taskCreatedDate < startDate) {
+            return false;
+          }
+        }
+        
+        if (filters.createdDateRange.end) {
+          const endDate = new Date(filters.createdDateRange.end);
+          if (taskCreatedDate > endDate) {
+            return false;
+          }
+        }
+      }
+
+      return true;
+    });
+  };
+
+  const loadAvailableTags = async () => {
+    try {
+      const tags = await tagService.getTags();
+      setAvailableTags(tags);
+    } catch (error) {
+      console.error('Failed to load tags:', error);
+    }
   };
 
   const handleSearchChange = (newSearchTerm: string) => {
     setSearchTerm(newSearchTerm);
     setIsSearching(newSearchTerm.length > 0);
+  };
+
+  const hasActiveFilters = (): boolean => {
+    return filters.status.length > 0 ||
+           filters.priority.length > 0 ||
+           filters.tags.length > 0 ||
+           !!filters.dueDateRange.start ||
+           !!filters.dueDateRange.end ||
+           !!filters.createdDateRange.start ||
+           !!filters.createdDateRange.end;
+  };
+
+  const getFilterSummary = (): string => {
+    const parts: string[] = [];
+    
+    if (filters.status.length > 0) {
+      parts.push(`${filters.status.length} status`);
+    }
+    if (filters.priority.length > 0) {
+      parts.push(`${filters.priority.length} priority`);
+    }
+    if (filters.tags.length > 0) {
+      parts.push(`${filters.tags.length} tag${filters.tags.length !== 1 ? 's' : ''}`);
+    }
+    if (filters.dueDateRange.start || filters.dueDateRange.end) {
+      parts.push('due date range');
+    }
+    if (filters.createdDateRange.start || filters.createdDateRange.end) {
+      parts.push('created date range');
+    }
+    
+    return `Filtered by ${parts.join(', ')}`;
   };
 
   const loadTasks = async () => {
@@ -223,9 +319,10 @@ const Dashboard: React.FC = () => {
   return (
     <div className="min-w-0 bg-gray-50 dark:bg-gray-800">
       <SearchBar 
-        selectedTags={selectedTags}
-        onTagsChange={setSelectedTags}
+        filters={filters}
+        onFiltersChange={setFilters}
         onSearchChange={handleSearchChange}
+        availableTags={availableTags}
       />
       <div className="p-6">
         <div className="mb-6">
@@ -244,9 +341,9 @@ const Dashboard: React.FC = () => {
                     • Found {filteredTasks.length} result{filteredTasks.length !== 1 ? 's' : ''} for "{searchTerm}"
                   </span>
                 )}
-                {!searchTerm && selectedTags.length > 0 && (
+                {!searchTerm && hasActiveFilters() && (
                   <span className="ml-2 text-blue-600 dark:text-blue-400">
-                    • Filtered by {selectedTags.length} tag{selectedTags.length !== 1 ? 's' : ''}
+                    • {getFilterSummary()}
                   </span>
                 )}
               </p>
@@ -266,6 +363,7 @@ const Dashboard: React.FC = () => {
         </div>
         <TaskBoard 
           tasks={filteredTasks} 
+          searchTerm={searchTerm}
           onCreateTask={handleCreateTask}
           onUpdateTask={handleUpdateTask}
           onDeleteTask={handleDeleteTask}

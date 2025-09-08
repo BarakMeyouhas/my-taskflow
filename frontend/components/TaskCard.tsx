@@ -4,6 +4,7 @@ import TaskDetailsModal from "./TaskDetailsModal";
 import { Button, IconButton, TagBadge } from "./ui";
 import { Task, UpdateTaskRequest } from "../types/task";
 import { Tag } from "../types/tag";
+import { highlightSearchTerm } from "../utils/highlightUtils";
 
 interface TaskCardProps {
   id: number;
@@ -21,6 +22,7 @@ interface TaskCardProps {
     email: string;
   };
   tags?: Tag[];
+  searchTerm?: string;
   onUpdateTask?: (taskId: number, taskData: UpdateTaskRequest, selectedTags?: Tag[]) => Promise<void>;
   onDeleteTask?: (taskId: number) => Promise<void>;
 }
@@ -37,6 +39,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   ownerId,
   owner,
   tags = [],
+  searchTerm = '',
   onUpdateTask,
   onDeleteTask,
 }) => {
@@ -155,9 +158,12 @@ const TaskCard: React.FC<TaskCardProps> = ({
       >
         {/* Header */}
         <div className="flex items-start justify-between space-element">
-          <h3 className="text-heading-4 text-gray-900 dark:text-gray-100 truncate">
-            {title}
-          </h3>
+          <h3 
+            className="text-heading-4 text-gray-900 dark:text-gray-100 truncate"
+            dangerouslySetInnerHTML={{ 
+              __html: searchTerm ? highlightSearchTerm(title, searchTerm) : title 
+            }}
+          />
           <div className="flex items-center gap-2">
             <span className={`${getPriorityColor(priority)}`}>
               {getPriorityIcon(priority)} {priority}
@@ -167,9 +173,12 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
         {/* Description */}
         {description && (
-          <p className="text-body-small text-gray-600 dark:text-gray-300 space-element overflow-hidden text-ellipsis whitespace-nowrap">
-            {description}
-          </p>
+          <p 
+            className="text-body-small text-gray-600 dark:text-gray-300 space-element overflow-hidden text-ellipsis whitespace-nowrap"
+            dangerouslySetInnerHTML={{ 
+              __html: searchTerm ? highlightSearchTerm(description, searchTerm) : description 
+            }}
+          />
         )}
 
         {/* Tags */}
@@ -184,7 +193,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
           <div className="space-element">
             <div className="flex flex-wrap gap-1">
               {tags.slice(0, 3).map(tag => (
-                <TagBadge key={tag.id} tag={tag} size="sm" />
+                <TagBadge key={tag.id} tag={tag} size="sm" searchTerm={searchTerm} />
               ))}
               {tags.length > 3 && (
                 <span className="text-xs text-gray-500 dark:text-gray-400 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full">

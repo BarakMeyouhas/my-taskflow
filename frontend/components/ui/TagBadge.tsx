@@ -1,5 +1,6 @@
 import React from 'react';
 import { Tag } from '../../types/tag';
+import { highlightSearchTerm } from '../../utils/highlightUtils';
 
 export interface TagBadgeProps {
   tag: Tag;
@@ -7,6 +8,7 @@ export interface TagBadgeProps {
   removable?: boolean;
   onRemove?: (tagId: number) => void;
   className?: string;
+  searchTerm?: string;
 }
 
 const TagBadge: React.FC<TagBadgeProps> = ({
@@ -14,7 +16,8 @@ const TagBadge: React.FC<TagBadgeProps> = ({
   size = 'md',
   removable = false,
   onRemove,
-  className = ''
+  className = '',
+  searchTerm = ''
 }) => {
   const sizeClasses = {
     sm: 'px-2 py-1 text-xs',
@@ -66,7 +69,11 @@ const TagBadge: React.FC<TagBadgeProps> = ({
       style={tag.color ? { backgroundColor: tag.color, color: getContrastColor(tag.color) } : undefined}
       title={tag.description || tag.name}
     >
-      {tag.name}
+      <span
+        dangerouslySetInnerHTML={{ 
+          __html: searchTerm ? highlightSearchTerm(tag.name, searchTerm) : tag.name 
+        }}
+      />
       {removable && (
         <button
           onClick={handleRemove}

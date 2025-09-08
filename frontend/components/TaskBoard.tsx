@@ -10,13 +10,15 @@ interface TaskBoardProps {
   onCreateTask?: (taskData: CreateTaskRequest) => Promise<void>;
   onUpdateTask?: (taskId: number, taskData: UpdateTaskRequest) => Promise<void>;
   onDeleteTask?: (taskId: number) => Promise<void>;
+  searchTerm?: string;
 }
 
 const TaskBoard: React.FC<TaskBoardProps> = ({ 
   tasks, 
   onCreateTask, 
   onUpdateTask, 
-  onDeleteTask 
+  onDeleteTask,
+  searchTerm = ''
 }) => {
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -137,6 +139,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({
                           >
                             <TaskCard 
                               {...task} 
+                              searchTerm={searchTerm}
                               onUpdateTask={onUpdateTask}
                               onDeleteTask={onDeleteTask}
                             />
