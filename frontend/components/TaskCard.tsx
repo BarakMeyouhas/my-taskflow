@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import TaskEditForm from "./TaskEditForm";
+import TaskDetailsModal from "./TaskDetailsModal";
+import { Button, IconButton } from "./ui";
 import { Task, UpdateTaskRequest } from "../types/task";
 
 interface TaskCardProps {
@@ -36,31 +38,32 @@ const TaskCard: React.FC<TaskCardProps> = ({
   onDeleteTask,
 }) => {
   const [isEditFormOpen, setIsEditFormOpen] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "ToDo":
-        return "bg-gray-100 text-gray-800";
+        return "badge-neutral";
       case "InProgress":
-        return "bg-blue-100 text-blue-800";
+        return "badge-info";
       case "Done":
-        return "bg-green-100 text-green-800";
+        return "badge-success";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "badge-neutral";
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "Low":
-        return "bg-gray-100 text-gray-600";
+        return "badge-neutral";
       case "Medium":
-        return "bg-blue-100 text-blue-600";
+        return "badge-info";
       case "High":
-        return "bg-orange-100 text-orange-600";
+        return "badge-warning";
       default:
-        return "bg-gray-100 text-gray-600";
+        return "badge-neutral";
     }
   };
 
@@ -108,20 +111,51 @@ const TaskCard: React.FC<TaskCardProps> = ({
     owner,
   };
 
+  const EditIcon = (
+    <svg
+      className="w-4 h-4"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+      />
+    </svg>
+  );
+
+  const DeleteIcon = (
+    <svg
+      className="w-4 h-4"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+      />
+    </svg>
+  );
+
   return (
     <>
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 p-6">
+      <div 
+        className="card-interactive padding-component cursor-pointer"
+        onClick={() => setIsDetailsModalOpen(true)}
+      >
         {/* Header */}
-        <div className="flex items-start justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900 truncate">
+        <div className="flex items-start justify-between space-element">
+          <h3 className="text-heading-4 text-gray-900 dark:text-gray-100 truncate">
             {title}
           </h3>
-          <div className="flex items-center space-x-2">
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(
-                priority
-              )}`}
-            >
+          <div className="flex items-center gap-2">
+            <span className={`${getPriorityColor(priority)}`}>
               {getPriorityIcon(priority)} {priority}
             </span>
           </div>
@@ -129,21 +163,17 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
         {/* Description */}
         {description && (
-          <p className="text-gray-600 text-sm mb-4 overflow-hidden text-ellipsis whitespace-nowrap">
+          <p className="text-body-small text-gray-600 dark:text-gray-300 space-element overflow-hidden text-ellipsis whitespace-nowrap">
             {description}
           </p>
         )}
 
         {/* Status and Owner */}
-        <div className="flex items-center justify-between mb-4">
-          <span
-            className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-              status
-            )}`}
-          >
+        <div className="flex items-center justify-between space-element">
+          <span className={`${getStatusColor(status)}`}>
             {status.replace(/([A-Z])/g, " $1").trim()}
           </span>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-2">
             <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
               <svg
                 className="w-4 h-4 text-gray-600"
@@ -159,17 +189,17 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 />
               </svg>
             </div>
-            <span className="text-sm text-gray-600">
+            <span className="text-caption text-gray-500 dark:text-gray-400">
               {owner?.username || "Unknown"}
             </span>
           </div>
         </div>
 
-        {/* Due Date and Actions */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-          <div className="flex items-center space-x-2 text-sm text-gray-500">
+        {/* Due Date */}
+        <div className="space-element">
+          <div className="flex items-center gap-2">
             <svg
-              className="w-4 h-4"
+              className="w-4 h-4 text-gray-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -181,52 +211,62 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            <span>Due {formatDate(dueDate)}</span>
+            <span className="text-caption text-gray-500 dark:text-gray-400">
+              {formatDate(dueDate)}
+            </span>
           </div>
+        </div>
 
-          <div className="flex items-center space-x-2">
-            <button 
-              onClick={() => setIsEditFormOpen(true)}
-              className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-md hover:bg-gray-100"
-              title="Edit task"
+        {/* Actions */}
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-600">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              leftIcon={EditIcon}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsEditFormOpen(true);
+              }}
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                />
-              </svg>
-            </button>
-            <button 
-              onClick={() => setShowDeleteConfirm(true)}
-              className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-md hover:bg-red-50"
-              title="Delete task"
+              Edit
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              leftIcon={DeleteIcon}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowDeleteConfirm(true);
+              }}
+              className="text-error-600 hover:text-error-700 hover:bg-error-50"
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                />
-              </svg>
-            </button>
+              Delete
+            </Button>
+          </div>
+          
+          <div className="text-caption text-gray-400 dark:text-gray-500">
+            Created {new Date(createdAt).toLocaleDateString()}
           </div>
         </div>
       </div>
 
+      {/* Task Details Modal */}
+      <TaskDetailsModal
+        isOpen={isDetailsModalOpen}
+        onClose={() => setIsDetailsModalOpen(false)}
+        task={currentTask}
+        onEdit={() => {
+          setIsDetailsModalOpen(false);
+          setIsEditFormOpen(true);
+        }}
+        onDelete={() => {
+          setIsDetailsModalOpen(false);
+          setShowDeleteConfirm(true);
+        }}
+      />
+
+      {/* Edit Form Modal */}
       <TaskEditForm
         isOpen={isEditFormOpen}
         onClose={() => setIsEditFormOpen(false)}
@@ -236,36 +276,29 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-            <div className="p-6">
-              <div className="flex items-center mb-4">
-                <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-                  <svg className="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                  </svg>
-                </div>
-              </div>
-              <div className="text-center">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Delete Task</h3>
-                <p className="text-sm text-gray-500 mb-6">
-                  Are you sure you want to delete "{title}"? This action cannot be undone.
-                </p>
-                <div className="flex space-x-3">
-                  <button
-                    onClick={() => setShowDeleteConfirm(false)}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleDeleteTask}
-                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-700 rounded-lg padding-component max-w-md w-full mx-4">
+            <h3 className="text-heading-4 text-gray-900 dark:text-gray-100 space-element">
+              Delete Task
+            </h3>
+            <p className="text-body text-gray-600 dark:text-gray-300 space-element">
+              Are you sure you want to delete "{title}"? This action cannot be undone.
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowDeleteConfirm(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleDeleteTask}
+              >
+                Delete
+              </Button>
             </div>
           </div>
         </div>

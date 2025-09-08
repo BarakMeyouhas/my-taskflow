@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { ThemeToggle } from "./ui/ThemeToggle";
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -22,7 +23,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   ];
 
   return (
-    <header className="relative bg-white shadow-sm border-b border-gray-200">
+    <header className="relative bg-white dark:bg-gray-700 shadow-sm border-b border-gray-200 dark:border-gray-600">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 min-w-0">
           {/* Logo and Brand with Sidebar Toggle */}
@@ -62,7 +63,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                 />
               </svg>
             </div>
-            <h1 className="text-xl font-bold text-gray-900">TaskFlow</h1>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">TaskFlow</h1>
           </div>
 
           {/* Mobile Navigation Toggle */}
@@ -101,8 +102,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                   href={item.href}
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
                     isActive
-                      ? "text-blue-700 bg-blue-50"
-                      : "text-gray-700 hover:text-blue-600"
+                      ? "text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
+                      : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
                   }`}
                 >
                   {item.label}
@@ -113,9 +114,12 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
           {/* User Menu */}
           <div className="hidden lg:flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+            
             {/* Notifications */}
             <button
-              className="p-2 text-gray-400 hover:text-gray-600 transition-colors relative"
+              className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors relative"
               aria-label="Notifications"
             >
               <svg
@@ -149,13 +153,13 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                       {user?.username.charAt(0).toUpperCase()}
                     </span>
                   </div>
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     {user?.username}
                   </span>
                 </div>
                 <button
                   onClick={logout}
-                  className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-red-600 transition-colors"
+                  className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-red-600 transition-colors"
                 >
                   Sign Out
                 </button>
@@ -165,7 +169,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               <div className="flex items-center space-x-2">
                 <Link
                   href="/login"
-                  className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+                  className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors"
                 >
                   Sign In
                 </Link>
@@ -183,7 +187,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
       {/* Collapsible mobile nav panel */}
       <div
-        className={`lg:hidden absolute top-16 left-0 right-0 bg-white border-b border-gray-200 shadow-sm ${
+        className={`lg:hidden absolute top-16 left-0 right-0 bg-white dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600 shadow-sm ${
           isMobileNavOpen ? "block" : "hidden"
         }`}
       >
@@ -196,8 +200,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                 href={item.href}
                 className={`block px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive
-                    ? "text-blue-700 bg-blue-50"
-                    : "text-gray-700 hover:text-blue-600"
+                    ? "text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
+                    : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
                 }`}
                 onClick={() => setIsMobileNavOpen(false)}
               >
@@ -207,7 +211,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           })}
 
           {/* Mobile Auth Links */}
-          <div className="border-t border-gray-200 mt-2 pt-2">
+          <div className="border-t border-gray-200 dark:border-gray-600 mt-2 pt-2">
             {isAuthenticated ? (
               /* Authenticated User Mobile Menu */
               <div className="px-3 py-2">
@@ -217,14 +221,14 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                       {user?.username.charAt(0).toUpperCase()}
                     </span>
                   </div>
-                  <span className="text-sm font-medium text-gray-700">{user?.username}</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{user?.username}</span>
                 </div>
                 <button
                   onClick={() => {
                     logout();
                     setIsMobileNavOpen(false);
                   }}
-                  className="w-full px-3 py-2 text-sm font-medium text-gray-700 hover:text-red-600 transition-colors text-left"
+                  className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-red-600 transition-colors text-left"
                 >
                   Sign Out
                 </button>
@@ -234,14 +238,14 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               <>
                 <Link
                   href="/login"
-                  className="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+                  className="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                   onClick={() => setIsMobileNavOpen(false)}
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/register"
-                  className="block px-3 py-2 rounded-md text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-md transition-all duration-200 mx-3 mt-2 text-center"
+                  className="block px-3 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-md transition-all duration-200 mx-3 mt-2 text-center"
                   onClick={() => setIsMobileNavOpen(false)}
                 >
                   Sign Up

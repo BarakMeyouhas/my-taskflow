@@ -19,7 +19,7 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
       {/* Fixed header */}
       <div className="fixed top-0 inset-x-0 z-50">
         <Header onMenuClick={() => setIsSidebarOpen((v) => !v)} />
@@ -28,7 +28,7 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
       {/* Sidebar - fixed on desktop, slide-in on mobile */}
       <div
         className={
-          "fixed top-16 left-0 z-40 h-[calc(100vh-4rem)] w-64 transform border-r border-gray-200 bg-white transition-transform duration-200 ease-in-out " +
+          "fixed top-16 left-0 z-40 h-[calc(100vh-4rem)] w-64 transform border-r border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 transition-transform duration-200 ease-in-out " +
           (isSidebarOpen ? "translate-x-0" : "-translate-x-full") +
           " lg:ml-64"
         }
@@ -45,7 +45,7 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
       )}
 
       {/* Main content area, offset for header and sidebar */}
-      <main className="pt-16 lg:ml-64 min-h-screen">
+      <main className="pt-16 lg:ml-64 min-h-screen bg-gray-50 dark:bg-gray-800">
         {children}
       </main>
     </div>

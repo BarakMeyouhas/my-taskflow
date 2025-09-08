@@ -64,10 +64,10 @@ const Dashboard: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-800 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading tasks...</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading tasks...</p>
         </div>
       </div>
     );
@@ -75,9 +75,9 @@ const Dashboard: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-800 flex items-center justify-center">
         <div className="text-center">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-md">
             <p className="font-medium">Error loading tasks</p>
             <p className="text-sm mt-1">{error}</p>
             <button 
@@ -93,12 +93,12 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-w-0">
+    <div className="min-w-0 bg-gray-50 dark:bg-gray-800">
       <SearchBar />
       <div className="p-6">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Task Board</h1>
-          <p className="text-gray-600">Manage your team&apos;s tasks and track progress</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Task Board</h1>
+          <p className="text-gray-600 dark:text-gray-400">Manage your team&apos;s tasks and track progress</p>
         </div>
         <TaskBoard 
           tasks={tasks} 
