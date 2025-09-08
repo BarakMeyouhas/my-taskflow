@@ -2503,6 +2503,10 @@ const TaskDetailsModal = (param)=>{
                             lineNumber: 113,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
+                        (()=>{
+                            console.log('🔍 DEBUG: TaskDetailsModal tags for task', task.title, ':', task.tags);
+                            return null;
+                        })(),
                         task.tags && task.tags.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -2510,7 +2514,7 @@ const TaskDetailsModal = (param)=>{
                                     children: "Tags"
                                 }, void 0, false, {
                                     fileName: "[project]/components/TaskDetailsModal.tsx",
-                                    lineNumber: 122,
+                                    lineNumber: 126,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2520,18 +2524,18 @@ const TaskDetailsModal = (param)=>{
                                             size: "md"
                                         }, tag.id, false, {
                                             fileName: "[project]/components/TaskDetailsModal.tsx",
-                                            lineNumber: 125,
+                                            lineNumber: 129,
                                             columnNumber: 19
                                         }, ("TURBOPACK compile-time value", void 0)))
                                 }, void 0, false, {
                                     fileName: "[project]/components/TaskDetailsModal.tsx",
-                                    lineNumber: 123,
+                                    lineNumber: 127,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/TaskDetailsModal.tsx",
-                            lineNumber: 121,
+                            lineNumber: 125,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2544,7 +2548,7 @@ const TaskDetailsModal = (param)=>{
                                             children: "Due Date"
                                         }, void 0, false, {
                                             fileName: "[project]/components/TaskDetailsModal.tsx",
-                                            lineNumber: 135,
+                                            lineNumber: 139,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2562,12 +2566,12 @@ const TaskDetailsModal = (param)=>{
                                                         d: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/TaskDetailsModal.tsx",
-                                                        lineNumber: 138,
+                                                        lineNumber: 142,
                                                         columnNumber: 19
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/TaskDetailsModal.tsx",
-                                                    lineNumber: 137,
+                                                    lineNumber: 141,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2575,19 +2579,19 @@ const TaskDetailsModal = (param)=>{
                                                     children: formatDate(task.dueDate)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/TaskDetailsModal.tsx",
-                                                    lineNumber: 140,
+                                                    lineNumber: 144,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/TaskDetailsModal.tsx",
-                                            lineNumber: 136,
+                                            lineNumber: 140,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/TaskDetailsModal.tsx",
-                                    lineNumber: 134,
+                                    lineNumber: 138,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2597,7 +2601,7 @@ const TaskDetailsModal = (param)=>{
                                             children: "Owner"
                                         }, void 0, false, {
                                             fileName: "[project]/components/TaskDetailsModal.tsx",
-                                            lineNumber: 146,
+                                            lineNumber: 150,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2610,12 +2614,12 @@ const TaskDetailsModal = (param)=>{
                                                         children: ((_task_owner = task.owner) === null || _task_owner === void 0 ? void 0 : (_task_owner_username = _task_owner.username) === null || _task_owner_username === void 0 ? void 0 : _task_owner_username.charAt(0).toUpperCase()) || '?'
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/TaskDetailsModal.tsx",
-                                                        lineNumber: 149,
+                                                        lineNumber: 153,
                                                         columnNumber: 19
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/TaskDetailsModal.tsx",
-                                                    lineNumber: 148,
+                                                    lineNumber: 152,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2623,19 +2627,19 @@ const TaskDetailsModal = (param)=>{
                                                     children: ((_task_owner1 = task.owner) === null || _task_owner1 === void 0 ? void 0 : _task_owner1.username) || 'Unknown'
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/TaskDetailsModal.tsx",
-                                                    lineNumber: 153,
+                                                    lineNumber: 157,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/TaskDetailsModal.tsx",
-                                            lineNumber: 147,
+                                            lineNumber: 151,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/TaskDetailsModal.tsx",
-                                    lineNumber: 145,
+                                    lineNumber: 149,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2645,7 +2649,7 @@ const TaskDetailsModal = (param)=>{
                                             children: "Created"
                                         }, void 0, false, {
                                             fileName: "[project]/components/TaskDetailsModal.tsx",
-                                            lineNumber: 159,
+                                            lineNumber: 163,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2653,13 +2657,13 @@ const TaskDetailsModal = (param)=>{
                                             children: formatDateTime(task.createdAt)
                                         }, void 0, false, {
                                             fileName: "[project]/components/TaskDetailsModal.tsx",
-                                            lineNumber: 160,
+                                            lineNumber: 164,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/TaskDetailsModal.tsx",
-                                    lineNumber: 158,
+                                    lineNumber: 162,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2669,7 +2673,7 @@ const TaskDetailsModal = (param)=>{
                                             children: "Last Updated"
                                         }, void 0, false, {
                                             fileName: "[project]/components/TaskDetailsModal.tsx",
-                                            lineNumber: 165,
+                                            lineNumber: 169,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2677,19 +2681,19 @@ const TaskDetailsModal = (param)=>{
                                             children: formatDateTime(task.updatedAt)
                                         }, void 0, false, {
                                             fileName: "[project]/components/TaskDetailsModal.tsx",
-                                            lineNumber: 166,
+                                            lineNumber: 170,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/TaskDetailsModal.tsx",
-                                    lineNumber: 164,
+                                    lineNumber: 168,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/TaskDetailsModal.tsx",
-                            lineNumber: 132,
+                            lineNumber: 136,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2702,12 +2706,12 @@ const TaskDetailsModal = (param)=>{
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/TaskDetailsModal.tsx",
-                                lineNumber: 172,
+                                lineNumber: 176,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0))
                         }, void 0, false, {
                             fileName: "[project]/components/TaskDetailsModal.tsx",
-                            lineNumber: 171,
+                            lineNumber: 175,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
@@ -2735,7 +2739,7 @@ const TaskDetailsModal = (param)=>{
                                 children: "Edit Task"
                             }, void 0, false, {
                                 fileName: "[project]/components/TaskDetailsModal.tsx",
-                                lineNumber: 179,
+                                lineNumber: 183,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$Button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
@@ -2747,13 +2751,13 @@ const TaskDetailsModal = (param)=>{
                                 children: "Delete Task"
                             }, void 0, false, {
                                 fileName: "[project]/components/TaskDetailsModal.tsx",
-                                lineNumber: 187,
+                                lineNumber: 191,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/TaskDetailsModal.tsx",
-                        lineNumber: 178,
+                        lineNumber: 182,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$Button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
@@ -2762,13 +2766,13 @@ const TaskDetailsModal = (param)=>{
                         children: "Close"
                     }, void 0, false, {
                         fileName: "[project]/components/TaskDetailsModal.tsx",
-                        lineNumber: 197,
+                        lineNumber: 201,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/TaskDetailsModal.tsx",
-                lineNumber: 177,
+                lineNumber: 181,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0))
         ]
@@ -2967,6 +2971,13 @@ const TaskCard = (param)=>{
                         lineNumber: 170,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0)),
+                    (()=>{
+                        console.log('🔍 DEBUG: TaskCard tags for task', title, ':', tags);
+                        if (tags && tags.length > 0) {
+                            console.log('🔍 DEBUG: Tag details:', tags[0]);
+                        }
+                        return null;
+                    })(),
                     tags && tags.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "space-element",
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2977,7 +2988,7 @@ const TaskCard = (param)=>{
                                         size: "sm"
                                     }, tag.id, false, {
                                         fileName: "[project]/components/TaskCard.tsx",
-                                        lineNumber: 180,
+                                        lineNumber: 187,
                                         columnNumber: 17
                                     }, ("TURBOPACK compile-time value", void 0))),
                                 tags.length > 3 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2989,18 +3000,18 @@ const TaskCard = (param)=>{
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/TaskCard.tsx",
-                                    lineNumber: 183,
+                                    lineNumber: 190,
                                     columnNumber: 17
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/TaskCard.tsx",
-                            lineNumber: 178,
+                            lineNumber: 185,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/components/TaskCard.tsx",
-                        lineNumber: 177,
+                        lineNumber: 184,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3011,7 +3022,7 @@ const TaskCard = (param)=>{
                                 children: status.replace(/([A-Z])/g, " $1").trim()
                             }, void 0, false, {
                                 fileName: "[project]/components/TaskCard.tsx",
-                                lineNumber: 193,
+                                lineNumber: 200,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3031,17 +3042,17 @@ const TaskCard = (param)=>{
                                                 d: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/TaskCard.tsx",
-                                                lineNumber: 204,
+                                                lineNumber: 211,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/components/TaskCard.tsx",
-                                            lineNumber: 198,
+                                            lineNumber: 205,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     }, void 0, false, {
                                         fileName: "[project]/components/TaskCard.tsx",
-                                        lineNumber: 197,
+                                        lineNumber: 204,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3049,19 +3060,19 @@ const TaskCard = (param)=>{
                                         children: (owner === null || owner === void 0 ? void 0 : owner.username) || "Unknown"
                                     }, void 0, false, {
                                         fileName: "[project]/components/TaskCard.tsx",
-                                        lineNumber: 212,
+                                        lineNumber: 219,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/TaskCard.tsx",
-                                lineNumber: 196,
+                                lineNumber: 203,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/TaskCard.tsx",
-                        lineNumber: 192,
+                        lineNumber: 199,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3081,12 +3092,12 @@ const TaskCard = (param)=>{
                                         d: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                                     }, void 0, false, {
                                         fileName: "[project]/components/TaskCard.tsx",
-                                        lineNumber: 227,
+                                        lineNumber: 234,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0))
                                 }, void 0, false, {
                                     fileName: "[project]/components/TaskCard.tsx",
-                                    lineNumber: 221,
+                                    lineNumber: 228,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3094,18 +3105,18 @@ const TaskCard = (param)=>{
                                     children: formatDate(dueDate)
                                 }, void 0, false, {
                                     fileName: "[project]/components/TaskCard.tsx",
-                                    lineNumber: 234,
+                                    lineNumber: 241,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/TaskCard.tsx",
-                            lineNumber: 220,
+                            lineNumber: 227,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/components/TaskCard.tsx",
-                        lineNumber: 219,
+                        lineNumber: 226,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3125,7 +3136,7 @@ const TaskCard = (param)=>{
                                         children: "Edit"
                                     }, void 0, false, {
                                         fileName: "[project]/components/TaskCard.tsx",
-                                        lineNumber: 243,
+                                        lineNumber: 250,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$Button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
@@ -3140,13 +3151,13 @@ const TaskCard = (param)=>{
                                         children: "Delete"
                                     }, void 0, false, {
                                         fileName: "[project]/components/TaskCard.tsx",
-                                        lineNumber: 254,
+                                        lineNumber: 261,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/TaskCard.tsx",
-                                lineNumber: 242,
+                                lineNumber: 249,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3157,13 +3168,13 @@ const TaskCard = (param)=>{
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/TaskCard.tsx",
-                                lineNumber: 268,
+                                lineNumber: 275,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/TaskCard.tsx",
-                        lineNumber: 241,
+                        lineNumber: 248,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
@@ -3186,7 +3197,7 @@ const TaskCard = (param)=>{
                 }
             }, void 0, false, {
                 fileName: "[project]/components/TaskCard.tsx",
-                lineNumber: 275,
+                lineNumber: 282,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$TaskEditForm$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -3196,7 +3207,7 @@ const TaskCard = (param)=>{
                 onSubmit: handleUpdateTask
             }, void 0, false, {
                 fileName: "[project]/components/TaskCard.tsx",
-                lineNumber: 290,
+                lineNumber: 297,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             showDeleteConfirm && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3209,7 +3220,7 @@ const TaskCard = (param)=>{
                             children: "Delete Task"
                         }, void 0, false, {
                             fileName: "[project]/components/TaskCard.tsx",
-                            lineNumber: 301,
+                            lineNumber: 308,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3221,7 +3232,7 @@ const TaskCard = (param)=>{
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/TaskCard.tsx",
-                            lineNumber: 304,
+                            lineNumber: 311,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3234,7 +3245,7 @@ const TaskCard = (param)=>{
                                     children: "Cancel"
                                 }, void 0, false, {
                                     fileName: "[project]/components/TaskCard.tsx",
-                                    lineNumber: 308,
+                                    lineNumber: 315,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$Button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
@@ -3244,24 +3255,24 @@ const TaskCard = (param)=>{
                                     children: "Delete"
                                 }, void 0, false, {
                                     fileName: "[project]/components/TaskCard.tsx",
-                                    lineNumber: 315,
+                                    lineNumber: 322,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/TaskCard.tsx",
-                            lineNumber: 307,
+                            lineNumber: 314,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/TaskCard.tsx",
-                    lineNumber: 300,
+                    lineNumber: 307,
                     columnNumber: 11
                 }, ("TURBOPACK compile-time value", void 0))
             }, void 0, false, {
                 fileName: "[project]/components/TaskCard.tsx",
-                lineNumber: 299,
+                lineNumber: 306,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0))
         ]
@@ -4703,13 +4714,21 @@ class TaskService {
                 throw new Error("Failed to fetch tasks: ".concat(response.statusText));
             }
             const data = await response.json();
+            console.log('🔍 DEBUG: Raw API response:', data);
             const tasks = data.tasks || [];
+            console.log('🔍 DEBUG: Tasks array:', tasks);
+            if (tasks.length > 0) {
+                console.log('🔍 DEBUG: First task:', tasks[0]);
+                console.log('🔍 DEBUG: First task tags:', tasks[0].tags);
+            }
             // Convert numeric status from backend to string format expected by frontend
-            return tasks.map((task)=>({
+            const convertedTasks = tasks.map((task)=>({
                     ...task,
                     status: this.convertStatusToString(task.status),
                     priority: this.convertPriorityToString(task.priority)
                 }));
+            console.log('🔍 DEBUG: Converted tasks:', convertedTasks);
+            return convertedTasks;
         } catch (error) {
             console.error("Error fetching tasks:", error);
             throw error;
@@ -4781,10 +4800,23 @@ class TaskService {
         try {
             // Convert frontend data to backend format
             const backendData = {
-                ...taskData,
-                status: taskData.status ? this.convertStatusToNumber(taskData.status) : undefined,
-                priority: taskData.priority ? this.convertPriorityToNumber(taskData.priority) : undefined
+                title: taskData.title,
+                description: taskData.description
             };
+            // Only add dueDate if it has a valid value
+            if (taskData.dueDate && taskData.dueDate.trim() !== '') {
+                backendData.dueDate = taskData.dueDate;
+            }
+            // Only add status and priority if they have values
+            if (taskData.status) {
+                backendData.status = this.convertStatusToNumber(taskData.status);
+            }
+            if (taskData.priority) {
+                backendData.priority = this.convertPriorityToNumber(taskData.priority);
+            }
+            console.log('🔍 DEBUG: Updating task with ID:', id);
+            console.log('🔍 DEBUG: Backend data being sent:', backendData);
+            console.log('🔍 DEBUG: Request URL:', "".concat(this.getBaseUrl(), "/api/task/").concat(id));
             const response = await fetch("".concat(this.getBaseUrl(), "/api/task/").concat(id), {
                 method: "PUT",
                 headers: this.getAuthHeaders(),
@@ -4792,6 +4824,10 @@ class TaskService {
             });
             if (!response.ok) {
                 const errorData = await response.json().catch(()=>({}));
+                console.log('🔍 DEBUG: Backend error response:', errorData);
+                console.log('🔍 DEBUG: Validation errors:', errorData.errors);
+                console.log('🔍 DEBUG: Response status:', response.status);
+                console.log('🔍 DEBUG: Response statusText:', response.statusText);
                 throw new Error(errorData.message || "Failed to update task: ".concat(response.statusText));
             }
             const data = await response.json();

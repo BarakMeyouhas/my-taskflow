@@ -64,14 +64,25 @@ class TaskService {
       }
 
       const data = await response.json();
+      console.log('🔍 DEBUG: Raw API response:', data);
+      
       const tasks = data.tasks || [];
+      console.log('🔍 DEBUG: Tasks array:', tasks);
+      
+      if (tasks.length > 0) {
+        console.log('🔍 DEBUG: First task:', tasks[0]);
+        console.log('🔍 DEBUG: First task tags:', tasks[0].tags);
+      }
       
       // Convert numeric status from backend to string format expected by frontend
-      return tasks.map((task: any) => ({
+      const convertedTasks = tasks.map((task: any) => ({
         ...task,
         status: this.convertStatusToString(task.status),
         priority: this.convertPriorityToString(task.priority)
       }));
+      
+      console.log('🔍 DEBUG: Converted tasks:', convertedTasks);
+      return convertedTasks;
     } catch (error) {
       console.error("Error fetching tasks:", error);
       throw error;
@@ -165,11 +176,27 @@ class TaskService {
   async updateTask(id: number, taskData: UpdateTaskRequest): Promise<Task> {
     try {
       // Convert frontend data to backend format
-      const backendData = {
-        ...taskData,
-        status: taskData.status ? this.convertStatusToNumber(taskData.status) : undefined,
-        priority: taskData.priority ? this.convertPriorityToNumber(taskData.priority) : undefined,
+      const backendData: any = {
+        title: taskData.title,
+        description: taskData.description,
       };
+
+      // Only add dueDate if it has a valid value
+      if (taskData.dueDate && taskData.dueDate.trim() !== '') {
+        backendData.dueDate = taskData.dueDate;
+      }
+
+      // Only add status and priority if they have values
+      if (taskData.status) {
+        backendData.status = this.convertStatusToNumber(taskData.status);
+      }
+      if (taskData.priority) {
+        backendData.priority = this.convertPriorityToNumber(taskData.priority);
+      }
+
+      console.log('🔍 DEBUG: Updating task with ID:', id);
+      console.log('🔍 DEBUG: Backend data being sent:', backendData);
+      console.log('🔍 DEBUG: Request URL:', `${this.getBaseUrl()}/api/task/${id}`);
 
       const response = await fetch(`${this.getBaseUrl()}/api/task/${id}`, {
         method: "PUT",
@@ -179,6 +206,10 @@ class TaskService {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        console.log('🔍 DEBUG: Backend error response:', errorData);
+        console.log('🔍 DEBUG: Validation errors:', errorData.errors);
+        console.log('🔍 DEBUG: Response status:', response.status);
+        console.log('🔍 DEBUG: Response statusText:', response.statusText);
         throw new Error(
           errorData.message || `Failed to update task: ${response.statusText}`
         );

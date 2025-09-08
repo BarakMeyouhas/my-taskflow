@@ -117,6 +117,10 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
           )}
 
           {/* Tags */}
+          {(() => {
+            console.log('🔍 DEBUG: TaskDetailsModal tags for task', task.title, ':', task.tags);
+            return null;
+          })()}
           {task.tags && task.tags.length > 0 && (
             <div>
               <h3 className="text-label text-gray-700 space-small">Tags</h3>

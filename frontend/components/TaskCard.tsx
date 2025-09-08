@@ -173,6 +173,13 @@ const TaskCard: React.FC<TaskCardProps> = ({
         )}
 
         {/* Tags */}
+        {(() => {
+          console.log('🔍 DEBUG: TaskCard tags for task', title, ':', tags);
+          if (tags && tags.length > 0) {
+            console.log('🔍 DEBUG: Tag details:', tags[0]);
+          }
+          return null;
+        })()}
         {tags && tags.length > 0 && (
           <div className="space-element">
             <div className="flex flex-wrap gap-1">
