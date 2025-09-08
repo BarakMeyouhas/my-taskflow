@@ -66,7 +66,7 @@ namespace TaskFlow.Api.Controllers
                 }
 
                 // Generate JWT token using service
-                var token = _jwtService.GenerateToken(user.Username);
+                var token = _jwtService.GenerateToken(user.Username, user.Id);
 
                 _logger.LogInformation(
                     "Login successful for username: {Username}",

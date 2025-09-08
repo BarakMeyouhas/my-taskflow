@@ -64,13 +64,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return;
       }
   
-      // For MVP: Just check if token exists and assume it's valid
-      // TODO: Implement proper token verification when backend endpoint is available
-      setUser({
-        id: "1", // TODO: Get from token
-        username: "Current User", // TODO: Get from token  
-        email: "user@example.com" // TODO: Get from token
-      });
+      // Parse JWT token to get user data
+      try {
+        const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+        setUser({
+          id: tokenPayload.nameid || tokenPayload.sub,
+          username: tokenPayload.unique_name || tokenPayload.name,
+          email: tokenPayload.email || "user@example.com"
+        });
+      } catch (error) {
+        console.error("Error parsing JWT token:", error);
+        localStorage.removeItem("token");
+        setUser(null);
+      }
       
       setIsLoading(false);
     } catch (error) {

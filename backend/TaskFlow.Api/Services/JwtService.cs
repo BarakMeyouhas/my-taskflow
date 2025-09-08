@@ -7,7 +7,7 @@ namespace TaskFlow.Api.Services
 {
     public interface IJwtService
     {
-        string GenerateToken(string username);
+        string GenerateToken(string username, int userId);
         bool ValidateToken(string token);
         ClaimsPrincipal GetPrincipalFromToken(string token);
     }
@@ -66,14 +66,18 @@ namespace TaskFlow.Api.Services
             _logger.LogInformation("=== END JWT DEBUG ===");
         }
 
-        public string GenerateToken(string username)
+        public string GenerateToken(string username, int userId)
         {
             try
             {
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
                 var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-                var claims = new[] { new Claim(ClaimTypes.Name, username) };
+                var claims = new[] 
+                { 
+                    new Claim(ClaimTypes.Name, username),
+                    new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+                };
 
                 var token = new JwtSecurityToken(
                     issuer: _issuer,
@@ -84,14 +88,14 @@ namespace TaskFlow.Api.Services
                 );
 
                 _logger.LogInformation(
-                    "JWT token generated successfully for user: {Username}",
-                    username
+                    "JWT token generated successfully for user: {Username} (ID: {UserId})",
+                    username, userId
                 );
                 return new JwtSecurityTokenHandler().WriteToken(token);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error generating JWT token for user: {Username}", username);
+                _logger.LogError(ex, "Error generating JWT token for user: {Username} (ID: {UserId})", username, userId);
                 throw;
             }
         }

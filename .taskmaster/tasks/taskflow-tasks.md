@@ -197,7 +197,6 @@
 - Add drag & drop for project reordering in sidebar
 - Create global "+" button for quick task creation
 - Build lightweight task creation (title only) with expand option
-- Implement dark mode toggle
 - Add session persistence for drag & drop changes
 - Test quick add functionality and theme switching
 

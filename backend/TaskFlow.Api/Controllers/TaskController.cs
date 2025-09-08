@@ -12,18 +12,21 @@ namespace TaskFlow.Api.Controllers
     public class TaskController : ControllerBase
     {
         private readonly ITaskService _taskService;
-        private readonly IUserService _userService; // Add this line
+        private readonly IUserService _userService;
+        private readonly IJwtService _jwtService;
 
         private readonly ILogger<TaskController> _logger;
 
         public TaskController(
             ITaskService taskService,
             ILogger<TaskController> logger,
-            IUserService userService
+            IUserService userService,
+            IJwtService jwtService
         )
         {
             _taskService = taskService;
             _userService = userService;
+            _jwtService = jwtService;
             _logger = logger;
         }
 
@@ -421,18 +424,22 @@ namespace TaskFlow.Api.Controllers
         // Helper method to get current user ID from JWT token
         private int? GetCurrentUserId()
         {
-            // For now, we'll extract from Authorization header
-            // In a real implementation, you'd use proper JWT middleware
             var authHeader = Request.Headers["Authorization"].FirstOrDefault();
             if (authHeader == null || !authHeader.StartsWith("Bearer "))
                 return null;
 
             try
             {
-                // This is a simplified approach - in production you'd use proper JWT middleware
-                // For now, we'll return a hardcoded user ID for testing
-                // TODO: Implement proper JWT token parsing
-                return 1; // Hardcoded for testing - replace with actual JWT parsing
+                var token = authHeader.Substring("Bearer ".Length).Trim();
+                var principal = _jwtService.GetPrincipalFromToken(token);
+                
+                var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+                {
+                    return userId;
+                }
+                
+                return null;
             }
             catch
             {
