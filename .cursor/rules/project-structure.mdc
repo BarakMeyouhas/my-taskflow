@@ -37,22 +37,36 @@ backend/
 ├── TaskFlow.Api/              # Main API project
 │   ├── Controllers/           # API controllers
 │   │   ├── AuthController.cs  # Authentication endpoints
-│   │   └── DbDebugController.cs # Database debugging
+│   │   ├── DbDebugController.cs # Database debugging
+│   │   ├── TaskController.cs  # Task CRUD endpoints
+│   │   └── TagController.cs   # Tag management endpoints
 │   ├── Data/                  # Data access layer
 │   │   └── AppDbContext.cs    # Entity Framework context
 │   ├── Middleware/            # Custom middleware
 │   │   ├── ExceptionHandlingMiddleware.cs
 │   │   ├── RequestLoggingMiddleware.cs
 │   │   └── README.md
+│   ├── Migrations/            # Database migrations
+│   │   ├── 20250907191214_AddTaskEntity.cs
+│   │   ├── 20250907193944_AddTaskAssignmentEntityFixed.cs
+│   │   └── AppDbContextModelSnapshot.cs
 │   ├── Models/                # Data models
-│   │   └── User.cs           # User entity model
+│   │   ├── User.cs           # User entity model
+│   │   ├── Task.cs           # Task entity model
+│   │   ├── TaskAssignment.cs # Task assignment entity
+│   │   ├── Tag.cs            # Tag entity model
+│   │   └── TaskTag.cs        # Task-Tag junction entity
 │   ├── Services/              # Business logic services
 │   │   ├── GreetingService.cs
 │   │   ├── GreetingServiceDapper.cs
 │   │   ├── GreetingServiceDapperTests.cs
 │   │   ├── JwtService.cs      # JWT token handling
 │   │   ├── QueueService.cs    # Message queue operations
-│   │   └── UserService.cs     # User management
+│   │   ├── UserService.cs     # User management
+│   │   ├── TaskService.cs     # Task business logic
+│   │   ├── ITaskService.cs    # Task service interface
+│   │   ├── TagService.cs      # Tag business logic
+│   │   └── ITagService.cs     # Tag service interface
 │   ├── Properties/            # Project properties
 │   │   └── launchSettings.json
 │   ├── appsettings.json       # Configuration (base)
@@ -89,14 +103,39 @@ frontend/
 │   ├── Header.tsx            # Header component
 │   ├── LandingPage.tsx      # Landing page component
 │   ├── ProtectedRoute.tsx   # Route protection
-│   ├── SearchBar.tsx         # Search functionality
+│   ├── SearchBar.tsx         # Search functionality with filtering
 │   ├── Sidebar.tsx           # Navigation sidebar
-│   ├── TaskBoard.tsx         # Task management board
-│   └── TaskCard.tsx          # Individual task card
+│   ├── TaskBoard.tsx         # Kanban board with drag-and-drop
+│   ├── TaskCard.tsx          # Individual task card with highlighting
+│   ├── TaskCreateForm.tsx    # Task creation modal
+│   ├── TaskEditForm.tsx      # Task editing modal
+│   ├── TaskDetailsModal.tsx  # Task details modal
+│   ├── TagManager.tsx        # Tag management modal
+│   ├── TagSelector.tsx       # Tag selection component
+│   ├── TagFilter.tsx         # Tag filtering component
+│   ├── TaskFilter.tsx        # Comprehensive task filtering
+│   └── ui/                   # Reusable UI components
+│       ├── Button.tsx        # Button component
+│       ├── IconButton.tsx    # Icon button component
+│       ├── Modal.tsx         # Modal component
+│       ├── ModalHeader.tsx   # Modal header component
+│       ├── ModalBody.tsx     # Modal body component
+│       ├── ModalFooter.tsx   # Modal footer component
+│       ├── TagBadge.tsx      # Tag badge with highlighting
+│       └── index.ts          # UI components export
 ├── config/                   # Configuration files
 │   └── auth.ts              # Authentication config
 ├── contexts/                 # React contexts
-│   └── AuthContext.tsx      # Authentication context
+│   ├── AuthContext.tsx      # Authentication context
+│   └── ThemeContext.tsx     # Theme context (dark/light)
+├── services/                 # API service layer
+│   ├── taskService.ts        # Task API service
+│   └── tagService.ts         # Tag API service
+├── types/                    # TypeScript type definitions
+│   ├── task.ts              # Task-related types
+│   └── tag.ts               # Tag-related types
+├── utils/                    # Utility functions
+│   └── highlightUtils.ts     # Search highlighting utilities
 ├── public/                   # Static assets
 │   ├── *.svg                # Icon files
 ├── package.json             # Dependencies and scripts
@@ -139,7 +178,8 @@ functions/
 
 ```
 docs/
-└── TaskFlow_UserRegistration_Architecture.md
+├── TaskFlow_UserRegistration_Architecture.md
+└── dev_status.md              # Development status and progress tracking
 ```
 
 ## Configuration Files
@@ -161,13 +201,28 @@ docs/
 - `AppDbContext.cs` - Database context and migrations
 - `JwtService.cs` - JWT token generation and validation
 - `UserService.cs` - User management business logic
+- `TaskService.cs` - Task business logic and CRUD operations
+- `TagService.cs` - Tag management and assignment logic
+- `TaskController.cs` - Task API endpoints (CRUD + search)
+- `TagController.cs` - Tag API endpoints (CRUD + assignment)
 - `QueueService.cs` - Message queue operations
 
 ### Frontend Files
 - `layout.tsx` - Root layout with providers
 - `AuthContext.tsx` - Authentication state management
+- `ThemeContext.tsx` - Dark/light theme management
 - `ProtectedRoute.tsx` - Route protection logic
-- `TaskBoard.tsx` - Main task management interface
+- `Dashboard.tsx` - Main dashboard with search and filtering
+- `TaskBoard.tsx` - Kanban board with drag-and-drop functionality
+- `TaskCard.tsx` - Individual task cards with highlighting
+- `SearchBar.tsx` - Search input with real-time filtering
+- `TaskFilter.tsx` - Comprehensive filtering interface
+- `TagManager.tsx` - Tag creation and management modal
+- `TagSelector.tsx` - Tag selection component
+- `TagBadge.tsx` - Tag display with highlighting support
+- `taskService.ts` - Task API service layer
+- `tagService.ts` - Tag API service layer
+- `highlightUtils.ts` - Search result highlighting utilities
 
 ### Functions Files
 - `UserRegistrationFunction.cs` - Handles user registration workflow
@@ -182,10 +237,38 @@ docs/
 4. **Documentation**: Update files in `docs/`
 5. **Rules**: Add/modify rules in `.cursor/rules/`
 
+## Key Features Implemented
+
+### Core Functionality (Phase 1)
+- **Complete CRUD Operations**: Full task lifecycle management
+- **User Authentication**: JWT-based login/registration system
+- **Task Management**: Create, read, update, delete tasks
+- **User Assignment**: Assign tasks to team members
+- **Responsive UI**: Mobile-first design with Tailwind CSS
+
+### Enhanced User Experience (Phase 2)
+- **Kanban Board**: Drag-and-drop task status management
+- **Tag System**: Flexible task categorization and filtering
+- **Advanced Search**: Full-text search across tasks and tags
+- **Comprehensive Filtering**: Multi-criteria task filtering
+- **Search Highlighting**: Visual highlighting of search matches
+- **Dark/Light Themes**: User preference support
+- **Modal System**: Reusable modal components for forms and details
+
+### Technical Architecture
+- **Clean Architecture**: Service layer pattern with dependency injection
+- **Type Safety**: Full TypeScript integration across frontend
+- **Component-Based Design**: Reusable UI components
+- **API Service Layer**: Centralized API communication
+- **Error Handling**: Comprehensive error handling and validation
+- **Database Relationships**: Proper foreign keys and cascade behaviors
+
 ## Important Notes
 
 - **Azurite Files**: The `__*storage__` directories and `*.json` files are generated by Azurite for local development
 - **Build Outputs**: `bin/` and `obj/` directories contain build artifacts
 - **Node Modules**: `node_modules/` contains frontend dependencies
 - **Configuration**: Environment-specific configs use `.Development.json` and `.Production.json` suffixes
+- **Dependencies**: Frontend uses `@hello-pangea/dnd` for drag-and-drop functionality
+- **Database Migrations**: All schema changes are tracked in the `Migrations/` folder
 ```

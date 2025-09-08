@@ -139,128 +139,71 @@
 - Create tag filtering in task list
 - Test tag system end-to-end
 
-#### Task 2.4: Advanced Search and Filtering
-**Priority:** Medium | **Estimated Time:** 4-5 hours
-- Implement full-text search API endpoint
-- Create search input component
-- Build filter interface (status, tags, assignee, date)
-- Add saved search presets
-- Implement search result highlighting
-- Add search history
-- Test search performance with large datasets
-
-#### Task 2.5: Task Comments and Activity Log
-**Priority:** Medium | **Estimated Time:** 4-5 hours
-- Create Comment entity model
-- Implement comment CRUD API endpoints
-- Build comment display component
-- Add comment creation form
-- Create activity log system
-- Implement real-time comment updates
-- Test comment system
-
-### Real-time Features
-
-#### Task 2.6: SignalR Integration
-**Priority:** High | **Estimated Time:** 6-7 hours
-- Install and configure SignalR
-- Create SignalR hub for real-time updates
-- Implement task update notifications
-- Add user presence indicators
-- Create real-time collaboration features
-- Handle connection/disconnection events
-- Test real-time functionality
-
-#### Task 2.7: Email Notification System
-**Priority:** Medium | **Estimated Time:** 4-5 hours
-- Set up SendGrid integration
-- Create email templates
-- Implement task assignment notifications
-- Add deadline reminder system
-- Create email preference settings
-- Test email delivery and formatting
-
-## Phase 3: Advanced Collaboration & Integrations
-
-### Team Features
-
-#### Task 3.1: Team Workspaces
-**Priority:** High | **Estimated Time:** 6-8 hours
-- Create Workspace entity model
-- Implement workspace CRUD operations
-- Build workspace invitation system
-- Create workspace management UI
-- Add workspace switching functionality
-- Implement workspace-level permissions
-- Test multi-workspace scenarios
-
-#### Task 3.2: Advanced Permission System
+#### Task 2.4: Projects (Task Grouping)
 **Priority:** High | **Estimated Time:** 5-6 hours
-- Implement role-based access control (RBAC)
-- Create permission matrix
-- Add workspace-level roles
-- Implement task-level permissions
-- Create permission management UI
-- Add audit logging for permission changes
-- Test permission enforcement
+- Create Project entity model (id, name, description, createdAt, updatedAt)
+- Add projectId field to Task entity (optional foreign key)
+- Implement project CRUD API endpoints
+- Build project creation and management UI
+- Add project selection to task creation/edit forms
+- Create sidebar "Projects" section with collapsible list
+- Implement task filtering by project
+- Handle project deletion (set task projectId to null)
+- Test project system end-to-end
 
-#### Task 3.3: File Attachments System
+#### Task 2.5: Sidebar Enhancements
+**Priority:** High | **Estimated Time:** 4-5 hours
+- Create sidebar sections: All Tasks, Today, Upcoming, Completed
+- Add "By Project" and "By Tag" sections
+- Implement global search functionality
+- Build unified search results view
+- Add dynamic sidebar updates for projects and tags
+- Create search input component
+- Test sidebar navigation and search
+
+#### Task 2.6: Recurring Tasks
 **Priority:** Medium | **Estimated Time:** 6-7 hours
-- Set up Azure Blob Storage
-- Create file upload API endpoints
-- Implement file validation and security
-- Build file attachment UI components
-- Add file preview functionality
-- Implement file download and sharing
-- Test file upload/download performance
+- Add recurrence field to Task entity (none, daily, weekly, monthly, custom)
+- Implement custom recurrence interval selection
+- Create recurrence logic for auto-generating next occurrences
+- Build recurrence dropdown in task forms
+- Implement task completion handling for recurring tasks
+- Add link tracking between recurring task instances
+- Test recurring task generation and completion
 
-### External Integrations
+#### Task 2.7: Multiple Task Views (Calendar & Timeline)
+**Priority:** Medium | **Estimated Time:** 7-8 hours
+- Create Calendar view component (monthly/weekly/day grid)
+- Implement Timeline/Agenda view component
+- Add view toggle functionality (List, Calendar, Timeline)
+- Build task display by due date in calendar
+- Create day-click functionality for detailed task view
+- Implement linear timeline view grouped by date
+- Add dynamic updates across all views
+- Test view switching and task display accuracy
 
-#### Task 3.4: Calendar Integration
+#### Task 2.8: Advanced Sidebar & Task Filters
 **Priority:** Medium | **Estimated Time:** 5-6 hours
-- Integrate Google Calendar API
-- Implement Outlook Calendar integration
-- Create calendar sync functionality
-- Add calendar event creation from tasks
-- Build calendar view component
-- Implement two-way sync
-- Test calendar integration
+- Create smart lists (Overdue Tasks, This Week, Tagged with X)
+- Implement multiple tag filtering
+- Build combined filter system (project + tag + date)
+- Add static and dynamic sidebar lists
+- Create filter combination logic
+- Test advanced filtering without breaking navigation
 
-#### Task 3.5: Advanced Reporting Dashboard
+#### Task 2.9: UI/UX Enhancements
 **Priority:** Medium | **Estimated Time:** 6-7 hours
-- Create analytics data models
-- Implement reporting API endpoints
-- Build dashboard UI components
-- Add task completion metrics
-- Create team productivity reports
-- Implement data visualization
-- Test reporting accuracy
+- Implement drag & drop for task reordering within projects/lists
+- Add drag & drop for project reordering in sidebar
+- Create global "+" button for quick task creation
+- Build lightweight task creation (title only) with expand option
+- Implement dark mode toggle
+- Add session persistence for drag & drop changes
+- Test quick add functionality and theme switching
 
-## Phase 4: Intelligence & Automation
+## Phase 3: Testing and Quality Assurance
 
-### AI Features
-
-#### Task 4.1: AI Task Suggestions
-**Priority:** Low | **Estimated Time:** 8-10 hours
-- Integrate AI/ML service
-- Implement task prioritization algorithm
-- Create smart task suggestions
-- Build AI recommendation UI
-- Add learning from user behavior
-- Test AI accuracy and relevance
-
-#### Task 4.2: Automated Workflows
-**Priority:** Low | **Estimated Time:** 6-8 hours
-- Create workflow engine
-- Implement rule-based automation
-- Build workflow builder UI
-- Add trigger and action system
-- Implement workflow testing
-- Test automation scenarios
-
-## Testing and Quality Assurance
-
-#### Task QA.1: Unit Testing Setup
+#### Task 3.1: Unit Testing Setup
 **Priority:** High | **Estimated Time:** 3-4 hours
 - Set up Jest and React Testing Library
 - Create test utilities and mocks
@@ -269,27 +212,27 @@
 - Implement test coverage reporting
 - Set up CI/CD test automation
 
-#### Task QA.2: Integration Testing
+#### Task 3.2: Integration Testing
 **Priority:** High | **Estimated Time:** 4-5 hours
 - Set up integration test environment
 - Create database test fixtures
 - Write API integration tests
 - Test authentication flows
-- Test real-time features
+- Test project and recurring task functionality
 - Add performance testing
 
-#### Task QA.3: End-to-End Testing
+#### Task 3.3: End-to-End Testing
 **Priority:** Medium | **Estimated Time:** 5-6 hours
 - Set up Playwright or Cypress
 - Create E2E test scenarios
-- Test complete user workflows
+- Test complete user workflows including projects and recurring tasks
 - Add cross-browser testing
 - Implement visual regression testing
 - Set up automated E2E runs
 
-## Deployment and DevOps
+## Phase 4: Deployment and DevOps
 
-#### Task DevOps.1: CI/CD Pipeline Setup
+#### Task 4.1: CI/CD Pipeline Setup
 **Priority:** High | **Estimated Time:** 4-5 hours
 - Set up GitHub Actions workflows
 - Configure automated builds
@@ -298,7 +241,7 @@
 - Configure production deployment
 - Add deployment approval gates
 
-#### Task DevOps.2: Azure Infrastructure
+#### Task 4.2: Azure Infrastructure
 **Priority:** High | **Estimated Time:** 6-8 hours
 - Set up Azure App Service for backend
 - Configure Azure Static Web Apps for frontend
@@ -309,9 +252,10 @@
 
 ## Summary
 
-**Total Estimated Time:** 150-200 hours
-**Critical Path:** Tasks 1.1 → 1.2 → 1.4 → 1.5 → 1.7 → 1.8 → 1.9
+**Total Estimated Time:** 120-150 hours
+**Critical Path:** Tasks 1.1 → 1.2 → 1.4 → 1.5 → 1.7 → 1.8 → 1.9 → 2.4
 **MVP Completion:** Tasks 1.1 through 1.10 (Phase 1)
+**Feature Expansion:** Tasks 2.4 through 2.9 (Phase 2)
 **Recommended Start:** Begin with Task 1.1 (Database Schema Setup)
 
-This breakdown follows your PRD's logical dependency chain and ensures you can build a working MVP quickly while maintaining a clear path to advanced features.
+This breakdown focuses on core functionality and essential user experience improvements, providing a solid foundation for personal task management with project organization, enhanced navigation, and multiple viewing options.
