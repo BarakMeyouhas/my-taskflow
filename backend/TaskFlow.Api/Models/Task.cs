@@ -42,5 +42,8 @@ namespace TaskFlow.Api.Models
 
         // Navigation Property
         public User Owner { get; set; } = null!;
+
+        // Navigation Property for many-to-many relationship with Tags
+        public ICollection<TaskTag> TaskTags { get; set; } = new List<TaskTag>();
     }
 }

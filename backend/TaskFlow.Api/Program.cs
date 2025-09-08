@@ -127,6 +127,7 @@ try
 
     // Add to the services registration section (around line 121)
     builder.Services.AddScoped<ITaskService, TaskService>();
+    builder.Services.AddScoped<ITagService, TagService>();
 
     Console.WriteLine("All application services registered successfully");
 }
