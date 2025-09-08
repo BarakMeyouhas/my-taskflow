@@ -139,5 +139,37 @@ namespace TaskFlow.Api.Services
             _logger.LogInformation("Assignment {AssignmentId} removed", assignmentId);
             return true;
         }
+
+        public async Task<IEnumerable<Models.Task>> SearchTasksAsync(int userId, string searchTerm)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return await GetTasksForUserAsync(userId);
+            }
+
+            var normalizedSearchTerm = searchTerm.ToLower().Trim();
+
+            return await _dbContext
+                .Tasks.Where(t => t.OwnerId == userId)
+                .Include(t => t.Owner)
+                .Include(t => t.TaskTags)
+                .ThenInclude(tt => tt.Tag)
+                .Where(t =>
+                    t.Title.ToLower().Contains(normalizedSearchTerm)
+                    || (
+                        t.Description != null
+                        && t.Description.ToLower().Contains(normalizedSearchTerm)
+                    )
+                    || t.TaskTags.Any(tt =>
+                        tt.Tag.Name.ToLower().Contains(normalizedSearchTerm)
+                        || (
+                            tt.Tag.Description != null
+                            && tt.Tag.Description.ToLower().Contains(normalizedSearchTerm)
+                        )
+                    )
+                )
+                .OrderByDescending(t => t.CreatedAt)
+                .ToListAsync();
+        }
     }
 }

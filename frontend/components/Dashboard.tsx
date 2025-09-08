@@ -15,16 +15,57 @@ const Dashboard: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isTagManagerOpen, setIsTagManagerOpen] = useState(false);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
 
   // Load tasks from API on component mount
   useEffect(() => {
     loadTasks();
   }, []);
 
-  // Filter tasks when selectedTags change
+  // Filter tasks when selectedTags or searchTerm change
   useEffect(() => {
-    filterTasks();
-  }, [tasks, selectedTags]);
+    if (searchTerm.trim()) {
+      performSearch();
+    } else {
+      filterTasks();
+    }
+  }, [tasks, selectedTags, searchTerm]);
+
+  const performSearch = async () => {
+    if (!searchTerm.trim()) {
+      filterTasks();
+      return;
+    }
+
+    try {
+      setIsSearching(true);
+      const searchResults = await taskService.searchTasks(searchTerm);
+      
+      // Apply tag filtering to search results if tags are selected
+      if (selectedTags.length > 0) {
+        const filtered = searchResults.filter(task => {
+          if (!task.tags || task.tags.length === 0) {
+            return false;
+          }
+          
+          return selectedTags.some(selectedTag => 
+            task.tags!.some(taskTag => taskTag.id === selectedTag.id)
+          );
+        });
+        setFilteredTasks(filtered);
+      } else {
+        setFilteredTasks(searchResults);
+      }
+    } catch (error) {
+      console.error('Search failed:', error);
+      setError('Search failed. Please try again.');
+      // Fallback to local filtering
+      filterTasks();
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   const filterTasks = () => {
     if (selectedTags.length === 0) {
@@ -44,6 +85,11 @@ const Dashboard: React.FC = () => {
     });
 
     setFilteredTasks(filtered);
+  };
+
+  const handleSearchChange = (newSearchTerm: string) => {
+    setSearchTerm(newSearchTerm);
+    setIsSearching(newSearchTerm.length > 0);
   };
 
   const loadTasks = async () => {
@@ -179,6 +225,7 @@ const Dashboard: React.FC = () => {
       <SearchBar 
         selectedTags={selectedTags}
         onTagsChange={setSelectedTags}
+        onSearchChange={handleSearchChange}
       />
       <div className="p-6">
         <div className="mb-6">
@@ -187,7 +234,17 @@ const Dashboard: React.FC = () => {
               <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Task Board</h1>
               <p className="text-gray-600 dark:text-gray-400">
                 Manage your team&apos;s tasks and track progress
-                {selectedTags.length > 0 && (
+                {isSearching && (
+                  <span className="ml-2 text-blue-600 dark:text-blue-400">
+                    • Searching for "{searchTerm}"...
+                  </span>
+                )}
+                {searchTerm && !isSearching && (
+                  <span className="ml-2 text-green-600 dark:text-green-400">
+                    • Found {filteredTasks.length} result{filteredTasks.length !== 1 ? 's' : ''} for "{searchTerm}"
+                  </span>
+                )}
+                {!searchTerm && selectedTags.length > 0 && (
                   <span className="ml-2 text-blue-600 dark:text-blue-400">
                     • Filtered by {selectedTags.length} tag{selectedTags.length !== 1 ? 's' : ''}
                   </span>

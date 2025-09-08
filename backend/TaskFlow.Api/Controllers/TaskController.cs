@@ -369,6 +369,55 @@ namespace TaskFlow.Api.Controllers
             }
         }
 
+        // GET /api/task/search?q={searchTerm} (search tasks)
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchTasks([FromQuery] string q)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                if (userId == null)
+                    return Unauthorized("User not authenticated");
+
+                var tasks = await _taskService.SearchTasksAsync(userId.Value, q ?? string.Empty);
+
+                return Ok(
+                    new
+                    {
+                        count = tasks.Count(),
+                        searchTerm = q,
+                        tasks = tasks.Select(t => new
+                        {
+                            t.Id,
+                            t.Title,
+                            t.Description,
+                            t.Status,
+                            t.Priority,
+                            t.DueDate,
+                            t.CreatedAt,
+                            t.UpdatedAt,
+                            OwnerId = t.OwnerId,
+                            OwnerName = t.Owner?.Username,
+                            Tags = t.TaskTags?.Select(tt => new
+                            {
+                                tt.Tag.Id,
+                                tt.Tag.Name,
+                                tt.Tag.Color,
+                                tt.Tag.Description,
+                                tt.Tag.CreatedAt,
+                                tt.Tag.UpdatedAt,
+                            }) ?? Enumerable.Empty<object>(),
+                        }),
+                    }
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error searching tasks");
+                return StatusCode(500, new { error = "Internal server error" });
+            }
+        }
+
         // Helper method to get current user ID from JWT token
         private int? GetCurrentUserId()
         {

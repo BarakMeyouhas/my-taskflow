@@ -247,6 +247,31 @@ class TaskService {
       throw error;
     }
   }
+
+  async searchTasks(searchTerm: string): Promise<Task[]> {
+    try {
+      const response = await fetch(`${this.getBaseUrl()}/api/task/search?q=${encodeURIComponent(searchTerm)}`, {
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to search tasks: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const tasks = data.tasks || [];
+      
+      // Convert numeric status and priority from backend to string format
+      return tasks.map((task: any) => ({
+        ...task,
+        status: this.convertStatusToString(task.status),
+        priority: this.convertPriorityToString(task.priority)
+      }));
+    } catch (error) {
+      console.error("Error searching tasks:", error);
+      throw error;
+    }
+  }
 }
 
 export const taskService = new TaskService();

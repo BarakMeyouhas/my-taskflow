@@ -621,11 +621,43 @@ __turbopack_context__.s({
     "default": ()=>__TURBOPACK__default__export__
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$TagFilter$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/TagFilter.tsx [app-client] (ecmascript)");
+;
+var _s = __turbopack_context__.k.signature();
 ;
 ;
 const SearchBar = (param)=>{
-    let { selectedTags = [], onTagsChange = ()=>{} } = param;
+    let { selectedTags = [], onTagsChange = ()=>{}, onSearchChange = ()=>{} } = param;
+    _s();
+    const [searchTerm, setSearchTerm] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('');
+    const [isSearching, setIsSearching] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    // Debounce search input
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "SearchBar.useEffect": ()=>{
+            const timeoutId = setTimeout({
+                "SearchBar.useEffect.timeoutId": ()=>{
+                    onSearchChange(searchTerm);
+                }
+            }["SearchBar.useEffect.timeoutId"], 300); // 300ms debounce
+            return ({
+                "SearchBar.useEffect": ()=>clearTimeout(timeoutId)
+            })["SearchBar.useEffect"];
+        }
+    }["SearchBar.useEffect"], [
+        searchTerm,
+        onSearchChange
+    ]);
+    const handleSearchChange = (e)=>{
+        const value = e.target.value;
+        setSearchTerm(value);
+        setIsSearching(value.length > 0);
+    };
+    const clearSearch = ()=>{
+        setSearchTerm('');
+        setIsSearching(false);
+        onSearchChange('');
+    };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "bg-white dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600 px-6 py-4",
         children: [
@@ -651,37 +683,67 @@ const SearchBar = (param)=>{
                                             d: "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                                         }, void 0, false, {
                                             fileName: "[project]/components/SearchBar.tsx",
-                                            lineNumber: 22,
+                                            lineNumber: 47,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0))
                                     }, void 0, false, {
                                         fileName: "[project]/components/SearchBar.tsx",
-                                        lineNumber: 21,
+                                        lineNumber: 46,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0))
                                 }, void 0, false, {
                                     fileName: "[project]/components/SearchBar.tsx",
-                                    lineNumber: 20,
+                                    lineNumber: 45,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
                                     type: "text",
+                                    value: searchTerm,
+                                    onChange: handleSearchChange,
                                     placeholder: "Search tasks, projects, or team members...",
-                                    className: "block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-500 rounded-md leading-5 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 dark:focus:placeholder-gray-500 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                    className: "block w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-500 rounded-md leading-5 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 dark:focus:placeholder-gray-500 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                 }, void 0, false, {
                                     fileName: "[project]/components/SearchBar.tsx",
-                                    lineNumber: 25,
+                                    lineNumber: 50,
                                     columnNumber: 13
+                                }, ("TURBOPACK compile-time value", void 0)),
+                                searchTerm && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    onClick: clearSearch,
+                                    className: "absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                        className: "h-4 w-4",
+                                        fill: "none",
+                                        stroke: "currentColor",
+                                        viewBox: "0 0 24 24",
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                            strokeLinecap: "round",
+                                            strokeLinejoin: "round",
+                                            strokeWidth: 2,
+                                            d: "M6 18L18 6M6 6l12 12"
+                                        }, void 0, false, {
+                                            fileName: "[project]/components/SearchBar.tsx",
+                                            lineNumber: 64,
+                                            columnNumber: 19
+                                        }, ("TURBOPACK compile-time value", void 0))
+                                    }, void 0, false, {
+                                        fileName: "[project]/components/SearchBar.tsx",
+                                        lineNumber: 63,
+                                        columnNumber: 17
+                                    }, ("TURBOPACK compile-time value", void 0))
+                                }, void 0, false, {
+                                    fileName: "[project]/components/SearchBar.tsx",
+                                    lineNumber: 59,
+                                    columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/SearchBar.tsx",
-                            lineNumber: 19,
+                            lineNumber: 44,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/components/SearchBar.tsx",
-                        lineNumber: 18,
+                        lineNumber: 43,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -692,7 +754,7 @@ const SearchBar = (param)=>{
                                 onTagsChange: onTagsChange
                             }, void 0, false, {
                                 fileName: "[project]/components/SearchBar.tsx",
-                                lineNumber: 36,
+                                lineNumber: 74,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -710,19 +772,19 @@ const SearchBar = (param)=>{
                                             d: "M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"
                                         }, void 0, false, {
                                             fileName: "[project]/components/SearchBar.tsx",
-                                            lineNumber: 44,
+                                            lineNumber: 82,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     }, void 0, false, {
                                         fileName: "[project]/components/SearchBar.tsx",
-                                        lineNumber: 43,
+                                        lineNumber: 81,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     "Sort"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/SearchBar.tsx",
-                                lineNumber: 42,
+                                lineNumber: 80,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -740,98 +802,130 @@ const SearchBar = (param)=>{
                                             d: "M12 6v6m0 0v6m0-6h6m-6 0H6"
                                         }, void 0, false, {
                                             fileName: "[project]/components/SearchBar.tsx",
-                                            lineNumber: 52,
+                                            lineNumber: 90,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     }, void 0, false, {
                                         fileName: "[project]/components/SearchBar.tsx",
-                                        lineNumber: 51,
+                                        lineNumber: 89,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     "Add Task"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/SearchBar.tsx",
-                                lineNumber: 50,
+                                lineNumber: 88,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/SearchBar.tsx",
-                        lineNumber: 34,
+                        lineNumber: 72,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/SearchBar.tsx",
-                lineNumber: 16,
+                lineNumber: 41,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "mt-3 flex items-center space-x-4",
-                children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                        className: "text-sm text-gray-500 dark:text-gray-400",
-                        children: "Quick filters:"
-                    }, void 0, false, {
-                        fileName: "[project]/components/SearchBar.tsx",
-                        lineNumber: 61,
-                        columnNumber: 9
-                    }, ("TURBOPACK compile-time value", void 0)),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "flex space-x-2",
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                className: "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors",
-                                children: "Due Today"
-                            }, void 0, false, {
-                                fileName: "[project]/components/SearchBar.tsx",
-                                lineNumber: 63,
-                                columnNumber: 11
-                            }, ("TURBOPACK compile-time value", void 0)),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                className: "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors",
-                                children: "Overdue"
-                            }, void 0, false, {
-                                fileName: "[project]/components/SearchBar.tsx",
-                                lineNumber: 66,
-                                columnNumber: 11
-                            }, ("TURBOPACK compile-time value", void 0)),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                className: "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors",
-                                children: "My Tasks"
-                            }, void 0, false, {
-                                fileName: "[project]/components/SearchBar.tsx",
-                                lineNumber: 69,
-                                columnNumber: 11
-                            }, ("TURBOPACK compile-time value", void 0)),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                className: "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors",
-                                children: "High Priority"
-                            }, void 0, false, {
-                                fileName: "[project]/components/SearchBar.tsx",
-                                lineNumber: 72,
-                                columnNumber: 11
-                            }, ("TURBOPACK compile-time value", void 0))
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/components/SearchBar.tsx",
-                        lineNumber: 62,
-                        columnNumber: 9
-                    }, ("TURBOPACK compile-time value", void 0))
-                ]
-            }, void 0, true, {
+                children: isSearching ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "flex items-center space-x-2",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                            className: "text-sm text-blue-600 dark:text-blue-400 font-medium",
+                            children: [
+                                'Searching for: "',
+                                searchTerm,
+                                '"'
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/components/SearchBar.tsx",
+                            lineNumber: 101,
+                            columnNumber: 13
+                        }, ("TURBOPACK compile-time value", void 0)),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                            onClick: clearSearch,
+                            className: "text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 underline",
+                            children: "Clear search"
+                        }, void 0, false, {
+                            fileName: "[project]/components/SearchBar.tsx",
+                            lineNumber: 104,
+                            columnNumber: 13
+                        }, ("TURBOPACK compile-time value", void 0))
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/components/SearchBar.tsx",
+                    lineNumber: 100,
+                    columnNumber: 11
+                }, ("TURBOPACK compile-time value", void 0)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                            className: "text-sm text-gray-500 dark:text-gray-400",
+                            children: "Quick filters:"
+                        }, void 0, false, {
+                            fileName: "[project]/components/SearchBar.tsx",
+                            lineNumber: 113,
+                            columnNumber: 13
+                        }, ("TURBOPACK compile-time value", void 0)),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "flex space-x-2",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    className: "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors",
+                                    children: "Due Today"
+                                }, void 0, false, {
+                                    fileName: "[project]/components/SearchBar.tsx",
+                                    lineNumber: 115,
+                                    columnNumber: 11
+                                }, ("TURBOPACK compile-time value", void 0)),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    className: "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors",
+                                    children: "Overdue"
+                                }, void 0, false, {
+                                    fileName: "[project]/components/SearchBar.tsx",
+                                    lineNumber: 118,
+                                    columnNumber: 11
+                                }, ("TURBOPACK compile-time value", void 0)),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    className: "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors",
+                                    children: "My Tasks"
+                                }, void 0, false, {
+                                    fileName: "[project]/components/SearchBar.tsx",
+                                    lineNumber: 121,
+                                    columnNumber: 11
+                                }, ("TURBOPACK compile-time value", void 0)),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    className: "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors",
+                                    children: "High Priority"
+                                }, void 0, false, {
+                                    fileName: "[project]/components/SearchBar.tsx",
+                                    lineNumber: 124,
+                                    columnNumber: 11
+                                }, ("TURBOPACK compile-time value", void 0))
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/components/SearchBar.tsx",
+                            lineNumber: 114,
+                            columnNumber: 13
+                        }, ("TURBOPACK compile-time value", void 0))
+                    ]
+                }, void 0, true)
+            }, void 0, false, {
                 fileName: "[project]/components/SearchBar.tsx",
-                lineNumber: 60,
+                lineNumber: 98,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0))
         ]
     }, void 0, true, {
         fileName: "[project]/components/SearchBar.tsx",
-        lineNumber: 15,
+        lineNumber: 40,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
+_s(SearchBar, "3dT/wDGS1sD0jId3ztl0DKmKA3c=");
 _c = SearchBar;
 const __TURBOPACK__default__export__ = SearchBar;
 var _c;
@@ -4857,6 +4951,27 @@ class TaskService {
             throw error;
         }
     }
+    async searchTasks(searchTerm) {
+        try {
+            const response = await fetch("".concat(this.getBaseUrl(), "/api/task/search?q=").concat(encodeURIComponent(searchTerm)), {
+                headers: this.getAuthHeaders()
+            });
+            if (!response.ok) {
+                throw new Error("Failed to search tasks: ".concat(response.statusText));
+            }
+            const data = await response.json();
+            const tasks = data.tasks || [];
+            // Convert numeric status and priority from backend to string format
+            return tasks.map((task)=>({
+                    ...task,
+                    status: this.convertStatusToString(task.status),
+                    priority: this.convertPriorityToString(task.priority)
+                }));
+        } catch (error) {
+            console.error("Error searching tasks:", error);
+            throw error;
+        }
+    }
 }
 const taskService = new TaskService();
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
@@ -4897,21 +5012,57 @@ const Dashboard = ()=>{
     const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [isTagManagerOpen, setIsTagManagerOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [selectedTags, setSelectedTags] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [searchTerm, setSearchTerm] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('');
+    const [isSearching, setIsSearching] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     // Load tasks from API on component mount
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "Dashboard.useEffect": ()=>{
             loadTasks();
         }
     }["Dashboard.useEffect"], []);
-    // Filter tasks when selectedTags change
+    // Filter tasks when selectedTags or searchTerm change
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "Dashboard.useEffect": ()=>{
-            filterTasks();
+            if (searchTerm.trim()) {
+                performSearch();
+            } else {
+                filterTasks();
+            }
         }
     }["Dashboard.useEffect"], [
         tasks,
-        selectedTags
+        selectedTags,
+        searchTerm
     ]);
+    const performSearch = async ()=>{
+        if (!searchTerm.trim()) {
+            filterTasks();
+            return;
+        }
+        try {
+            setIsSearching(true);
+            const searchResults = await __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$taskService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["taskService"].searchTasks(searchTerm);
+            // Apply tag filtering to search results if tags are selected
+            if (selectedTags.length > 0) {
+                const filtered = searchResults.filter((task)=>{
+                    if (!task.tags || task.tags.length === 0) {
+                        return false;
+                    }
+                    return selectedTags.some((selectedTag)=>task.tags.some((taskTag)=>taskTag.id === selectedTag.id));
+                });
+                setFilteredTasks(filtered);
+            } else {
+                setFilteredTasks(searchResults);
+            }
+        } catch (error) {
+            console.error('Search failed:', error);
+            setError('Search failed. Please try again.');
+            // Fallback to local filtering
+            filterTasks();
+        } finally{
+            setIsSearching(false);
+        }
+    };
     const filterTasks = ()=>{
         if (selectedTags.length === 0) {
             setFilteredTasks(tasks);
@@ -4925,6 +5076,10 @@ const Dashboard = ()=>{
             return selectedTags.some((selectedTag)=>task.tags.some((taskTag)=>taskTag.id === selectedTag.id));
         });
         setFilteredTasks(filtered);
+    };
+    const handleSearchChange = (newSearchTerm)=>{
+        setSearchTerm(newSearchTerm);
+        setIsSearching(newSearchTerm.length > 0);
     };
     const loadTasks = async ()=>{
         try {
@@ -5023,7 +5178,7 @@ const Dashboard = ()=>{
                         className: "animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"
                     }, void 0, false, {
                         fileName: "[project]/components/Dashboard.tsx",
-                        lineNumber: 151,
+                        lineNumber: 197,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -5031,18 +5186,18 @@ const Dashboard = ()=>{
                         children: "Loading tasks..."
                     }, void 0, false, {
                         fileName: "[project]/components/Dashboard.tsx",
-                        lineNumber: 152,
+                        lineNumber: 198,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/Dashboard.tsx",
-                lineNumber: 150,
+                lineNumber: 196,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0))
         }, void 0, false, {
             fileName: "[project]/components/Dashboard.tsx",
-            lineNumber: 149,
+            lineNumber: 195,
             columnNumber: 7
         }, ("TURBOPACK compile-time value", void 0));
     }
@@ -5059,7 +5214,7 @@ const Dashboard = ()=>{
                             children: "Error loading tasks"
                         }, void 0, false, {
                             fileName: "[project]/components/Dashboard.tsx",
-                            lineNumber: 163,
+                            lineNumber: 209,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -5067,7 +5222,7 @@ const Dashboard = ()=>{
                             children: error
                         }, void 0, false, {
                             fileName: "[project]/components/Dashboard.tsx",
-                            lineNumber: 164,
+                            lineNumber: 210,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -5076,23 +5231,23 @@ const Dashboard = ()=>{
                             children: "Retry"
                         }, void 0, false, {
                             fileName: "[project]/components/Dashboard.tsx",
-                            lineNumber: 165,
+                            lineNumber: 211,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/Dashboard.tsx",
-                    lineNumber: 162,
+                    lineNumber: 208,
                     columnNumber: 11
                 }, ("TURBOPACK compile-time value", void 0))
             }, void 0, false, {
                 fileName: "[project]/components/Dashboard.tsx",
-                lineNumber: 161,
+                lineNumber: 207,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0))
         }, void 0, false, {
             fileName: "[project]/components/Dashboard.tsx",
-            lineNumber: 160,
+            lineNumber: 206,
             columnNumber: 7
         }, ("TURBOPACK compile-time value", void 0));
     }
@@ -5101,10 +5256,11 @@ const Dashboard = ()=>{
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$SearchBar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                 selectedTags: selectedTags,
-                onTagsChange: setSelectedTags
+                onTagsChange: setSelectedTags,
+                onSearchChange: handleSearchChange
             }, void 0, false, {
                 fileName: "[project]/components/Dashboard.tsx",
-                lineNumber: 179,
+                lineNumber: 225,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5122,14 +5278,42 @@ const Dashboard = ()=>{
                                             children: "Task Board"
                                         }, void 0, false, {
                                             fileName: "[project]/components/Dashboard.tsx",
-                                            lineNumber: 187,
+                                            lineNumber: 234,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                             className: "text-gray-600 dark:text-gray-400",
                                             children: [
                                                 "Manage your team's tasks and track progress",
-                                                selectedTags.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                isSearching && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "ml-2 text-blue-600 dark:text-blue-400",
+                                                    children: [
+                                                        '• Searching for "',
+                                                        searchTerm,
+                                                        '"...'
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/components/Dashboard.tsx",
+                                                    lineNumber: 238,
+                                                    columnNumber: 19
+                                                }, ("TURBOPACK compile-time value", void 0)),
+                                                searchTerm && !isSearching && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "ml-2 text-green-600 dark:text-green-400",
+                                                    children: [
+                                                        "• Found ",
+                                                        filteredTasks.length,
+                                                        " result",
+                                                        filteredTasks.length !== 1 ? 's' : '',
+                                                        ' for "',
+                                                        searchTerm,
+                                                        '"'
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/components/Dashboard.tsx",
+                                                    lineNumber: 243,
+                                                    columnNumber: 19
+                                                }, ("TURBOPACK compile-time value", void 0)),
+                                                !searchTerm && selectedTags.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                     className: "ml-2 text-blue-600 dark:text-blue-400",
                                                     children: [
                                                         "• Filtered by ",
@@ -5139,19 +5323,19 @@ const Dashboard = ()=>{
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/Dashboard.tsx",
-                                                    lineNumber: 191,
+                                                    lineNumber: 248,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/Dashboard.tsx",
-                                            lineNumber: 188,
+                                            lineNumber: 235,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/Dashboard.tsx",
-                                    lineNumber: 186,
+                                    lineNumber: 233,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$Button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
@@ -5169,29 +5353,29 @@ const Dashboard = ()=>{
                                             d: "M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
                                         }, void 0, false, {
                                             fileName: "[project]/components/Dashboard.tsx",
-                                            lineNumber: 202,
+                                            lineNumber: 259,
                                             columnNumber: 19
                                         }, void 0)
                                     }, void 0, false, {
                                         fileName: "[project]/components/Dashboard.tsx",
-                                        lineNumber: 201,
+                                        lineNumber: 258,
                                         columnNumber: 17
                                     }, void 0),
                                     children: "Manage Tags"
                                 }, void 0, false, {
                                     fileName: "[project]/components/Dashboard.tsx",
-                                    lineNumber: 197,
+                                    lineNumber: 254,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/Dashboard.tsx",
-                            lineNumber: 185,
+                            lineNumber: 232,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/components/Dashboard.tsx",
-                        lineNumber: 184,
+                        lineNumber: 231,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$TaskBoard$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -5201,13 +5385,13 @@ const Dashboard = ()=>{
                         onDeleteTask: handleDeleteTask
                     }, void 0, false, {
                         fileName: "[project]/components/Dashboard.tsx",
-                        lineNumber: 210,
+                        lineNumber: 267,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/Dashboard.tsx",
-                lineNumber: 183,
+                lineNumber: 230,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$TagManager$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -5215,17 +5399,17 @@ const Dashboard = ()=>{
                 onClose: ()=>setIsTagManagerOpen(false)
             }, void 0, false, {
                 fileName: "[project]/components/Dashboard.tsx",
-                lineNumber: 219,
+                lineNumber: 276,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0))
         ]
     }, void 0, true, {
         fileName: "[project]/components/Dashboard.tsx",
-        lineNumber: 178,
+        lineNumber: 224,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
-_s(Dashboard, "9Vm2coD3nMt5btvbaQ3mZS+ppns=");
+_s(Dashboard, "oXDSmjQPMV6orRTaDtHE+ny9QYI=");
 _c = Dashboard;
 const __TURBOPACK__default__export__ = Dashboard;
 var _c;

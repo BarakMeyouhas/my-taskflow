@@ -1,16 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import TagFilter from './TagFilter';
 import { Tag } from '../types/tag';
 
 interface SearchBarProps {
   selectedTags?: Tag[];
   onTagsChange?: (tags: Tag[]) => void;
+  onSearchChange?: (searchTerm: string) => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ 
   selectedTags = [], 
-  onTagsChange = () => {} 
+  onTagsChange = () => {},
+  onSearchChange = () => {}
 }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+
+  // Debounce search input
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      onSearchChange(searchTerm);
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, onSearchChange]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    setIsSearching(value.length > 0);
+  };
+
+  const clearSearch = () => {
+    setSearchTerm('');
+    setIsSearching(false);
+    onSearchChange('');
+  };
   return (
     <div className="bg-white dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600 px-6 py-4">
       <div className="flex items-center justify-between">
@@ -24,9 +49,22 @@ const SearchBar: React.FC<SearchBarProps> = ({
             </div>
             <input
               type="text"
+              value={searchTerm}
+              onChange={handleSearchChange}
               placeholder="Search tasks, projects, or team members..."
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-500 rounded-md leading-5 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 dark:focus:placeholder-gray-500 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="block w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-500 rounded-md leading-5 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 dark:focus:placeholder-gray-500 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             />
+            {/* Clear search button */}
+            {searchTerm && (
+              <button
+                onClick={clearSearch}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
 
@@ -58,8 +96,22 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
       {/* Quick Filters */}
       <div className="mt-3 flex items-center space-x-4">
-        <span className="text-sm text-gray-500 dark:text-gray-400">Quick filters:</span>
-        <div className="flex space-x-2">
+        {isSearching ? (
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+              Searching for: "{searchTerm}"
+            </span>
+            <button
+              onClick={clearSearch}
+              className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 underline"
+            >
+              Clear search
+            </button>
+          </div>
+        ) : (
+          <>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Quick filters:</span>
+            <div className="flex space-x-2">
           <button className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors">
             Due Today
           </button>
@@ -72,7 +124,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
           <button className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors">
             High Priority
           </button>
-        </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

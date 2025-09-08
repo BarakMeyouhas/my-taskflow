@@ -1523,6 +1523,10 @@ small {
   padding-top: 1rem;
 }
 
+.pr-10 {
+  padding-right: 2.5rem;
+}
+
 .text-left {
   text-align: left;
 }
@@ -1742,6 +1746,11 @@ small {
 .text-green-500 {
   --tw-text-opacity: 1;
   color: rgba(34, 197, 94, var(--tw-text-opacity, 1));
+}
+
+.underline {
+  -webkit-text-decoration-line: underline;
+  text-decoration-line: underline;
 }
 
 .antialiased {

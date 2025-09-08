@@ -17,5 +17,6 @@ namespace TaskFlow.Api.Services
         );
         Task<IEnumerable<TaskAssignment>> GetTaskAssignmentsAsync(int taskId);
         Task<bool> RemoveTaskAssignmentAsync(int assignmentId, int userId);
+        Task<IEnumerable<Models.Task>> SearchTasksAsync(int userId, string searchTerm);
     }
 }
